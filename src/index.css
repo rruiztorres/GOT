@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/*GoogleFonts*/
+@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
+
