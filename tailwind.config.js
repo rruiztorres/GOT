@@ -6,9 +6,7 @@ module.exports = {
       fontFamily: {
         'sans': ['Montserrat', 'Sans-serif']
       },
-      backgroundImage: theme => ({
-        'login-back': "url('../src/assets/start_background.jpg')",
-      })
+      
     },
   },
   variants: {
