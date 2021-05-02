@@ -57,8 +57,8 @@ import axios from 'axios';
     mounted(){
         const url = 'http://10.13.86.114:3000/'; //url del servicio
         axios
-          .get(url+'incidencias/')
-          .then(data => {this.incidencias = data.data.response, console.log(data.data.mensaje)})
+          .get(url+'incidencias')
+          .then(data => {this.incidencias = data.data, console.log(data.data)})
     },
     methods: {
       getColor (estado) {
