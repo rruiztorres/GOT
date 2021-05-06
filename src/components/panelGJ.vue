@@ -2,7 +2,7 @@
 <div class="mt-4">
     <div class="flex">
         <div class="h-full w-full bg-white rounded-lg shadow-sm mr-4">
-            <IncBdjGJ></IncBdjGJ>
+            <IncTriajeGJ></IncTriajeGJ>
         </div>
     </div>
 </div>        
@@ -10,12 +10,12 @@
 
 <script>
 
-import IncBdjGJ from '../components/IncBdjGJ.vue';
+import IncTriajeGJ from '../components/IncTriajeGJ';
     export default {
         name:"panelGJ",
         components:{
-            IncBdjGJ
-        }
+            IncTriajeGJ,
+        },
     }
 
 

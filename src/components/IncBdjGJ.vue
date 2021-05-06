@@ -58,11 +58,11 @@ import axios from 'axios';
         const url = 'http://10.13.86.114:3000/'; //url del servicio
         axios
           .get(url+'incidencias')
-          .then(data => {this.incidencias = data.data, console.log(data.data)})
+          .then(data => {this.incidencias = data.data.response, console.log(data.data)})
     },
     methods: {
       getColor (estado) {
-        if (estado == 'Pendiente') return '#FFC300'; //amarillo
+        if (estado == 'Pendiente') return '#ffd000'; //amarillo
         else if (estado == 'Solucionada') return '#228B22'; //verde
         else if (estado == 'Devuelto') return '#FF0000' //rojo
       },
