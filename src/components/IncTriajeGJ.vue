@@ -135,7 +135,7 @@ import axios from 'axios';
         const url = 'http://10.13.86.114:3000/'; //url del servicio
         axios
           .get(url+'incidencias')
-          .then(data => {this.incidencias = data.data.response, console.log(data.data)})
+          .then(data => {this.incidencias = data.data.response, console.log(data.data.response)})
       },
 
       getColor (estado) {
@@ -188,4 +188,10 @@ import axios from 'axios';
     },
   }
 </script>
+
+<style>
+  .v-application--wrap {
+    min-height: 1vh !important;
+  }
+</style>
 
