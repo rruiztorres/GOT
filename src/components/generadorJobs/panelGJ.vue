@@ -2,7 +2,9 @@
 <div class="mt-4">
     <div class="flex">
         <div class="h-full w-full bg-white rounded-lg shadow-sm mr-4">
-            <div><IncTriajeGJ></IncTriajeGJ></div>
+            <!--v-if IncTriajeGJ == true activo -->
+            <div>   <IncTriajeGJ></IncTriajeGJ> </div>
+
         </div>
     </div>
 </div>        
@@ -10,12 +12,13 @@
 
 <script>
 
-import IncTriajeGJ from '../components/IncTriajeGJ';
+import IncTriajeGJ from "@/components/generadorJobs/IncTriajeGJ";
 
     export default {
         name:"panelGJ",
         components:{
             IncTriajeGJ,
+           
         },
     }
 

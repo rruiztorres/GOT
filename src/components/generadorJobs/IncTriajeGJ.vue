@@ -78,6 +78,10 @@
 import axios from 'axios';
 
   export default {
+    name:'IncTriajeGJ',
+    components: {
+
+    },
     data: () => ({
       dialog: false,
       dialogDelete: false,

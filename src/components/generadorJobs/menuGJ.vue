@@ -6,7 +6,7 @@
     </div>
     <ul>
         <li 
-        v-on:click="openPanel(accion.group, accion.name, true)" 
+        v-on:click="openPanel(accion.label, true)" 
         class="hover:bg-gray-300 hover:shadow-inner text-left mb-2 w-full bg-gray-200 text-s px-4 py-3 mr-1 mb-1 ease-linear transition-all duration-50" 
         v-for="accion in gestionIncidencias" :key="accion.label">
         {{accion.label}}
@@ -54,23 +54,23 @@ export default {
     created() {
         this.defineMenu(true);
     },
-    
+ 
     methods: {
         defineMenu(){
             this.gestionIncidencias = [
-                {group: 'gestionIncidencias', name: '', label:'Insertar incidencia', active: false},
-                {group: 'gestionIncidencias', name: '', label:'Eliminar incidencia', active: false}
+                {group: 'gestionIncidencias', name: 'InsertIncidencia', label:'Insertar incidencia', active: false},
+                {group: 'gestionIncidencias', name: 'DeleteIncidencia', label:'Eliminar incidencia', active: false}
             ];
             this.menuPrincipal = [
                 {group: 'menuPrincipal', name: 'IncBdjGJ', label:'Incidencias en Bandeja', pend: 15, active: false},
                 {group: 'menuPrincipal', name: 'IncTriaje', label:'Incidencias en Triaje', pend: 0, active: false},
-                {group: 'menuPrincipal', name: '', label:'IDV', pend: 0, active: false},
-                {group: 'menuPrincipal', name: '', label:'Jobs Devueltos', pend: 0, active: false},
-                {group: 'menuPrincipal', name: '', label:'Jobs en Triaje', pend: 0, active: false}
+                {group: 'menuPrincipal', name: 'IDV', label:'IDV', pend: 0, active: false},
+                {group: 'menuPrincipal', name: 'JobsDevueltos', label:'Jobs Devueltos', pend: 0, active: false},
+                {group: 'menuPrincipal', name: 'JobsTriaje', label:'Jobs en Triaje', pend: 0, active: false}
             ];
             this.informes = [
-                {group: 'informes', name: '', label:'Vista General', active: true}, // --> vista definida por defecto
-                {group: 'informes', name: '', label:'Mis KPI', active: false}
+                {group: 'informes', name: 'Overview', label:'Vista General', active: true}, // --> vista definida por defecto
+                {group: 'informes', name: 'KPI', label:'Mis KPI', active: false}
             ];
         },
         reloadMenu(){
@@ -81,11 +81,11 @@ export default {
                 }
             }
         },
-        openPanel(groupPanel, panel, isActive) {
+        openPanel(groupPanel, panel) {
             this.reloadMenu(); //evita dos paneles activos al mismo tiempo
-            const menu = [groupPanel, panel, isActive];
+            const menu = [groupPanel, panel];
             console.log (menu);
-            return {menu};
+            return { menu };
             
         }, 
     }
