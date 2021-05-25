@@ -1,63 +1,138 @@
 <template>
-  <div class="mx-8">
-    <h1 class="ml-2 text-2xl font-bold my-6">
-    Incidencias en Bandeja
-    </h1>
-    <div class="myTable">
-    <v-app>
-      <v-data-table
-        :headers="cabecera"
-        :items="incidencias"
-        :items-per-page='10'
-        :search="search"
-        class="font-sans"
-        loading-text="Recuperando datos..."
-      >
-        <template v-slot:top>
-          <v-text-field
-            v-model="search"
-            label="Buscar"
-            class="mx-4"
-          ></v-text-field>
-        </template>
+  
+    <div class="mx-8">
+      <h1 class="ml-2 text-2xl font-bold my-6">
+      Incidencias en Bandeja
+      </h1>
 
-        <template v-slot:item.estado="{item}">
-          <v-chip
-            :color="getColor(item.estado)"
-            dark
+      <v-app> 
+        <div class="myTable">
+        
+          <v-data-table
+            :headers="headers"
+            :items="incidencias"
+            :search="search"
+            class="font-sans"
           >
-            {{ item.estado }}
-          </v-chip>
-        </template>
-      </v-data-table>
-    </v-app>
+            <template v-slot:top>
+              <v-text-field
+                v-model="search"
+                label="Buscar"
+                class="mx-4"
+              ></v-text-field>
+            
+              <v-toolbar flat>
+
+                <v-dialog v-model="dialog" max-width="1700">
+                  <div class="bg-white p-6">
+                    <h1>Hago cosas</h1>
+                  </div>
+                </v-dialog>
+                
+                <v-dialog v-model="dialogDelete" max-width="500px">
+                  <v-card>
+                    <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+                        <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                        <v-spacer></v-spacer>
+                      </v-card-actions>
+                  </v-card>
+                </v-dialog>
+
+              </v-toolbar>
+            </template>
+
+            <template v-slot:item.actions="{ item }">
+              <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
+              <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
+            </template>
+
+            <template v-slot:no-data>
+              <br />
+                <h1 class="text-2xl">Parece que los datos perdido se han</h1>
+                <p>Pulsar el botón RESET debes, si el problema persiste contacta con el admin</p>
+                <v-btn color="primary" @click="initialize">Reset</v-btn>
+              <br />
+            </template>
+
+            <template v-slot:item.estado="{item}">
+              <v-chip :color="getColor(item.estado)" dark>
+                {{ item.estado }}
+              </v-chip>
+            </template>
+
+          </v-data-table>
+        </div>
+      </v-app>
     </div>
-  </div>
+ 
 </template>
 
 <script>
 import axios from 'axios';
 import {getColor} from '@/assets/getColor.js';
 
+
   export default {
-    name:'IncBdjGJ',
+    name:'IncTriajeGJ',
     mixins: [getColor],
-    data () {
-        return {
-          search:'',
-          cabecera: [
-            { text: 'Incidencia', align: 'start', sortable: true, value: 'id_inc' },
+    
+    data: () => ({
+      dialog: false,
+      dialogDelete: false,
+      search:'',
+      headers: [
+        { text: 'Incidencia', align: 'start', sortable: true, value: 'id_inc' },
             { text: 'Estado', align: 'start', sortable: true, value: 'estado' },
             { text: 'Vía Entrada', align: 'start', sortable: true, value: 'via_ent' },
             { text: 'Prioridad', align: 'start', sortable: true, value: 'prioridad' },
             { text: 'Seguimiento', align: 'start', sortable: true, value: 'seguimiento' },
             { text: 'Procedencia', align: 'start', sortable: true, value: 'procedencia' },
-            
-          ],
-          incidencias: [] //<-- recibimos datos desde mounted
-      }
+        { text: 'Actions', value: 'actions', sortable: false },
+      ],
+      incidencias: [],
+      editedIndex: -1,
+      editedItem: {
+        id_inc:'',
+        estado:'',
+        via_ent:'',
+        prioridad:'',
+        seguimiento:'',
+        procedencia:'',
+      },
+      defaultItem: {
+        id_inc:'',
+        estado:'',
+        via_ent:'',
+        prioridad:'',
+        seguimiento:'',
+        procedencia:'',
+      },
+    }),
+
+    computed: {
+      formTitle () {
+        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      },
     },
-    mounted(){
+
+    watch: {
+      dialog (val) {
+        val || this.close()
+      },
+      dialogDelete (val) {
+        val || this.closeDelete()
+      },
+    },
+
+    created () {
+      this.initialize()
+    },
+    
+    methods: {
+      initialize () {
         const url = 'http://10.13.86.114:3000/'; //url del servicio
         axios
           .get(url+'incidencias')
@@ -68,19 +143,60 @@ import {getColor} from '@/assets/getColor.js';
                               if (this.incidenciasBruto[this.elemento].estado == 'En Bandeja') {
                                this.incidencias.push(this.incidenciasBruto[this.elemento])            
                               }     
-                        }
+                          }
           //debug
-          console.log('InciGEO (IncBdjGJ) -> Incidencias recuperadas y filtradas correctamente'); 
+          console.log('InciGEO (IncBDJGJ) -> Incidencias recuperadas y filtradas correctamente'); 
           })
+      },
 
+      editItem (item) {
+        this.editedIndex = this.incidencias.indexOf(item)
+        this.editedItem = Object.assign({}, item)
+        this.dialog = true
+      },
+
+      deleteItem (item) {
+        this.editedIndex = this.incidencias.indexOf(item)
+        this.editedItem = Object.assign({}, item)
+        this.dialogDelete = true
+      },
+
+      deleteItemConfirm () {
+        this.incidencias.splice(this.editedIndex, 1)
+        this.closeDelete()
+      },
+
+      close () {
+        this.dialog = false
+        this.$nextTick(() => {
+          this.editedItem = Object.assign({}, this.defaultItem)
+          this.editedIndex = -1
+        })
+      },
+
+      closeDelete () {
+        this.dialogDelete = false
+        this.$nextTick(() => {
+          this.editedItem = Object.assign({}, this.defaultItem)
+          this.editedIndex = -1
+        })
+      },
+
+      save () {
+        if (this.editedIndex > -1) {
+          Object.assign(this.incidencias[this.editedIndex], this.editedItem)
+        } else {
+          this.incidencias.push(this.editedItem)
+        }
+        this.close()
+      },
     },
-    
   }
-
 </script>
-  
+
 <style>
   .v-application--wrap {
     min-height: 1vh !important;
   }
 </style>
+
