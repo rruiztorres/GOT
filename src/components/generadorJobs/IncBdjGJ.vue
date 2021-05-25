@@ -10,7 +10,7 @@
         :items="incidencias"
         :items-per-page='10'
         :search="search"
-        class="myTable"
+        class="font-sans"
         loading-text="Recuperando datos..."
       >
         <template v-slot:top>
@@ -37,8 +37,11 @@
 
 <script>
 import axios from 'axios';
+import {getColor} from '@/assets/getColor.js';
 
   export default {
+    name:'IncBdjGJ',
+    mixins: [getColor],
     data () {
         return {
           search:'',
@@ -58,15 +61,19 @@ import axios from 'axios';
         const url = 'http://10.13.86.114:3000/'; //url del servicio
         axios
           .get(url+'incidencias')
-          .then(data => {this.incidencias = data.data.response, console.log(data.data)})
+          //se realiza el filtro para las incidencias en triaje
+          .then(data => {
+                          this.incidenciasBruto = data.data.response;
+                          for (this.elemento in this.incidenciasBruto) {
+                              if (this.incidenciasBruto[this.elemento].estado == 'En Bandeja') {
+                               this.incidencias.push(this.incidenciasBruto[this.elemento])            
+                              }     
+                        }
+          //debug
+          console.log('InciGEO (IncBdjGJ) -> Incidencias recuperadas y filtradas correctamente'); 
+          })
+
     },
-    methods: {
-      getColor (estado) {
-        if (estado == 'Pendiente') return '#ffd000'; //amarillo
-        else if (estado == 'Solucionada') return '#228B22'; //verde
-        else if (estado == 'Devuelto') return '#FF0000' //rojo
-      },
-    }
     
   }
 

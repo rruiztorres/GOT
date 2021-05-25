@@ -1,14 +1,30 @@
 <template>
-    <panelGJ></panelGJ>
+<div>
+        <div v-if="activarMenu == 'IncTriajeGJ'"><IncTriajeGJ></IncTriajeGJ></div>
+        <div v-if="activarMenu == 'IncBdjGJ'"><IncBdjGJ></IncBdjGJ></div>
+</div>
 </template>
 
 <script>
-import panelGJ from '@/components/generadorJobs/panelGJ';
+import IncTriajeGJ from '@/components/generadorJobs/IncTriajeGJ';
+import IncBdjGJ from '@/components/generadorJobs/IncBdjGJ'
+
 
 export default {
     name:'Loader',
     components: {
-        panelGJ,
-    }
+        IncTriajeGJ,
+        IncBdjGJ,
+    },
+    props: {
+        activarMenu: {
+            type: String,
+            default: 'IncTriajeGJ',
+        }
+    },
 }
 </script>
+
+<style>
+
+</style>

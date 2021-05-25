@@ -1,35 +1,49 @@
-<template>
-    <div class="h-screen font-sans text-left text-sm">
-        <!--header-->
-        <div class="w-screen">
-            <!--menu-->
-            <Sidebar></Sidebar>
-            <Header></Header>
-        </div> <!--fin header-->
-
-
-        <!--paneles de rol-->
-        <div>
-            <Loader></Loader>
+<template >
+    <div >
+        <div class="h-screen font-sans text-left text-sm">
+            <!--container-->
+            <div class="w-full h-full" >
+                <!--menu-->
+                <Navigation @cambiomenu="cambiarMenu" :userRole="userRole" class="float-left mr-8"></Navigation>
+                <!--header-->
+                <Header></Header>
+                <!--paneles de rol-->
+                <Loader class="mr-8" :activarMenu="newMenu"></Loader>
+            </div>
         </div>
-    </div><!--container principal-->
-
+    </div>
 </template>
 
 <script>
 //componentes
-import Sidebar from '../components/Sidebar';
 import Header from '@/components/Header';
 import Loader from '@/components/Loader';
-
+import Navigation from '@/components/Navigation';
 
     export default {
         name:"Dashboard",
         components:{
-            Sidebar,
             Header,
+            Navigation,
             Loader,
             },
+
+        methods: {
+            cambiarMenu(data){
+                this.newMenu = data;
+            }
+        },
+
+        data(){
+        const userRole = 'Generador de Jobs';
+        let newMenu = this.newMenu;
+            return{
+                userRole,
+                newMenu,
+                
+            }
+        },
+       
         
     }
 

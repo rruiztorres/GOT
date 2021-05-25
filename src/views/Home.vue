@@ -191,7 +191,9 @@
         axios.post(url+'auth/'+this.usuario + '/' + this.password, json).then(data => 
         {
           if (data.data.status == 200) {
-            localStorage.token = data.data.token
+            localStorage.token = data.data.token;
+            localStorage.usuario = data.data.usuario;
+            localStorage.rol = data.data.rolDefecto;
             this.$router.push('Dashboard');
           } else {
             this.error = data.data.error;

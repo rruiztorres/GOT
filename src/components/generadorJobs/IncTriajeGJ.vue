@@ -1,87 +1,94 @@
 <template>
-<v-app>
-  <v-data-table
-    :headers="headers"
-    :items="incidencias"
-    :search="search"
-    sort-by="calories"
-    class="font-sans"
-  >
-    
+<div class="mx-8">
+    <h1 class="ml-2 text-2xl font-bold my-6">
+    Incidencias en Triaje
+    </h1>
+    <div class="myTable">
+      <v-app>
+        <v-data-table
+          :headers="headers"
+          :items="incidencias"
+          :search="search"
+          class="font-sans"
+        >
+          <template v-slot:top>
+            <v-text-field
+              v-model="search"
+              label="Buscar"
+              class="mx-4"
+            ></v-text-field>
+          </template>
 
-    <template v-slot:top>
-      <v-text-field
-        v-model="search"
-        label="Buscar"
-        class="mx-4"
-      ></v-text-field>
+          <template> 
 
-      <v-toolbar
-        flat
-      >
-        <v-toolbar-title><span class="text-2xl">Incidencias en Triaje</span></v-toolbar-title>
+            <v-toolbar
+              flat
+            >
 
-        <v-dialog v-model="dialog" max-width="1700">
-        <div class="bg-white p-6">
-          <h1>Hago cosas</h1>
-        </div>
-        </v-dialog>
-        <v-dialog v-model="dialogDelete" max-width="500px">
-          <v-card>
-            <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-toolbar>
-    </template>
-    <template v-slot:item.actions="{ item }">
-      <v-icon
-        small
-        class="mr-2"
-        @click="editItem(item)"
-      >
-        mdi-pencil
-      </v-icon>
-      <v-icon
-        small
-        @click="deleteItem(item)"
-      >
-        mdi-delete
-      </v-icon>
-    </template>
-    <template v-slot:no-data>
-      <v-btn
-        color="primary"
-        @click="initialize"
-      >
-        Reset
-      </v-btn>
-    </template>
-    <template v-slot:item.estado="{item}">
-          <v-chip
-            :color="getColor(item.estado)"
-            dark
-          >
-            {{ item.estado }}
-          </v-chip>
-        </template>
-  </v-data-table>
-</v-app>
+              <v-dialog v-model="dialog" max-width="1700">
+              <div class="bg-white p-6">
+                <h1>Hago cosas</h1>
+              </div>
+              </v-dialog>
+              <v-dialog v-model="dialogDelete" max-width="500px">
+                <v-card>
+                  <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+                    <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                    <v-spacer></v-spacer>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </v-toolbar>
+          </template>
+          <template v-slot:item.actions="{ item }">
+            <v-icon
+              small
+              class="mr-2"
+              @click="editItem(item)"
+            >
+              mdi-pencil
+            </v-icon>
+            <v-icon
+              small
+              @click="deleteItem(item)"
+            >
+              mdi-delete
+            </v-icon>
+          </template>
+          <template v-slot:no-data>
+            <v-btn
+              color="primary"
+              @click="initialize"
+            >
+              Reset
+            </v-btn>
+          </template>
+          <template v-slot:item.estado="{item}">
+                <v-chip
+                  :color="getColor(item.estado)"
+                  dark
+                >
+                  {{ item.estado }}
+                </v-chip>
+              </template>
+        </v-data-table>
+      </v-app>
+    </div>
+  </div>
 </template>
 
 <script>
 import axios from 'axios';
+import {getColor} from '@/assets/getColor.js';
+
 
   export default {
     name:'IncTriajeGJ',
-    components: {
-
-    },
+    mixins: [getColor],
+    
     data: () => ({
       dialog: false,
       dialogDelete: false,
@@ -133,19 +140,23 @@ import axios from 'axios';
     created () {
       this.initialize()
     },
-
+    
     methods: {
       initialize () {
         const url = 'http://10.13.86.114:3000/'; //url del servicio
         axios
           .get(url+'incidencias')
-          .then(data => {this.incidencias = data.data.response, console.log(data.data.response)})
-      },
-
-      getColor (estado) {
-        if (estado == 'Pendiente') return '#ffd000'; //amarillo
-        else if (estado == 'Solucionada') return '#228B22'; //verde
-        else if (estado == 'Devuelto') return '#FF0000' //rojo
+          //se realiza el filtro para las incidencias en triaje
+          .then(data => {
+                          this.incidenciasBruto = data.data.response;
+                          for (this.elemento in this.incidenciasBruto) {
+                              if (this.incidenciasBruto[this.elemento].estado == 'En Triaje') {
+                               this.incidencias.push(this.incidenciasBruto[this.elemento])            
+                              }     
+                        }
+          //debug
+          console.log('InciGEO (IncTriajeGJ) -> Incidencias recuperadas y filtradas correctamente'); 
+          })
       },
 
       editItem (item) {
