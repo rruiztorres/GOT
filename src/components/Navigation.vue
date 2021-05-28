@@ -1,20 +1,19 @@
 <template>
-
+<v-app class="font-sans h-full">
     <v-navigation-drawer 
     class="bg-blue-900"
     dark v-model="drawer" :mini-variant.sync="mini" permanent src="https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg">
    
-      <v-list-item class="p-1 h-18">
-    
+      <v-list-item class="p-0 h-24">
         <v-list>
           <!--mini avatar-->
-          <div v-if="mini" class="bg-blue-900 rounded-full p-1 ml-2">
-            <v-icon class="">mdi-account-circle</v-icon>
+          <div v-if="mini" class="bg-blue-800 rounded-full ml-3">
+            <v-icon class="w-8 h-8">mdi-account-circle</v-icon>
           </div>
 
           <!--avatar completo-->
           <div v-if="!mini" class="flex">
-            <v-list-item class="pl-2">
+            <v-list-item class="w-16 ml-0">
                       
               <v-list-item-avatar>
                 <v-img src="https://randomuser.me/api/portraits/women/28.jpg"></v-img>
@@ -67,6 +66,9 @@
         <div v-if="!mini">
           <v-list-item-title class="ml-4 my-2">Gestion de Incidencias</v-list-item-title>
         </div>
+        <div v-if="mini">
+          <v-list-item-title class="ml-3 my-2">INC</v-list-item-title>
+        </div>
 
           <v-divider></v-divider>
           <v-list-item
@@ -76,7 +78,7 @@
             @click="activar(opcionIncidencia.active)"
           >
             <v-list-item-icon>
-              <v-icon class="mr-4">{{ opcionIncidencia.icon }}</v-icon>
+              <v-icon>{{ opcionIncidencia.icon }}</v-icon>
             </v-list-item-icon>
 
             <v-list-item-content>
@@ -92,6 +94,9 @@
         <div v-if="!mini">
           <v-list-item-title class="ml-4 my-2">Gestion de Jobs</v-list-item-title>
         </div>
+        <div v-if="mini">
+          <v-list-item-title class="ml-3 my-2">JOB</v-list-item-title>
+        </div>
 
           <v-divider></v-divider>
           <v-list-item
@@ -100,7 +105,7 @@
             link
           >
             <v-list-item-icon>
-              <v-icon class="mr-4">{{ opcionJob.icon }}</v-icon>
+              <v-icon>{{ opcionJob.icon }}</v-icon>
             </v-list-item-icon>
 
             <v-list-item-content>
@@ -116,6 +121,9 @@
         <div v-if="!mini">
           <v-list-item-title class="ml-4 my-2">Informes</v-list-item-title>
         </div>
+        <div v-if="mini">
+          <v-list-item-title class="ml-3 my-2">KPI</v-list-item-title>
+        </div>
         <v-divider></v-divider>
         <v-list-item
           v-for="informe in informes"
@@ -123,7 +131,7 @@
           link
         >
           <v-list-item-icon>
-            <v-icon class="mr-4">{{ informe.icon }}</v-icon>
+            <v-icon>{{ informe.icon }}</v-icon>
           </v-list-item-icon>
 
           <v-list-item-content>
@@ -135,7 +143,7 @@
       <v-divider></v-divider>
 
     </v-navigation-drawer>
-  
+</v-app>
 </template>
 
 <script>
