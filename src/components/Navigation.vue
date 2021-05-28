@@ -1,9 +1,11 @@
 <template>
 <v-app class="font-sans h-full">
-    <v-navigation-drawer 
+  <v-navigation-drawer 
     class="bg-blue-900"
     dark v-model="drawer" :mini-variant.sync="mini" permanent src="https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg">
    
+
+<!-- PANEL USUARIO -->
       <v-list-item class="p-0 h-24">
         <v-list>
           <!--mini avatar-->
@@ -13,12 +15,10 @@
 
           <!--avatar completo-->
           <div v-if="!mini" class="flex">
-            <v-list-item class="w-16 ml-0">
-                      
+            <v-list-item class="w-16 ml-0">    
               <v-list-item-avatar>
-                <v-img src="https://randomuser.me/api/portraits/women/28.jpg"></v-img>
-              </v-list-item-avatar>
-                      
+                <v-img src="https://randomuser.me/api/portraits/men/3.jpg"></v-img>
+              </v-list-item-avatar>      
             </v-list-item>
 
             <v-list-item class="pl-0 flex-none w-36">
@@ -31,17 +31,18 @@
                 <v-list-item-subtitle class="text-xs">Generador de Jobs</v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
-          </div>
+          </div> <!-- fin avatar -->
         </v-list>
 
         <v-btn class="pl-0" icon @click.stop="mini = !mini">
             <v-icon>mdi-menu-open</v-icon>
         </v-btn>
-
-
       </v-list-item>
+<!-- FIN PANEL USUARIO -->
 
-      <v-divider></v-divider>
+  <v-divider></v-divider>
+
+<!-- ICONOS ACCIONES USUARIO -->
 
       <v-list class="flex">
         <v-list-item
@@ -51,17 +52,20 @@
         >
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <v-list-item-title v-bind="attrs" v-on="on" link >
-              <v-icon class="m-auto">{{configuracion.icon}}</v-icon>
+              <v-list-item-title v-bind="attrs" v-on="on" link class="m-auto" >
+                <v-icon class="m-auto">{{configuracion.icon}}</v-icon>
               </v-list-item-title>
             </template>
             <span>{{configuracion.name}}</span>
           </v-tooltip>
         </v-list-item>
       </v-list>
+<!-- FIN ICONOS ACCIONES USUARIO -->
 
-      <v-divider></v-divider>
+  <v-divider></v-divider>
 
+<!-- MENU OPCIONES SEGUN ROL -->
+  <div>
       <v-list>
         <div v-if="!mini">
           <v-list-item-title class="ml-4 my-2">Gestion de Incidencias</v-list-item-title>
@@ -138,18 +142,16 @@
             <v-list-item-title class="text-xs">{{ informe.name }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-      </v-list>
+      </v-list>  
+  </div> 
+<!-- FIN MENU OPCIONES SEGUN ROL -->
 
-      <v-divider></v-divider>
-
-    </v-navigation-drawer>
+  <v-divider></v-divider>
+  </v-navigation-drawer>
 </v-app>
 </template>
 
 <script>
-
-
-
   export default {
     name:'Navigation',
 
@@ -168,10 +170,10 @@
 
         //objetos datos
         config: [
-          {name:'Configuracion', icon:'mdi-cog'},
-          {name:'Cambio de Rol', icon:'mdi-account-hard-hat'},
+          {name:'Cambio de Rol', icon:'mdi-account-convert'},
           {name:'Mi Calendario', icon:'mdi-calendar-month'},
-          {name:'Cerrar Sesión', icon:'mdi-account-arrow-left'},
+          {name:'Configuracion', icon:'mdi-cog'},
+          {name:'Cerrar Sesión', icon:'mdi-location-exit'},
         ],
         gestIncidencias: [
           {name:'Nueva Incidencia', icon:'mdi-map-marker-alert'},
