@@ -21,16 +21,15 @@
               </v-list-item-avatar>      
             </v-list-item>
 
-            <v-list-item class="pl-0 flex-none w-36">
+            <v-list-item
+            class="pl-0 flex-none w-36">
               <v-list-item-content>
-                
-                <v-list-item-title>
-                  {{ usrname }}
-                </v-list-item-title>
-
-                <v-list-item-subtitle class="text-xs">Generador de Jobs</v-list-item-subtitle>
+                <v-list-item-title v-model="userName">{{userName}}</v-list-item-title>
+                <v-list-item-subtitle v-model="userRole" class="text-xs">{{userRole}}</v-list-item-subtitle>
               </v-list-item-content>
+
             </v-list-item>
+
           </div> <!-- fin avatar -->
         </v-list>
 
@@ -45,20 +44,39 @@
 <!-- ICONOS ACCIONES USUARIO -->
 
       <v-list class="flex">
-        <v-list-item
-        v-for="configuracion in config" 
-        :key="configuracion.name"
-        link
-        >
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-list-item-title v-bind="attrs" v-on="on" link class="m-auto" >
-                <v-icon class="m-auto">{{configuracion.icon}}</v-icon>
-              </v-list-item-title>
-            </template>
-            <span>{{configuracion.name}}</span>
-          </v-tooltip>
-        </v-list-item>
+        <template>
+          <div class="text-center">
+            <v-menu offset-y>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  link
+                  dark
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                <v-icon>mdi-cog</v-icon>
+              </v-btn>
+        </template>
+
+            <v-list>
+              <v-list-item
+                v-for="rol in roles"
+                :key="rol.name"
+                class="hover:bg-gray-200"
+                @click="cambiarRol(rol.name)" 
+              >
+                <v-list-item-title
+                class="text-xs">
+                {{ rol.name }}
+                </v-list-item-title>
+              </v-list-item>
+            </v-list>
+
+          </v-menu>
+        </div>
+        </template>
+
       </v-list>
 <!-- FIN ICONOS ACCIONES USUARIO -->
 
@@ -158,17 +176,30 @@
     methods: {
       activar(datos) {
         this.$emit('cambiomenu', datos);
+      },
+      cambiarRol(rol) {
+        this.userRole = rol;
+        localStorage.rol = rol;
+        console.log("el rol pasó a ser " + rol)
       }
     },
 
+    watch: {
+      userRole() {},
+    },
+
     data () {
-      const usrname = localStorage.usuario;
-      
         return {
         drawer: true,
-        usrname,
+        userName: localStorage.usuario,
+        userRole: localStorage.rol,
 
         //objetos datos
+        roles: [
+          {name:'Generador de Jobs'},
+          {name:'Operador Especializado'},
+          {name:'Control de Calidad'},
+        ],
         config: [
           {name:'Cambio de Rol', icon:'mdi-account-convert'},
           {name:'Mi Calendario', icon:'mdi-calendar-month'},
@@ -181,7 +212,7 @@
           {name:'Incidencias en Triaje', icon:'mdi-ambulance', active:'IncTriajeGJ'},
           {name:'Acciones globales', icon:'mdi-table-eye'},
         ],
-        gestJobs: [
+        gestJobs: [ 
           {name:'Jobs Devueltos', icon:'mdi-briefcase-remove'},
           {name:'Jobs en Triaje', icon:'mdi-ambulance'},
           {name:'Acciones globales', icon:'mdi-table-eye'},
