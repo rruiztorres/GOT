@@ -33,7 +33,7 @@
           </div> <!-- fin avatar -->
         </v-list>
 
-        <v-btn class="pl-0" icon @click.stop="mini = !mini">
+        <v-btn class="pl-0" icon @click="hacerMini">
             <v-icon>mdi-menu-open</v-icon>
         </v-btn>
       </v-list-item>
@@ -83,85 +83,8 @@
   <v-divider></v-divider>
 
 <!-- MENU OPCIONES SEGUN ROL -->
-  <div>
-      <v-list>
-        <div v-if="!mini">
-          <v-list-item-title class="ml-4 my-2">Gestion de Incidencias</v-list-item-title>
-        </div>
-        <div v-if="mini">
-          <v-list-item-title class="ml-3 my-2">INC</v-list-item-title>
-        </div>
-
-          <v-divider></v-divider>
-          <v-list-item
-            v-for="opcionIncidencia in gestIncidencias"
-            :key="opcionIncidencia.name"
-            link
-            @click="activar(opcionIncidencia.active)"
-          >
-            <v-list-item-icon>
-              <v-icon>{{ opcionIncidencia.icon }}</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title class="text-xs">{{ opcionIncidencia.name }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-
-      </v-list>
-
-      <v-divider></v-divider>
-
-      <v-list>
-        <div v-if="!mini">
-          <v-list-item-title class="ml-4 my-2">Gestion de Jobs</v-list-item-title>
-        </div>
-        <div v-if="mini">
-          <v-list-item-title class="ml-3 my-2">JOB</v-list-item-title>
-        </div>
-
-          <v-divider></v-divider>
-          <v-list-item
-            v-for="opcionJob in gestJobs"
-            :key="opcionJob.name"
-            link
-          >
-            <v-list-item-icon>
-              <v-icon>{{ opcionJob.icon }}</v-icon>
-            </v-list-item-icon>
-
-            <v-list-item-content>
-              <v-list-item-title class="text-xs">{{ opcionJob.name }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        
-      </v-list>
-
-      <v-divider></v-divider>
-
-      <v-list>
-        <div v-if="!mini">
-          <v-list-item-title class="ml-4 my-2">Informes</v-list-item-title>
-        </div>
-        <div v-if="mini">
-          <v-list-item-title class="ml-3 my-2">KPI</v-list-item-title>
-        </div>
-        <v-divider></v-divider>
-        <v-list-item
-          v-for="informe in informes"
-          :key="informe.name"
-          link
-        >
-          <v-list-item-icon>
-            <v-icon>{{ informe.icon }}</v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-content>
-            <v-list-item-title class="text-xs">{{ informe.name }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>  
-  </div> 
+  <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="cambiarMenu" :hacerMini="mini"></NavGJ></div>
+  <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="cambiarMenu" :hacerMini="mini"></NavOpEsp></div>
 <!-- FIN MENU OPCIONES SEGUN ROL -->
 
   <v-divider></v-divider>
@@ -170,22 +93,45 @@
 </template>
 
 <script>
+import NavGJ from '@/components/generadorJobs/NavGJ';
+import NavOpEsp from '@/components/operadorEsp/NavOpEsp';
+import {roles} from '@/assets/mixins/roles.js';
+
+
   export default {
     name:'Navigation',
+    mixins: [roles],
+
+    components: {
+      NavGJ,
+      NavOpEsp,
+    },
 
     methods: {
+      hacerMini() {
+        this.mini = !this.mini;
+      },
       activar(datos) {
         this.$emit('cambiomenu', datos);
       },
       cambiarRol(rol) {
         this.userRole = rol;
         localStorage.rol = rol;
+        //hay que cambiar menu por defecto también
         console.log("el rol pasó a ser " + rol)
-      }
+      },
+      //Solo transmite lo que le envia el menu según rol
+      cambiarMenu(data){
+        this.newMenu = data;
+        this.$emit('cambiomenu', data);
+      },
     },
 
     watch: {
       userRole() {},
+      mini() {
+        this.$emit('hacerMini', this.mini);
+      },
     },
 
     data () {
@@ -193,35 +139,15 @@
         drawer: true,
         userName: localStorage.usuario,
         userRole: localStorage.rol,
+        roles, //desde mixins configuramos fuera
 
         //objetos datos
-        roles: [
-          {name:'Generador de Jobs'},
-          {name:'Operador Especializado'},
-          {name:'Control de Calidad'},
-        ],
         config: [
           {name:'Cambio de Rol', icon:'mdi-account-convert'},
           {name:'Mi Calendario', icon:'mdi-calendar-month'},
           {name:'Configuracion', icon:'mdi-cog'},
           {name:'Cerrar Sesión', icon:'mdi-location-exit'},
         ],
-        gestIncidencias: [
-          {name:'Nueva Incidencia', icon:'mdi-map-marker-alert'},
-          {name:'Incidencias en Bandeja', icon:'mdi-inbox-arrow-down', active:'IncBdjGJ'},
-          {name:'Incidencias en Triaje', icon:'mdi-ambulance', active:'IncTriajeGJ'},
-          {name:'Acciones globales', icon:'mdi-table-eye'},
-        ],
-        gestJobs: [ 
-          {name:'Jobs Devueltos', icon:'mdi-briefcase-remove'},
-          {name:'Jobs en Triaje', icon:'mdi-ambulance'},
-          {name:'Acciones globales', icon:'mdi-table-eye'},
-        ],
-        informes: [
-          {name:'Vista General', icon:'mdi-finance'},
-          {name:'Mis KPI', icon:'mdi-card-account-details-star'},
-        ],
-
         mini: false,
       }
     },

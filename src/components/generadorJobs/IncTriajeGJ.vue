@@ -69,7 +69,7 @@
 
 <script>
 import axios from 'axios';
-import {getColor} from '@/assets/getColor.js';
+import {getColor} from '@/assets/mixins/getColor.js';
 
 
   export default {
