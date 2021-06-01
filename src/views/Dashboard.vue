@@ -8,7 +8,7 @@
                 <!--header-->
                 <Header></Header>
                 <!--paneles de rol-->
-                <Loader class="mr-8" :activarMenu="newMenu"></Loader>
+                <Loader class="mr-8" :activarMenu="newMenu" :userRole="userRole"></Loader>
             </div>
         </div>
     </div>

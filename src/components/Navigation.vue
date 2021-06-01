@@ -33,6 +33,7 @@
           </div> <!-- fin avatar -->
         </v-list>
 
+        <!--BOTON MINI-->
         <v-btn class="pl-0" icon @click="hacerMini">
             <v-icon>mdi-menu-open</v-icon>
         </v-btn>
@@ -64,7 +65,7 @@
                 v-for="rol in roles"
                 :key="rol.name"
                 class="hover:bg-gray-200"
-                @click="cambiarRol(rol.name)" 
+                @click="cambiarRol(rol)" 
               >
                 <v-list-item-title
                 class="text-xs">
@@ -83,8 +84,11 @@
   <v-divider></v-divider>
 
 <!-- MENU OPCIONES SEGUN ROL -->
+
   <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="cambiarMenu" :hacerMini="mini"></NavGJ></div>
   <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="cambiarMenu" :hacerMini="mini"></NavOpEsp></div>
+  <div v-if="userRole=='Control de Calidad'"><Ccalidad @cambiomenu="cambiarMenu" :hacerMini="mini"></Ccalidad></div>
+
 <!-- FIN MENU OPCIONES SEGUN ROL -->
 
   <v-divider></v-divider>
@@ -93,8 +97,12 @@
 </template>
 
 <script>
+//components
 import NavGJ from '@/components/generadorJobs/NavGJ';
 import NavOpEsp from '@/components/operadorEsp/NavOpEsp';
+import Ccalidad from '@/components/controlCalidad/navCC';
+
+//mixins
 import {roles} from '@/assets/mixins/roles.js';
 
 
@@ -105,30 +113,33 @@ import {roles} from '@/assets/mixins/roles.js';
     components: {
       NavGJ,
       NavOpEsp,
+      Ccalidad,
     },
 
     methods: {
-      hacerMini() {
-        this.mini = !this.mini;
-      },
       activar(datos) {
         this.$emit('cambiomenu', datos);
       },
-      cambiarRol(rol) {
-        this.userRole = rol;
-        localStorage.rol = rol;
-        //hay que cambiar menu por defecto también
-        console.log("el rol pasó a ser " + rol)
-      },
-      //Solo transmite lo que le envia el menu según rol
       cambiarMenu(data){
         this.newMenu = data;
         this.$emit('cambiomenu', data);
       },
+      cambiarRol(rol) {
+        this.userRole = rol.name;
+        localStorage.rol = rol.name;
+        console.log("el rol pasó a ser " + rol.name)
+        //hay que cambiar dashboard por defecto también al cambiar rol usuario
+        this.cambiarMenu(rol.default)
+      },
+      hacerMini() {
+        this.mini = !this.mini;
+      },
     },
 
     watch: {
-      userRole() {},
+      userRole() {
+        //
+      },
       mini() {
         this.$emit('hacerMini', this.mini);
       },
@@ -137,6 +148,7 @@ import {roles} from '@/assets/mixins/roles.js';
     data () {
         return {
         drawer: true,
+        mini: false,
         userName: localStorage.usuario,
         userRole: localStorage.rol,
         roles, //desde mixins configuramos fuera
@@ -148,7 +160,6 @@ import {roles} from '@/assets/mixins/roles.js';
           {name:'Configuracion', icon:'mdi-cog'},
           {name:'Cerrar Sesión', icon:'mdi-location-exit'},
         ],
-        mini: false,
       }
     },
   }

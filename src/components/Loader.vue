@@ -1,7 +1,9 @@
 <template>
 <div>
-        <div v-if="activarMenu == 'IncTriajeGJ'"><IncTriajeGJ></IncTriajeGJ></div>
-        <div v-if="activarMenu == 'IncBdjGJ'"><IncBdjGJ></IncBdjGJ></div>
+
+    <div v-if="activarMenu == 'IncTriajeGJ'"><IncTriajeGJ></IncTriajeGJ></div>
+    <div v-if="activarMenu == 'IncBdjGJ'"><IncBdjGJ></IncBdjGJ></div>
+
 </div>
 </template>
 
@@ -20,7 +22,7 @@ export default {
         activarMenu: {
             type: String,
             default: 'IncTriajeGJ',
-        }
+        },
     },
 }
 </script>
