@@ -5,6 +5,9 @@ import './index.css'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import vuetify from './plugins/vuetify';
+import Vuetify from 'vuetify/lib'
+
+Vue.use(Vuetify)
 
 Vue.use(VueAxios, axios)
 
