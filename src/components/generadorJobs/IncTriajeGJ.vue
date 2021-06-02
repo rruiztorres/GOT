@@ -1,18 +1,19 @@
 <template>
-  
     <div class="mx-8">
+
       <h1 class="ml-2 text-2xl font-bold my-6">
       Incidencias en Triaje
       </h1>
 
       <v-app> 
-        <div class="myTable">
+        <div class="overflow-y-auto">
         
           <v-data-table
             :headers="headers"
             :items="incidencias"
             :search="search"
             class="font-sans"
+            style="max-height:47rem;"
           >
             <template v-slot:top>
               <v-text-field

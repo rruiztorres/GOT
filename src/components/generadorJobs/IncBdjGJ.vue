@@ -13,6 +13,7 @@
             :items="incidencias"
             :search="search"
             class="font-sans"
+            style="max-height:47rem;"
           >
             <template v-slot:top>
               <v-text-field

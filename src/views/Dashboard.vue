@@ -2,7 +2,7 @@
     <div >
         <div class="h-screen font-sans text-left text-sm">
             <!--container-->
-            <div class="w-full h-full" >
+            <div class="w-full h-screen" >
                 <!--menu-->
                 <Navigation @cambiomenu="cambiarMenu" :userRole="userRole" class="float-left mr-8"></Navigation>
                 <!--header-->
