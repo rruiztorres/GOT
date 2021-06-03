@@ -20,26 +20,41 @@
             dark
             v-bind="attrs"
             v-on="on"
-            >
+            > 
+
+            <div v-if="mini==false">
               <img
               src="https://medicaenergy.com/assets/images/default-user.png"
-              class="w-20 border-2 border-blue-700 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
+              class="w-20 border-2 border-gray-400 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
               >
+            </div>
+            <div v-if="mini==true">
+              <img
+              src="https://medicaenergy.com/assets/images/default-user.png"
+              class="w-10 border-2 border-gray-400 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
+              >
+            </div>
+
             </v-img>
+
             <v-list-item-content>
-              <v-list-item-title 
-              v-model="userName"
-              class="text-white"
-              >
-              {{userName}}
-              </v-list-item-title>
-              <v-list-item-subtitle 
-              v-model="userRole"
-              class="text-white"
-              > 
-              {{userRole}}
-              </v-list-item-subtitle>
+              <div v-if="mini==false">
+                <v-list-item-title 
+                v-model="userName"
+                class="text-white"
+                >
+                {{userName}}
+                </v-list-item-title>
+              
+                <v-list-item-subtitle 
+                v-model="userRole"
+                class="text-white"
+                > 
+                {{userRole}}
+                </v-list-item-subtitle>
+              </div>
             </v-list-item-content>
+
           </template>
 
           <!-- MENU DESPLEGABLE USUARIO -->
@@ -97,14 +112,7 @@
 
             <v-card-actions class="w-80">
               <v-spacer></v-spacer>
-                <v-btn
-                class="bg-gray-500"
-                icon
-                dark
-                @click="menu = false"
-                >
-                <v-icon>mdi-cog</v-icon>
-                </v-btn>
+                <h6 class="text-xs">InciGEOv2 - dev</h6>
             </v-card-actions>
           </v-card> 
           <!-- FIN MENU DESPLEGABLE USUARIO -->
@@ -113,9 +121,9 @@
     </template>
         
     <!--BOTON MINI-->
-  <v-btn class="float-right" icon @click="hacerMini">
+  <!-- <v-btn class="float-right p-6" icon @click="hacerMini">
       <v-icon>mdi-menu-open</v-icon>
-  </v-btn>
+  </v-btn> -->
       
 <!-- FIN PANEL USUARIO -->
 
@@ -128,6 +136,7 @@
   <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="cambiarMenu" :hacerMini="mini"></NavGJ></div>
   <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="cambiarMenu" :hacerMini="mini"></NavOpEsp></div>
   <div v-if="userRole=='Control de Calidad'"><Ccalidad @cambiomenu="cambiarMenu" :hacerMini="mini"></Ccalidad></div>
+  
 
 <!-- FIN MENU OPCIONES SEGUN ROL -->
 
@@ -156,10 +165,14 @@ import {roles} from '@/assets/mixins/roles.js';
       Ccalidad,
     },
 
+    props: {
+      mini: {
+        type: Boolean,
+        default: false,
+      }
+    },
+    
     methods: {
-      activar(datos) {
-        this.$emit('cambiomenu', datos);
-      },
       cambiarMenu(data){
         this.newMenu = data;
         this.$emit('cambiomenu', data);
@@ -171,39 +184,22 @@ import {roles} from '@/assets/mixins/roles.js';
         //hay que cambiar dashboard por defecto también al cambiar rol usuario
         this.cambiarMenu(rol.default)
       },
-      hacerMini() {
-        this.mini = !this.mini;
-      },
+
     },
 
     watch: {
-      userRole() {
-        //
-      },
-      mini() {
-        this.$emit('hacerMini', this.mini);
-      },
+      userRole() {/**/},
+      mini(){},
     },
 
     data () {
-        return {
-        drawer: true,
-        mini: false,
-        fav: true,
-        menu: false,
-        message: false,
-        hints: true,
-        userName: localStorage.usuario,
-        userRole: localStorage.rol,
-        roles, //desde mixins configuramos fuera
-
-        //objetos datos
-        config: [
-          {name:'Cambio de Rol', icon:'mdi-account-convert'},
-          {name:'Mi Calendario', icon:'mdi-calendar-month'},
-          {name:'Configuracion', icon:'mdi-cog'},
-          {name:'Cerrar Sesión', icon:'mdi-location-exit'},
-        ],
+      return {
+      closeOnClick: true,
+      drawer: true,
+      menu: false,
+      userName: localStorage.usuario,
+      userRole: localStorage.rol,
+      roles, //desde mixins configuramos fuera
       }
     },
   }
