@@ -11,7 +11,7 @@
         <v-menu
         v-model="menu"
         :close-on-click="closeOnClick"
-        :nudge-width="100"
+        :nudge-width="80"
         offset-x
         class="transition duration-1500 ease-in-out"
         >
@@ -22,7 +22,7 @@
             v-on="on"
             >
               <img
-              src="https://cdn.vuetifyjs.com/images/john.jpg"
+              src="https://medicaenergy.com/assets/images/default-user.png"
               class="w-20 border-2 border-blue-700 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
               >
             </v-img>
@@ -42,12 +42,13 @@
             </v-list-item-content>
           </template>
 
+          <!-- MENU DESPLEGABLE USUARIO -->
           <v-card>
             <v-list>
-              <v-list-item>
+              <v-list-item class="w-80">
                 <v-list-item-avatar>
                   <img
-                  src="https://cdn.vuetifyjs.com/images/john.jpg"
+                  src="https://medicaenergy.com/assets/images/default-user.png"
                   >
                 </v-list-item-avatar>
 
@@ -63,9 +64,6 @@
                     {{userRole}}
                   </v-list-item-subtitle>
                 </v-list-item-content>
-                <v-list-item-content>
-                  <v-icon>mdi-cog</v-icon>
-                </v-list-item-content>
               </v-list-item>
                 
             </v-list>
@@ -73,45 +71,43 @@
             <v-divider></v-divider>
               
                <v-list>
-                 <v-list-item-title class="p-2">Cambio de Rol</v-list-item-title>
+                <v-list-item-title class="p-2">Cambio de Rol</v-list-item-title>
+
                 <v-list-item
                   v-for="rol in roles"
                   :key="rol.name"
-                  class="hover:bg-gray-200"
+                  class="hover:bg-gray-200 w-80"
                   @click="cambiarRol(rol)" 
                 >
                   <v-list-item-title
                   class="text-xs ml-3">
                   {{ rol.name }}
                   </v-list-item-title>
+
                   <v-icon
                   v-if="userRole==rol.name" 
-                  class="rounded-full p-1 bg-green-500" dark>
+                  class="rounded-full p-1 bg-green-500" dark
+                  >
                     mdi-check
                   </v-icon>
                 </v-list-item>
               </v-list>
+
             <v-divider></v-divider>
 
-            <!--<v-card-actions>
-            <v-spacer></v-spacer>
-              <v-btn
-              class="bg-red-500"
-              text
-              dark
-              @click="menu = false"
-              >
-              Cancelar
-              </v-btn>
-              <v-btn
-              class="bg-green-500"
-              text
-              dark
-              @click="menu = false"
-              > Guardar
-              </v-btn>
-            </v-card-actions>-->
-          </v-card>
+            <v-card-actions class="w-80">
+              <v-spacer></v-spacer>
+                <v-btn
+                class="bg-gray-500"
+                icon
+                dark
+                @click="menu = false"
+                >
+                <v-icon>mdi-cog</v-icon>
+                </v-btn>
+            </v-card-actions>
+          </v-card> 
+          <!-- FIN MENU DESPLEGABLE USUARIO -->
         </v-menu>
       </div>
     </template>
