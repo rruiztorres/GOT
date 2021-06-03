@@ -6,82 +6,126 @@
    
 
 <!-- PANEL USUARIO -->
-      <v-list-item class="p-0 h-24">
-        <v-list>
-          <!--mini avatar-->
-          <div v-if="mini" class="bg-blue-800 rounded-full ml-3">
-            <v-icon class="w-8 h-8">mdi-account-circle</v-icon>
-          </div>
+    <template>
+      <div class="text-center pt-6">
+        <v-menu
+        v-model="menu"
+        :close-on-click="closeOnClick"
+        :nudge-width="100"
+        offset-x
+        class="transition duration-1500 ease-in-out"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-img
+            dark
+            v-bind="attrs"
+            v-on="on"
+            >
+              <img
+              src="https://cdn.vuetifyjs.com/images/john.jpg"
+              class="w-20 border-2 border-blue-700 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
+              >
+            </v-img>
+            <v-list-item-content>
+              <v-list-item-title 
+              v-model="userName"
+              class="text-white"
+              >
+              {{userName}}
+              </v-list-item-title>
+              <v-list-item-subtitle 
+              v-model="userRole"
+              class="text-white"
+              > 
+              {{userRole}}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
 
-          <!--avatar completo-->
-          <div v-if="!mini" class="flex">
-            <v-list-item class="w-16 ml-0">    
-              <v-list-item-avatar>
-                <v-img src="https://randomuser.me/api/portraits/men/3.jpg"></v-img>
-              </v-list-item-avatar>      
-            </v-list-item>
+          <v-card>
+            <v-list>
+              <v-list-item>
+                <v-list-item-avatar>
+                  <img
+                  src="https://cdn.vuetifyjs.com/images/john.jpg"
+                  >
+                </v-list-item-avatar>
 
-            <v-list-item
-            class="pl-0 flex-none w-36">
-              <v-list-item-content>
-                <v-list-item-title v-model="userName">{{userName}}</v-list-item-title>
-                <v-list-item-subtitle v-model="userRole" class="text-xs">{{userRole}}</v-list-item-subtitle>
-              </v-list-item-content>
+                <v-list-item-content>
+                  <v-list-item-title 
+                  v-model="userName"
+                  >
+                    {{userName}}
+                  </v-list-item-title>
+                  <v-list-item-subtitle 
+                  v-model="userRole"
+                  > 
+                    {{userRole}}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+                <v-list-item-content>
+                  <v-icon>mdi-cog</v-icon>
+                </v-list-item-content>
+              </v-list-item>
+                
+            </v-list>
 
-            </v-list-item>
+            <v-divider></v-divider>
+              
+               <v-list>
+                 <v-list-item-title class="p-2">Cambio de Rol</v-list-item-title>
+                <v-list-item
+                  v-for="rol in roles"
+                  :key="rol.name"
+                  class="hover:bg-gray-200"
+                  @click="cambiarRol(rol)" 
+                >
+                  <v-list-item-title
+                  class="text-xs ml-3">
+                  {{ rol.name }}
+                  </v-list-item-title>
+                  <v-icon
+                  v-if="userRole==rol.name" 
+                  class="rounded-full p-1 bg-green-500" dark>
+                    mdi-check
+                  </v-icon>
+                </v-list-item>
+              </v-list>
+            <v-divider></v-divider>
 
-          </div> <!-- fin avatar -->
-        </v-list>
-
-        <!--BOTON MINI-->
-        <v-btn class="pl-0" icon @click="hacerMini">
-            <v-icon>mdi-menu-open</v-icon>
-        </v-btn>
-      </v-list-item>
+            <!--<v-card-actions>
+            <v-spacer></v-spacer>
+              <v-btn
+              class="bg-red-500"
+              text
+              dark
+              @click="menu = false"
+              >
+              Cancelar
+              </v-btn>
+              <v-btn
+              class="bg-green-500"
+              text
+              dark
+              @click="menu = false"
+              > Guardar
+              </v-btn>
+            </v-card-actions>-->
+          </v-card>
+        </v-menu>
+      </div>
+    </template>
+        
+    <!--BOTON MINI-->
+  <v-btn class="float-right" icon @click="hacerMini">
+      <v-icon>mdi-menu-open</v-icon>
+  </v-btn>
+      
 <!-- FIN PANEL USUARIO -->
 
   <v-divider></v-divider>
 
-<!-- ICONOS ACCIONES USUARIO -->
 
-      <v-list class="flex">
-        <template>
-          <div class="text-center">
-            <v-menu offset-y>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  link
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                <v-icon>mdi-cog</v-icon>
-              </v-btn>
-        </template>
-
-            <v-list>
-              <v-list-item
-                v-for="rol in roles"
-                :key="rol.name"
-                class="hover:bg-gray-200"
-                @click="cambiarRol(rol)" 
-              >
-                <v-list-item-title
-                class="text-xs">
-                {{ rol.name }}
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-
-          </v-menu>
-        </div>
-        </template>
-
-      </v-list>
-<!-- FIN ICONOS ACCIONES USUARIO -->
-
-  <v-divider></v-divider>
 
 <!-- MENU OPCIONES SEGUN ROL -->
 
@@ -149,6 +193,10 @@ import {roles} from '@/assets/mixins/roles.js';
         return {
         drawer: true,
         mini: false,
+        fav: true,
+        menu: false,
+        message: false,
+        hints: true,
         userName: localStorage.usuario,
         userRole: localStorage.rol,
         roles, //desde mixins configuramos fuera
