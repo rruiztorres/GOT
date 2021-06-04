@@ -23,12 +23,14 @@
               ></v-text-field>
             
               <v-toolbar flat>
-
+                
+                <!-- VENTANA EDICION INCIDENCIA -->
                 <v-dialog v-model="dialog" max-width="1700">
                   <div class="bg-white p-6">
                     <h1>Hago cosas</h1>
                   </div>
                 </v-dialog>
+                <!-- FIN VENTANA EDICION INCIDENCIA -->
                 
                 <v-dialog v-model="dialogDelete" max-width="500px">
                   <v-card>
