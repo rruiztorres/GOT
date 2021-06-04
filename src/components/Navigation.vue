@@ -118,12 +118,7 @@
           <!-- FIN MENU DESPLEGABLE USUARIO -->
         </v-menu>
       </div>
-    </template>
-        
-    <!--BOTON MINI-->
-  <!-- <v-btn class="float-right p-6" icon @click="hacerMini">
-      <v-icon>mdi-menu-open</v-icon>
-  </v-btn> -->
+    </template>      
       
 <!-- FIN PANEL USUARIO -->
 
@@ -204,7 +199,3 @@ import {roles} from '@/assets/mixins/roles.js';
     },
   }
 </script>
-
-<style>
-
-</style>
