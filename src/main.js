@@ -5,7 +5,12 @@ import './index.css'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import vuetify from './plugins/vuetify';
-import Vuetify from 'vuetify/lib'
+import Vuetify from 'vuetify/lib';
+
+import VueLayers from 'vuelayers';
+import 'vuelayers/lib/style.css'; // needs css-loader
+
+Vue.use(VueLayers)
 
 Vue.use(Vuetify)
 

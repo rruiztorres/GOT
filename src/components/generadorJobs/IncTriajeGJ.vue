@@ -14,7 +14,7 @@
             :search="search"
             class="font-sans"
             style="max-height:47rem;"
-          >
+            >
             <template v-slot:top>
               <v-text-field
                 v-model="search"
@@ -26,16 +26,14 @@
                 
                 <!-- VENTANA EDICION INCIDENCIA -->
                 <v-dialog v-model="dialog" max-width="1700">
-                  <div class="bg-white p-6">
-                    <h1>Hago cosas</h1>
-                  </div>
+                  <VerIncidencia :incidencia="editedItem"></VerIncidencia>
                 </v-dialog>
                 <!-- FIN VENTANA EDICION INCIDENCIA -->
                 
                 <v-dialog v-model="dialogDelete" max-width="500px">
                   <v-card>
                    <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
-                   <h3 class="text-center text-l">Esta acción borrará la incidencia actual ¿Desea continuar?</h3>
+                   <h3 class="text-center text-l">Esta acción borrará la incidencia ¿Desea continuar?</h3>
                       <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn class="w-24 bg-red-500" dark text @click="closeDelete">Cancel</v-btn>
@@ -74,10 +72,15 @@
 import axios from 'axios';
 import {getColor} from '@/assets/mixins/getColor.js';
 
+import VerIncidencia from '@/components/VerIncidencia';
+
 
   export default {
     name:'IncTriajeGJ',
     mixins: [getColor],
+    components: {
+      VerIncidencia,
+    },
     
     data: () => ({
       dialog: false,
@@ -126,7 +129,6 @@ import {getColor} from '@/assets/mixins/getColor.js';
         val || this.closeDelete()
       },
     },
-
     created () {
       this.initialize()
     },
