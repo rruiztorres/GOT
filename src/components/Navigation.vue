@@ -6,88 +6,137 @@
    
 
 <!-- PANEL USUARIO -->
-      <v-list-item class="p-0 h-24">
-        <v-list>
-          <!--mini avatar-->
-          <div v-if="mini" class="bg-blue-800 rounded-full ml-3">
-            <v-icon class="w-8 h-8">mdi-account-circle</v-icon>
-          </div>
+    <template>
+      <div class="text-center pt-6">
+        <v-menu
+        v-model="menu"
+        :close-on-click="closeOnClick"
+        :nudge-width="80"
+        offset-x
+        class="transition duration-1500 ease-in-out"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-img
+            dark
+            v-bind="attrs"
+            v-on="on"
+            > 
 
-          <!--avatar completo-->
-          <div v-if="!mini" class="flex">
-            <v-list-item class="w-16 ml-0">    
-              <v-list-item-avatar>
-                <v-img src="https://randomuser.me/api/portraits/men/3.jpg"></v-img>
-              </v-list-item-avatar>      
-            </v-list-item>
+            <div v-if="mini==false">
+              <img
+              src="https://medicaenergy.com/assets/images/default-user.png"
+              class="w-20 border-2 border-gray-400 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
+              >
+            </div>
+            <div v-if="mini==true">
+              <img
+              src="https://medicaenergy.com/assets/images/default-user.png"
+              class="w-10 border-2 border-gray-400 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
+              >
+            </div>
 
-            <v-list-item
-            class="pl-0 flex-none w-36">
-              <v-list-item-content>
-                <v-list-item-title v-model="userName">{{userName}}</v-list-item-title>
-                <v-list-item-subtitle v-model="userRole" class="text-xs">{{userRole}}</v-list-item-subtitle>
-              </v-list-item-content>
+            </v-img>
 
-            </v-list-item>
+            <v-list-item-content>
+              <div v-if="mini==false">
+                <v-list-item-title 
+                v-model="userName"
+                class="text-white"
+                >
+                {{userName}}
+                </v-list-item-title>
+              
+                <v-list-item-subtitle 
+                v-model="userRole"
+                class="text-white"
+                > 
+                {{userRole}}
+                </v-list-item-subtitle>
+              </div>
+            </v-list-item-content>
 
-          </div> <!-- fin avatar -->
-        </v-list>
+          </template>
 
-        <!--BOTON MINI-->
-        <v-btn class="pl-0" icon @click="hacerMini">
-            <v-icon>mdi-menu-open</v-icon>
-        </v-btn>
-      </v-list-item>
+          <!-- MENU DESPLEGABLE USUARIO -->
+          <v-card>
+            <v-list>
+              <v-list-item class="w-80">
+                <v-list-item-avatar>
+                  <img
+                  src="https://medicaenergy.com/assets/images/default-user.png"
+                  >
+                </v-list-item-avatar>
+
+                <v-list-item-content>
+                  <v-list-item-title 
+                  v-model="userName"
+                  >
+                    {{userName}}
+                  </v-list-item-title>
+                  <v-list-item-subtitle 
+                  v-model="userRole"
+                  > 
+                    {{userRole}}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+                
+            </v-list>
+
+            <v-divider></v-divider>
+              
+               <v-list>
+                <v-list-item-title class="p-2">Cambio de Rol</v-list-item-title>
+
+                <v-list-item
+                  v-for="rol in roles"
+                  :key="rol.name"
+                  class="hover:bg-gray-200 w-80"
+                  @click="cambiarRol(rol)" 
+                >
+                  <v-list-item-title
+                  class="text-xs ml-3">
+                  {{ rol.name }}
+                  </v-list-item-title>
+
+                  <v-icon
+                  v-if="userRole==rol.name" 
+                  class="rounded-full p-1 bg-green-500" dark
+                  >
+                    mdi-check
+                  </v-icon>
+                </v-list-item>
+              </v-list>
+
+            <v-divider></v-divider>
+
+            <v-card-actions class="w-80">
+              <v-spacer></v-spacer>
+                <h6 class="text-xs">InciGEOv2 - dev</h6>
+            </v-card-actions>
+          </v-card> 
+          <!-- FIN MENU DESPLEGABLE USUARIO -->
+        </v-menu>
+      </div>
+    </template>
+        
+    <!--BOTON MINI-->
+  <!-- <v-btn class="float-right p-6" icon @click="hacerMini">
+      <v-icon>mdi-menu-open</v-icon>
+  </v-btn> -->
+      
 <!-- FIN PANEL USUARIO -->
 
   <v-divider></v-divider>
 
-<!-- ICONOS ACCIONES USUARIO -->
 
-      <v-list class="flex">
-        <template>
-          <div class="text-center">
-            <v-menu offset-y>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  icon
-                  link
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                <v-icon>mdi-cog</v-icon>
-              </v-btn>
-        </template>
-
-            <v-list>
-              <v-list-item
-                v-for="rol in roles"
-                :key="rol.name"
-                class="hover:bg-gray-200"
-                @click="cambiarRol(rol)" 
-              >
-                <v-list-item-title
-                class="text-xs">
-                {{ rol.name }}
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-
-          </v-menu>
-        </div>
-        </template>
-
-      </v-list>
-<!-- FIN ICONOS ACCIONES USUARIO -->
-
-  <v-divider></v-divider>
 
 <!-- MENU OPCIONES SEGUN ROL -->
 
   <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="cambiarMenu" :hacerMini="mini"></NavGJ></div>
   <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="cambiarMenu" :hacerMini="mini"></NavOpEsp></div>
   <div v-if="userRole=='Control de Calidad'"><Ccalidad @cambiomenu="cambiarMenu" :hacerMini="mini"></Ccalidad></div>
+  
 
 <!-- FIN MENU OPCIONES SEGUN ROL -->
 
@@ -116,10 +165,14 @@ import {roles} from '@/assets/mixins/roles.js';
       Ccalidad,
     },
 
+    props: {
+      mini: {
+        type: Boolean,
+        default: false,
+      }
+    },
+    
     methods: {
-      activar(datos) {
-        this.$emit('cambiomenu', datos);
-      },
       cambiarMenu(data){
         this.newMenu = data;
         this.$emit('cambiomenu', data);
@@ -131,35 +184,22 @@ import {roles} from '@/assets/mixins/roles.js';
         //hay que cambiar dashboard por defecto también al cambiar rol usuario
         this.cambiarMenu(rol.default)
       },
-      hacerMini() {
-        this.mini = !this.mini;
-      },
+
     },
 
     watch: {
-      userRole() {
-        //
-      },
-      mini() {
-        this.$emit('hacerMini', this.mini);
-      },
+      userRole() {/**/},
+      mini(){},
     },
 
     data () {
-        return {
-        drawer: true,
-        mini: false,
-        userName: localStorage.usuario,
-        userRole: localStorage.rol,
-        roles, //desde mixins configuramos fuera
-
-        //objetos datos
-        config: [
-          {name:'Cambio de Rol', icon:'mdi-account-convert'},
-          {name:'Mi Calendario', icon:'mdi-calendar-month'},
-          {name:'Configuracion', icon:'mdi-cog'},
-          {name:'Cerrar Sesión', icon:'mdi-location-exit'},
-        ],
+      return {
+      closeOnClick: true,
+      drawer: true,
+      menu: false,
+      userName: localStorage.usuario,
+      userRole: localStorage.rol,
+      roles, //desde mixins configuramos fuera
       }
     },
   }
