@@ -21,7 +21,6 @@ export default {
     props: {
         activarMenu: {
             type: String,
-            default: 'IncTriajeGJ',
         },
     },
 }

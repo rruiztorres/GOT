@@ -1,4 +1,5 @@
 <template>
+
   <div class="home">
     <div class="font-sans text-gray-800 antialiased">
       <nav class="top-0 absolute z-50 w-full flex flex-wrap items-center justify-between px-2 py-3 ">
@@ -6,10 +7,6 @@
         <div class="container px-4 mx-auto flex flex-wrap items-center justify-between">
 
           <div class="w-full relative flex justify-between lg:w-auto lg:static lg:block lg:justify-start">
-            <!--<a class="text-sm font-bold leading-relaxed inline-block mr-4 py-2 whitespace-nowrap uppercase text-white" 
-            href="#">
-            BDIG
-            </a>-->
 
             <button
               class="cursor-pointer text-xl leading-none px-3 py-1 border border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none"
@@ -30,11 +27,14 @@
                   type="button">
                   <i class="fas fa-arrow-alt-circle-down"></i> Ayuda
                 </button>
+                
               </li>
             </ul>
           </div>
         </div>
       </nav>
+
+      
     
       <main>
         <section class="absolute w-full h-full">
@@ -113,6 +113,10 @@
                           value="LOGIN"
                         >
                       </div>
+
+
+                      <!-- ERRORES --> 
+                      
                       <div v-if="error" role="alert">
                         <div class="bg-red-500 text-white font-bold rounded-t px-4 py-2">
                           ¡Error!
@@ -121,7 +125,18 @@
                            {{error_msg}}
                         </div>
                       </div>
+                      <div v-if="errorAPI !=='' " role="alert">
+                        <div class="bg-red-500 text-white font-bold rounded-t px-4 py-2">
+                          ¡Error!
+                        </div>
+                        <div class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
+                          Fallo de conexion con API REST
+                        </div>
+                      </div>
+
                     </form>
+                    <div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -154,12 +169,15 @@
                   </ul>
                 </div>
               </div>
+               
             </div>
           </footer>
         </section>
-      </main>
+         
+        </main>
     </div>
   </div>
+
 </template>
 
 <script>
@@ -168,25 +186,39 @@
 
   export default {
     name: 'Home',
-    components: {
-    
-    },
+
     data(){
       return{
         usuario:"",
         password:"",
         error: false,
-        error_msg: ""
+        error_msg: "",
+        errorAPI:"",
       }
     },
+    created(){
+      this.initialize()
+    },
     methods:{
+      initialize(){
+        const url = 'http://10.13.86.114:3000/';
+        axios
+          .get(url+'conexion')
+          .then(data => {
+                        if (data.data.status == 200) {
+                          console.log("API REST Listo")
+                        }
+                      }
+                )
+          .catch(errorAPI => {this.errorAPI = errorAPI})
+      
+      },
       login(){
+        const url = 'http://10.13.86.114:3000/';
         let json = {
           "usuario": this.usuario,
           "password": this.password,
         };
-
-      const url = 'http://10.13.86.114:3000/';
 
         axios.post(url+'auth/'+this.usuario + '/' + this.password, json).then(data => 
         {
@@ -194,6 +226,7 @@
             localStorage.token = data.data.token;
             localStorage.usuario = data.data.usuario;
             localStorage.rol = data.data.rolDefecto;
+            // localStorage.usrname = data.data.usrname; UNDEFINED
             this.$router.push('Dashboard');
           } else {
             this.error = data.data.error;
