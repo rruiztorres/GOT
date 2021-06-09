@@ -25,8 +25,18 @@
               <v-toolbar flat>
                 
                 <!-- VENTANA EDICION INCIDENCIA -->
-                <v-dialog v-model="dialog" max-width="1700">
-                  <VerIncidencia :incidencia="editedItem"></VerIncidencia>
+                <v-dialog 
+                v-model="dialog" 
+                fullscreen
+                hide-overlay
+                transition="dialog-bottom-transition"
+                class="h-full">
+                  <VerIncidencia 
+                    @dialog="dialogClose" 
+                    :incidencia="editedItem" 
+                    :error="editedItem.geometria_error"
+                    :center="editedItem.geometria_error"
+                  ></VerIncidencia>
                 </v-dialog>
                 <!-- FIN VENTANA EDICION INCIDENCIA -->
                 
@@ -81,19 +91,19 @@ import VerIncidencia from '@/components/VerIncidencia';
     components: {
       VerIncidencia,
     },
-    
+
     data: () => ({
       dialog: false,
       dialogDelete: false,
       search:'',
       headers: [
         { text: 'Incidencia', align: 'start', sortable: true, value: 'id_inc' },
-            { text: 'Estado', align: 'start', sortable: true, value: 'estado' },
-            { text: 'Vía Entrada', align: 'start', sortable: true, value: 'via_ent' },
-            { text: 'Prioridad', align: 'start', sortable: true, value: 'prioridad' },
-            { text: 'Seguimiento', align: 'start', sortable: true, value: 'seguimiento' },
-            { text: 'Procedencia', align: 'start', sortable: true, value: 'procedencia' },
-        { text: 'Actions', value: 'actions', sortable: false },
+        { text: 'Estado', align: 'start', sortable: true, value: 'estado' },
+        { text: 'Vía Entrada', align: 'start', sortable: true, value: 'via_ent' },
+        { text: 'Prioridad', align: 'start', sortable: true, value: 'prioridad' },
+        { text: 'Seguimiento', align: 'start', sortable: true, value: 'seguimiento' },
+        { text: 'Procedencia', align: 'start', sortable: true, value: 'procedencia' },
+        { text: 'Acciones', value: 'actions', sortable: false },
       ],
       incidencias: [],
       editedIndex: -1,
@@ -182,6 +192,10 @@ import VerIncidencia from '@/components/VerIncidencia';
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
         })
+      },
+      
+      dialogClose(){
+        this.dialog = false;
       },
 
       save () {
