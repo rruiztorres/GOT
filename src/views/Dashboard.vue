@@ -34,11 +34,12 @@ import {roles} from '@/assets/mixins/roles.js';
             },
 
         created(){
+            //ejecutamos initialize al cargar pagina
             this.initialize()
         },
 
         methods: {
-            //asigna panel activo por defecto segun array roles desde mixins
+            //asigna el panel que debe activarse de acuerdo al array "roles" recibido como mixin property.
             initialize(){
                 this.rolDefault = localStorage.rol;
                 for(this.rol in roles) {
@@ -48,13 +49,17 @@ import {roles} from '@/assets/mixins/roles.js';
                 }
             },
 
+            //...   
             cambiarMenu(data){
                 this.newMenu = data;
-                console.log("DB -> recibido cambio menu")
+                //debug
+                //console.log("DB -> recibido cambio menu")
             },
+            //..
             cambioMini(data){
                 this.newMini = data;
-                console.log("DB -> recibido cambio mini a " + this.newMini)
+                //debug
+                //console.log("DB -> recibido cambio mini a " + this.newMini)
             },
         },
 
@@ -73,7 +78,3 @@ import {roles} from '@/assets/mixins/roles.js';
     }
 
 </script>
-
-<style>
-
-</style>

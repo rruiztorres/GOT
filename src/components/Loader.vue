@@ -1,15 +1,21 @@
 <template>
 <div>
 
+    <!--Generador de Jobs-->
     <div v-if="activarMenu == 'IncTriajeGJ'"><IncTriajeGJ></IncTriajeGJ></div>
     <div v-if="activarMenu == 'IncBdjGJ'"><IncBdjGJ></IncBdjGJ></div>
+    <div v-if="activarMenu == 'JobsDevGJ'"><JobsDevGJ></JobsDevGJ></div>
+    <div v-if="activarMenu == 'JobsTriajeGJ'"><JobsTriajeGJ></JobsTriajeGJ></div>
 
 </div>
 </template>
 
 <script>
 import IncTriajeGJ from '@/components/generadorJobs/IncTriajeGJ';
-import IncBdjGJ from '@/components/generadorJobs/IncBdjGJ'
+import IncBdjGJ from '@/components/generadorJobs/IncBdjGJ';
+import JobsDevGJ from '@/components/generadorJobs/JobsDevGJ';
+import JobsTriajeGJ from '@/components/generadorJobs/JobsTriajeGJ';
+
 
 
 export default {
@@ -17,6 +23,8 @@ export default {
     components: {
         IncTriajeGJ,
         IncBdjGJ,
+        JobsDevGJ,
+        JobsTriajeGJ,
     },
     props: {
         activarMenu: {

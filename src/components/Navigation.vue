@@ -175,7 +175,9 @@ import {roles} from '@/assets/mixins/roles.js';
       cambiarRol(rol) {
         this.userRole = rol.name;
         localStorage.rol = rol.name;
-        console.log("el rol pasó a ser " + rol.name)
+        //debug
+        //console.log("el rol pasó a ser " + rol.name)
+        
         //hay que cambiar dashboard por defecto también al cambiar rol usuario
         this.cambiarMenu(rol.default)
       },

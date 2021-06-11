@@ -65,9 +65,9 @@
               <v-btn color="primary" @click="initialize">Reset</v-btn>
             </template>
 
-            <template v-slot:item.estado="{item}">
-              <v-chip :color="getColor(item.estado)" dark>
-                {{ item.estado }}
+            <template v-slot:item.inc_estado="{item}">
+              <v-chip :color="getColor(item.inc_estado)" dark>
+                {{ item.inc_estado }}
               </v-chip>
             </template>
 
@@ -98,30 +98,30 @@ import VerIncidencia from '@/components/VerIncidencia';
       search:'',
       headers: [
         { text: 'Incidencia', align: 'start', sortable: true, value: 'id_inc' },
-        { text: 'Estado', align: 'start', sortable: true, value: 'estado' },
-        { text: 'Vía Entrada', align: 'start', sortable: true, value: 'via_ent' },
-        { text: 'Prioridad', align: 'start', sortable: true, value: 'prioridad' },
-        { text: 'Seguimiento', align: 'start', sortable: true, value: 'seguimiento' },
-        { text: 'Procedencia', align: 'start', sortable: true, value: 'procedencia' },
+        { text: 'Estado', align: 'start', sortable: true, value: 'inc_estado' },
+        { text: 'Vía Entrada', align: 'start', sortable: true, value: 'inc_via_ent' },
+        { text: 'Prioridad', align: 'start', sortable: true, value: 'inc_prioridad' },
+        { text: 'Seguimiento', align: 'start', sortable: true, value: 'inc_seguimiento' },
+        { text: 'Procedencia', align: 'start', sortable: true, value: 'inc_procedencia' },
         { text: 'Acciones', value: 'actions', sortable: false },
       ],
       incidencias: [],
       editedIndex: -1,
       editedItem: {
         id_inc:'',
-        estado:'',
-        via_ent:'',
-        prioridad:'',
-        seguimiento:'',
-        procedencia:'',
+        inc_estado:'',
+        inc_via_ent:'',
+        inc_prioridad:'',
+        inc_seguimiento:'',
+        inc_procedencia:'',
       },
       defaultItem: {
         id_inc:'',
-        estado:'',
-        via_ent:'',
-        prioridad:'',
-        seguimiento:'',
-        procedencia:'',
+        inc_estado:'',
+        inc_via_ent:'',
+        inc_prioridad:'',
+        inc_seguimiento:'',
+        inc_procedencia:'',
       },
     }),
 
@@ -152,12 +152,12 @@ import VerIncidencia from '@/components/VerIncidencia';
           .then(data => {
                           this.incidenciasBruto = data.data.response;
                           for (this.elemento in this.incidenciasBruto) {
-                              if (this.incidenciasBruto[this.elemento].estado == 'En Triaje') {
+                              if (this.incidenciasBruto[this.elemento].inc_estado == 'En Triaje') {
                                this.incidencias.push(this.incidenciasBruto[this.elemento])            
                               }     
                           }
           //debug
-          console.log('InciGEO (IncTriajeGJ) -> Incidencias recuperadas y filtradas correctamente'); 
+          //console.log('InciGEO (IncTriajeGJ) -> Incidencias recuperadas y filtradas correctamente'); 
           })
       },
 
