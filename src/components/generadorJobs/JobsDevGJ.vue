@@ -2,7 +2,7 @@
     <div class="mx-8">
 
       <h1 class="ml-2 text-2xl font-bold my-6">
-      Incidencias en Bandeja
+      Jobs Devueltos
       </h1>
 
       <v-app> 
@@ -10,7 +10,7 @@
         
           <v-data-table
             :headers="headers"
-            :items="incidencias"
+            :items="jobs"
             :search="search"
             class="font-sans"
             style="max-height:47rem;"
@@ -31,12 +31,14 @@
                 hide-overlay
                 transition="dialog-bottom-transition"
                 class="h-full">
+                
                   <VerIncidencia 
                     @dialog="dialogClose" 
                     :incidencia="editedItem" 
                     :error="editedItem.geometria_error"
                     :center="editedItem.geometria_error"
                   ></VerIncidencia>
+
                 </v-dialog>
                 <!-- FIN VENTANA EDICION INCIDENCIA -->
                 
@@ -65,9 +67,9 @@
               <v-btn color="primary" @click="initialize">Reset</v-btn>
             </template>
 
-            <template v-slot:item.inc_estado="{item}">
-              <v-chip :color="getColor(item.inc_estado)" dark>
-                {{ item.inc_estado }}
+            <template v-slot:item.job_estado="{item}">
+              <v-chip :color="getColor(item.job_estado)" dark>
+                {{ item.job_estado }}
               </v-chip>
             </template>
 
@@ -86,7 +88,7 @@ import VerIncidencia from '@/components/VerIncidencia';
 
 
   export default {
-    name:'IncTriajeGJ',
+    name:'JobsDevGJ',
     mixins: [getColor],
     components: {
       VerIncidencia,
@@ -97,31 +99,29 @@ import VerIncidencia from '@/components/VerIncidencia';
       dialogDelete: false,
       search:'',
       headers: [
-        { text: 'Incidencia', align: 'start', sortable: true, value: 'id_inc' },
-        { text: 'Estado', align: 'start', sortable: true, value: 'inc_estado' },
-        { text: 'Vía Entrada', align: 'start', sortable: true, value: 'inc_via_ent' },
-        { text: 'Prioridad', align: 'start', sortable: true, value: 'inc_prioridad' },
-        { text: 'Seguimiento', align: 'start', sortable: true, value: 'inc_seguimiento' },
-        { text: 'Procedencia', align: 'start', sortable: true, value: 'inc_procedencia' },
-        { text: 'Acciones', value: 'actions', sortable: false },
+        { text: 'Job', align: 'start', sortable: true, value: 'id_inc'},
+        { text: 'Estado', align: 'start', sortable: true, value: 'job_estado' },
+        { text: 'Prioridad', align: 'start', sortable: true, value: 'job_prioridad' },
+        { text: 'Detectado en', align: 'start', sortable: true, value: 'job_detectado' },
+        { text: 'Arreglar en', align: 'start', sortable: true, value: 'job_arreglar' },
+        // pendiente determinar acciones
+        //{ text: 'Acciones', value: 'actions', sortable: false },
       ],
-      incidencias: [],
+      jobs: [],
       editedIndex: -1,
       editedItem: {
         id_inc:'',
-        inc_estado:'',
-        inc_via_ent:'',
-        inc_prioridad:'',
-        inc_seguimiento:'',
-        inc_procedencia:'',
+        job_estado:'',
+        job_prioridad:'',
+        job_detectado:'',
+        job_arreglar:'',
       },
       defaultItem: {
         id_inc:'',
-        inc_estado:'',
-        inc_via_ent:'',
-        inc_prioridad:'',
-        inc_seguimiento:'',
-        inc_procedencia:'',
+        job_estado:'',
+        job_prioridad:'',
+        job_detectado:'',
+        job_arreglar:'',
       },
     }),
 
@@ -147,34 +147,37 @@ import VerIncidencia from '@/components/VerIncidencia';
       initialize () {
         const url = 'http://10.13.86.114:3000/'; //url del servicio
         axios
-          .get(url+'incidencias')
-          //se realiza el filtro para las incidencias en bandeja
+          .get(url+'jobs')
+          //se realiza el filtro para los jobs devueltos y la asignación del job_id
           .then(data => {
-                          this.incidenciasBruto = data.data.response;
-                          for (this.elemento in this.incidenciasBruto) {
-                              if (this.incidenciasBruto[this.elemento].inc_estado == 'En Bandeja') {
-                               this.incidencias.push(this.incidenciasBruto[this.elemento])            
+                          this.jobsBruto = data.data.response;
+                          for (this.elemento in this.jobsBruto) {
+                              //referenciamos los -J01, -J02, etc. por cada incidencia.
+                              this.jobsBruto[this.elemento].id_inc = this.jobsBruto[this.elemento].id_inc+'-J'+this.jobsBruto[this.elemento].job_id
+                              //filtramos jobs segun estado
+                              if (this.jobsBruto[this.elemento].job_estado == 'Devuelto') {
+                               this.jobs.push(this.jobsBruto[this.elemento])            
                               }     
                           }
           //debug
-          //console.log('InciGEO (IncTriajeGJ) -> Incidencias recuperadas y filtradas correctamente'); 
+          //console.log('InciGEO (JobsDevGJ) -> Jobs recuperados y filtrados correctamente'); 
           })
       },
 
       editItem (item) {
-        this.editedIndex = this.incidencias.indexOf(item)
+        this.editedIndex = this.jobs.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
-        this.editedIndex = this.incidencias.indexOf(item)
+        this.editedIndex = this.jobs.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
-        this.incidencias.splice(this.editedIndex, 1)
+        this.jobs.splice(this.editedIndex, 1)
         this.closeDelete()
       },
 
@@ -200,9 +203,9 @@ import VerIncidencia from '@/components/VerIncidencia';
 
       save () {
         if (this.editedIndex > -1) {
-          Object.assign(this.incidencias[this.editedIndex], this.editedItem)
+          Object.assign(this.jobs[this.editedIndex], this.editedItem)
         } else {
-          this.incidencias.push(this.editedItem)
+          this.jobs.push(this.editedItem)
         }
         this.close()
       },

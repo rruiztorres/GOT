@@ -41,6 +41,7 @@
             v-for="opcionJob in gestJobs"
             :key="opcionJob.name"
             link
+            @click="activar(opcionJob.active)"
           >
             <v-list-item-icon>
               <v-icon>{{ opcionJob.icon }}</v-icon>
@@ -98,7 +99,8 @@ export default {
       cambiarRol(rol) {
         this.userRole = rol;
         localStorage.rol = rol;
-        console.log("el rol pasó a ser " + rol)
+        //debug
+        //console.log("el rol pasó a ser " + rol)
       },
     },
 
@@ -115,8 +117,8 @@ export default {
           {name:'Acciones globales', icon:'mdi-table-eye'},
         ],
         gestJobs: [ 
-          {name:'Jobs Devueltos', icon:'mdi-briefcase-remove'},
-          {name:'Jobs en Triaje', icon:'mdi-ambulance'},
+          {name:'Jobs Devueltos', icon:'mdi-briefcase-remove', active:'JobsDevGJ'},
+          {name:'Jobs en Triaje', icon:'mdi-ambulance', active:'JobsTriajeGJ'},
           {name:'Acciones globales', icon:'mdi-table-eye'},
         ],
         informes: [

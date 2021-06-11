@@ -21,7 +21,7 @@ export const getColor = {
             else if (estado == 'Pendiente Solucion') return '#ffcc00'; //amarillo
             else if (estado == 'Solucionado') return '#009933'; //verde
             else if (estado == 'Desestimado') return '#0066ff'; //azul
-
+            else if (estado == 'Devuelto') return '#f54b42'; //rojo
         }
     },
 }

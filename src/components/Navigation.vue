@@ -1,7 +1,7 @@
 <template>
 <v-app class="font-sans h-full">
   <v-navigation-drawer 
-    class="bg-blue-900"
+    class=""
     dark v-model="drawer" :mini-variant.sync="mini" permanent src="https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg">
    
 
@@ -24,13 +24,13 @@
 
             <div v-if="mini==false">
               <img
-              src="https://medicaenergy.com/assets/images/default-user.png"
+              src="https://png.pngtree.com/png-vector/20190710/ourlarge/pngtree-user-vector-avatar-png-image_1541962.jpg"
               class="w-20 border-2 border-gray-400 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
               >
             </div>
             <div v-if="mini==true">
               <img
-              src="https://medicaenergy.com/assets/images/default-user.png"
+              src="https://png.pngtree.com/png-vector/20190710/ourlarge/pngtree-user-vector-avatar-png-image_1541962.jpg"
               class="w-10 border-2 border-gray-400 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
               >
             </div>
@@ -118,12 +118,7 @@
           <!-- FIN MENU DESPLEGABLE USUARIO -->
         </v-menu>
       </div>
-    </template>
-        
-    <!--BOTON MINI-->
-  <!-- <v-btn class="float-right p-6" icon @click="hacerMini">
-      <v-icon>mdi-menu-open</v-icon>
-  </v-btn> -->
+    </template>      
       
 <!-- FIN PANEL USUARIO -->
 
@@ -180,7 +175,9 @@ import {roles} from '@/assets/mixins/roles.js';
       cambiarRol(rol) {
         this.userRole = rol.name;
         localStorage.rol = rol.name;
-        console.log("el rol pasó a ser " + rol.name)
+        //debug
+        //console.log("el rol pasó a ser " + rol.name)
+        
         //hay que cambiar dashboard por defecto también al cambiar rol usuario
         this.cambiarMenu(rol.default)
       },
@@ -204,7 +201,3 @@ import {roles} from '@/assets/mixins/roles.js';
     },
   }
 </script>
-
-<style>
-
-</style>

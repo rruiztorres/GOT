@@ -21,22 +21,45 @@ import Header from '@/components/Header';
 import Loader from '@/components/Loader';
 import Navigation from '@/components/Navigation';
 
+//mixins
+import {roles} from '@/assets/mixins/roles.js';
+
     export default {
         name:"Dashboard",
+        mixins: [roles],
         components:{
             Header,
             Navigation,
             Loader,
             },
 
+        created(){
+            //ejecutamos initialize al cargar pagina
+            this.initialize()
+        },
+
         methods: {
+            //asigna el panel que debe activarse de acuerdo al array "roles" recibido como mixin property.
+            initialize(){
+                this.rolDefault = localStorage.rol;
+                for(this.rol in roles) {
+                    if (roles[this.rol].name == this.rolDefault){
+                        this.newMenu = roles[this.rol].default;
+                    }
+                }
+            },
+
+            //...   
             cambiarMenu(data){
                 this.newMenu = data;
-                console.log("DB -> recibido cambio menu")
+                //debug
+                //console.log("DB -> recibido cambio menu")
             },
+            //..
             cambioMini(data){
                 this.newMini = data;
-                console.log("DB -> recibido cambio mini a " + this.newMini)
+                //debug
+                //console.log("DB -> recibido cambio mini a " + this.newMini)
             },
         },
 
@@ -44,12 +67,10 @@ import Navigation from '@/components/Navigation';
         const userRole = 'Generador de Jobs';
         let newMenu = this.newMenu;
         let newMini = this.mini;
-
             return{
                 userRole,
                 newMenu,
                 newMini,
-    
             }
         },
        
@@ -57,7 +78,3 @@ import Navigation from '@/components/Navigation';
     }
 
 </script>
-
-<style>
-
-</style>

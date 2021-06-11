@@ -14,7 +14,7 @@
             :search="search"
             class="font-sans"
             style="max-height:47rem;"
-          >
+            >
             <template v-slot:top>
               <v-text-field
                 v-model="search"
@@ -23,17 +23,27 @@
               ></v-text-field>
             
               <v-toolbar flat>
-
-                <v-dialog v-model="dialog" max-width="1700">
-                  <div class="bg-white p-6">
-                    <h1>Hago cosas</h1>
-                  </div>
+                
+                <!-- VENTANA EDICION INCIDENCIA -->
+                <v-dialog 
+                v-model="dialog" 
+                fullscreen
+                hide-overlay
+                transition="dialog-bottom-transition"
+                class="h-full">
+                  <VerIncidencia 
+                    @dialog="dialogClose" 
+                    :incidencia="editedItem" 
+                    :error="editedItem.geometria_error"
+                    :center="editedItem.geometria_error"
+                  ></VerIncidencia>
                 </v-dialog>
+                <!-- FIN VENTANA EDICION INCIDENCIA -->
                 
                 <v-dialog v-model="dialogDelete" max-width="500px">
                   <v-card>
                    <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
-                   <h3 class="text-center text-l">Esta acción borrará la incidencia actual ¿Desea continuar?</h3>
+                   <h3 class="text-center text-l">Esta acción borrará la incidencia ¿Desea continuar?</h3>
                       <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn class="w-24 bg-red-500" dark text @click="closeDelete">Cancel</v-btn>
@@ -55,9 +65,9 @@
               <v-btn color="primary" @click="initialize">Reset</v-btn>
             </template>
 
-            <template v-slot:item.estado="{item}">
-              <v-chip :color="getColor(item.estado)" dark>
-                {{ item.estado }}
+            <template v-slot:item.inc_estado="{item}">
+              <v-chip :color="getColor(item.inc_estado)" dark>
+                {{ item.inc_estado }}
               </v-chip>
             </template>
 
@@ -72,41 +82,46 @@
 import axios from 'axios';
 import {getColor} from '@/assets/mixins/getColor.js';
 
+import VerIncidencia from '@/components/VerIncidencia';
+
 
   export default {
     name:'IncTriajeGJ',
     mixins: [getColor],
-    
+    components: {
+      VerIncidencia,
+    },
+
     data: () => ({
       dialog: false,
       dialogDelete: false,
       search:'',
       headers: [
         { text: 'Incidencia', align: 'start', sortable: true, value: 'id_inc' },
-            { text: 'Estado', align: 'start', sortable: true, value: 'estado' },
-            { text: 'Vía Entrada', align: 'start', sortable: true, value: 'via_ent' },
-            { text: 'Prioridad', align: 'start', sortable: true, value: 'prioridad' },
-            { text: 'Seguimiento', align: 'start', sortable: true, value: 'seguimiento' },
-            { text: 'Procedencia', align: 'start', sortable: true, value: 'procedencia' },
-        { text: 'Actions', value: 'actions', sortable: false },
+        { text: 'Estado', align: 'start', sortable: true, value: 'inc_estado' },
+        { text: 'Vía Entrada', align: 'start', sortable: true, value: 'inc_via_ent' },
+        { text: 'Prioridad', align: 'start', sortable: true, value: 'inc_prioridad' },
+        { text: 'Seguimiento', align: 'start', sortable: true, value: 'inc_seguimiento' },
+        { text: 'Procedencia', align: 'start', sortable: true, value: 'inc_procedencia' },
+        { text: 'Acciones', value: 'actions', sortable: false },
       ],
       incidencias: [],
       editedIndex: -1,
       editedItem: {
         id_inc:'',
-        estado:'',
-        via_ent:'',
-        prioridad:'',
-        seguimiento:'',
-        procedencia:'',
+        inc_estado:'',
+        inc_via_ent:'',
+        inc_prioridad:'',
+        inc_seguimiento:'',
+        inc_procedencia:'',
       },
       defaultItem: {
         id_inc:'',
-        estado:'',
-        via_ent:'',
-        prioridad:'',
-        seguimiento:'',
-        procedencia:'',
+        inc_estado:'',
+        inc_via_ent:'',
+        inc_prioridad:'',
+        inc_seguimiento:'',
+        inc_procedencia:'',
       },
     }),
 
@@ -124,7 +139,6 @@ import {getColor} from '@/assets/mixins/getColor.js';
         val || this.closeDelete()
       },
     },
-
     created () {
       this.initialize()
     },
@@ -138,12 +152,12 @@ import {getColor} from '@/assets/mixins/getColor.js';
           .then(data => {
                           this.incidenciasBruto = data.data.response;
                           for (this.elemento in this.incidenciasBruto) {
-                              if (this.incidenciasBruto[this.elemento].estado == 'En Triaje') {
+                              if (this.incidenciasBruto[this.elemento].inc_estado == 'En Triaje') {
                                this.incidencias.push(this.incidenciasBruto[this.elemento])            
                               }     
                           }
           //debug
-          console.log('InciGEO (IncTriajeGJ) -> Incidencias recuperadas y filtradas correctamente'); 
+          //console.log('InciGEO (IncTriajeGJ) -> Incidencias recuperadas y filtradas correctamente'); 
           })
       },
 
@@ -178,6 +192,10 @@ import {getColor} from '@/assets/mixins/getColor.js';
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
         })
+      },
+      
+      dialogClose(){
+        this.dialog = false;
       },
 
       save () {
