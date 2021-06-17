@@ -14,7 +14,7 @@
           <v-toolbar-title>Incidencia {{incidencia.id_inc}}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn class="w-24 bg-red-500 mr-5" dark text @click="closeDialog">CANCELAR</v-btn>
-          <v-btn class="w-24 bg-green-500" dark text>GUARDAR</v-btn>
+          <v-btn class="w-24 bg-green-500" dark text @click="storePolygonGeom">GUARDAR</v-btn>
         </v-toolbar>
 
 
@@ -54,29 +54,51 @@
                             <br/>
                             <!--Sacar a componente-->
                             <div>
-                                <h1 class="text-xl mb-1">JOBS ASOCIADOS A LA INCIDENCIA {{incidencia.id_inc}}</h1>
-                                
+                                <h1 
+                                    class="text-xl pb-3"
+                                    >
+                                    JOBS ASOCIADOS A LA INCIDENCIA {{incidencia.id_inc}}
+                                </h1>                                                               
                                 <div v-if="(jobs.length!==0)">
-                                    <table class="p-6 text-justify shadow-md w-full">
-                                        <thead>
-                                        <tr class="bg-gray-300">
-                                            <th class="p-3"><b>JOB nº</b></th>
-                                            <th class="p-3">Estado</th>
-                                            <th class="p-3">Prioridad</th>
-                                            <th class="p-3">Detectado</th>
-                                            <th class="p-3">Arreglar en</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr v-for="job in jobs" :key="job.job_id">
-                                            <td class="p-3">{{job.id_inc+'-J'+job.job_id}}</td>
-                                            <td class="p-3">{{job.job_estado}}</td>
-                                            <td class="p-3">{{job.job_prioridad}}</td>
-                                            <td class="p-3">{{job.job_detectado}}</td>
-                                            <td class="p-3">{{job.job_arreglar}}</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                    <template>
+                                        <v-data-table
+                                            :headers="jobHeaders"
+                                            :items="jobs"
+                                            :expanded.sync="expanded"
+                                            item-key="job_id"
+                                            show-expand
+                                            class="shadow-lg"
+                                        >
+                                            <template 
+                                                v-slot:expanded-item="{ headers }">
+                                                <td
+                                                class="bg-gray-100 pl-16"
+                                                :colspan="headers.length">
+
+                                                    <!-- TODO TABLA ERRORES DE CADA JOB -->
+                                                    <h3 class="mt-4">ERRORES EN JOB (pruebas)</h3>
+                                                    <table class="border mb-4 w-4/5">
+                                                        <tr>
+                                                            <td class="p-3 bg-white border border-gray-400">IGN_C_2021000001-J01-E01</td>
+                                                            <td class="p-3 bg-white border border-gray-400">Atributo</td>
+                                                            <td class="p-3 bg-white border border-gray-400">Atributo</td>
+                                                            <td class="p-3 bg-white border border-gray-400">Atributo</td>
+                                                            <td class="p-3 bg-white border border-gray-400">Atributo</td>
+                                                            <td class="p-3 bg-white border border-gray-400">Atributo</td>
+                                                            <td class="p-3 bg-white border border-gray-400">Atributo</td>
+                                                            <td class="p-3 bg-white border border-gray-400">Atributo</td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </template>
+
+                                            <template v-slot:[`item.job_estado`]="{ item }">
+                                                <v-chip :color="getColor(item.job_estado)" dark>
+                                                    {{ item.job_estado }}
+                                                </v-chip>
+                                            </template>
+                                        </v-data-table>
+                                    </template>
                                 </div>
 
                                 <div v-if="(jobs.length==0)">
@@ -99,57 +121,13 @@
                                 </div>
                             </div>
                             <br/>
-                            <div>
-                                <h1 class="text-xl mb-1">ERRORES ASOCIADOS A LA INCIDENCIA {{incidencia.id_inc}}</h1>
-                                
-                                <div v-if="(jobs.length!==0)">
-                                    <table class="p-6 text-justify shadow-md w-full">
-                                        <thead>
-                                        <tr class="bg-gray-300">
-                                            <th class="p-3"><b>JOB nº</b></th>
-                                            <th class="p-3">Estado</th>
-                                            <th class="p-3">Prioridad</th>
-                                            <th class="p-3">Detectado</th>
-                                            <th class="p-3">Arreglar en</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr v-for="job in jobs" :key="job.job_id">
-                                            <td class="p-3">{{job.id_inc+'-J'+job.job_id}}</td>
-                                            <td class="p-3">{{job.job_estado}}</td>
-                                            <td class="p-3">{{job.job_prioridad}}</td>
-                                            <td class="p-3">{{job.job_detectado}}</td>
-                                            <td class="p-3">{{job.job_arreglar}}</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div v-if="(jobs.length==0)">
-                                    <table class="p-6 text-justify shadow-md w-full">
-                                        <thead>
-                                        <tr class="bg-gray-300">
-                                            <th class="p-3"><b>JOB nº</b></th>
-                                            <th class="p-3">Estado</th>
-                                            <th class="p-3">Prioridad</th>
-                                            <th class="p-3">Detectado</th>
-                                            <th class="p-3">Arreglar en</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr class="bg-white">
-                                            <td colspan="5" class="p-3">No Existen Jobs asociados a la incidencia</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                            
                             <!--FIN tabla JOBS-->    
                             </div>
 
                     <v-card-text>
                         <p>
-                        Hello moto!
+                        <!--comodin-->
                         </p>
                     </v-card-text>
                     </v-card>
@@ -179,13 +157,32 @@
                                 <vl-source-osm></vl-source-osm>
                             </vl-layer-tile>
 
+                            <!--<vl-layer-tile>
+                                <vl-source-xyz :url="url"></vl-source-xyz>
+                            </vl-layer-tile>-->
+
+                            <vl-layer-vector style="zIndex=1">
+                                <vl-source-vector :features.sync="features" ident="the-source"></vl-source-vector>
+                                    <vl-style-box>
+                                        <vl-style-stroke color="green"></vl-style-stroke>
+                                        <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+                                    </vl-style-box>
+                            </vl-layer-vector>
+
+                            <vl-interaction-draw type="Polygon" source="the-source">
+                                <vl-style-box>
+                                    <vl-style-stroke color="blue"></vl-style-stroke>
+                                    <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+                                </vl-style-box>
+                            </vl-interaction-draw>
+
+
                         <!--GEOMETRIAS MAPA-->
                             <vl-layer-vector>
                                 <vl-feature>
                                     <vl-geom-point
                                         :coordinates="error_inc">
                                     </vl-geom-point>
-
                                     <vl-style-box>
                                         <vl-style-circle :radius="10">
                                             <vl-style-fill color="red"></vl-style-fill>
@@ -193,6 +190,16 @@
                                         </vl-style-circle>
                                     </vl-style-box>
                                 </vl-feature>
+                                
+                                <!-- MOSTRAR JOBS
+                                    <div v-for="job in jobs" :key="job.id">
+                                    <vl-feature id="polygon">
+                                        <vl-geom-polygon :coordinates="[[job.job_geometria]]"></vl-geom-polygon>
+                                    </vl-feature>
+                                </div>-->
+
+
+
                             </vl-layer-vector>
                         </vl-map>
                         <v-card-text>
@@ -380,36 +387,73 @@ import axios from 'axios';
                 this.error_inc = this.error;
                 this.center_inc = this.error;
             }
-            
-        }
+         },
+        jobs(){},
+        jobHeaders(){},
     },
 
     methods:{
         //inicializa la tabla de jobs asociados a la incidencia
         initialize () {
-        const url = 'http://10.13.86.114:3000/'; //url del servicio
-        const id_inc = this.incidencia.id_inc;
-        axios
-          .get(url+'jobs/'+ id_inc)
-          //se realiza el filtro para las incidencias en bandeja
-          .then(data => {this.jobs = data.data;
-          //debug
-          //console.log(this.jobs); 
-          })
+            const url = 'http://10.13.86.114:3000/'; //url del servicio
+            const id_inc = this.incidencia.id_inc;
+            document.cookie = 'SameSite = Strict';
+            axios
+                .get(url+'jobs/'+ id_inc)
+                //se realiza el filtro para las incidencias en bandeja
+                .then(data => {this.jobs = data.data;
+                //debug
+                //console.log(this.jobs); 
+                })
         },
         closeDialog(){
             this.dialog = false;
             this.$emit('dialog', this.dialog);
-        }
+        },
+        storePolygonGeom(){
+            //de momento solo puede almacenar 1 poligono
+            this.geometries = this.features[0].geometry.coordinates;
+            this.jobGeometry = [];
+            //formateo de geometrias desde openlayers a postgis
+            for (this.geometry in this.geometries) {
+                for(this.index in this.geometries[this.geometry]){
+                    this.coordinate = this.geometries[this.geometry][this.index];
+                    this.coordinate = JSON.stringify(this.coordinate);
+                    //borrar caracteres no deseados
+                    this.coordinate = this.coordinate.replace("[", "");
+                    this.coordinate = this.coordinate.replace("]", "");
+                    this.coordinate = this.coordinate.replace(",", " ");
+                    this.jobGeometry.push(this.coordinate);
+                }
+            }
+            this.jobGeometry = '"POLYGON((' + this.jobGeometry + '))"';
+            console.log(this.jobGeometry);
+        },
+
     },
 
     data () {
         return {
-                zoom: 15,
+                zoom: 13,
                 jobs:[],
                 //recogemos las props en otras variables de lo contrario se genera un bug al cerrar el panel
                 error_inc: this.error,
                 center_inc: this.error,
+                url: 'https://tms-ign-base.ign.es/1.0.0/IGNBaseTodo/{z}/{x}/{-y}.jpeg',
+                features:[],
+
+                expanded: [],
+                jobHeaders: [
+                    
+                    { text: 'Incidencia', align: 'start', sortable: false, value:'id_inc',},
+                    { text: 'Job', align: 'start', sortable: false, value: 'job_id',},
+                    { text: 'Estado', value: 'job_estado' },
+                    { text: 'Prioridad', value: 'job_prioridad' },
+                    { text: 'Detectado', value: 'job_detectado' },
+                    { text: 'Arreglar en', value: 'job_arreglar' },
+                    { text: 'Descripción', value: 'job_desc' },
+                    
+                ],
                 
             }
     },
