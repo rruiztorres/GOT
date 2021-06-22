@@ -26,7 +26,7 @@
 
                     <v-stepper-step 
                         step="3">
-                        Asignar y Finalizar
+                        Finalizar
                     </v-stepper-step>
                 </v-stepper-header>
 
@@ -97,21 +97,24 @@
 
                             <v-btn
                             color="primary"
-                            @click="
-                                    e1 = 2
-                                    showResume()"
+                            @click="e1 = 2"
                             class="mr-2"
                             >
                             Siguiente
                             </v-btn>
                     </v-stepper-content>
 
+
+
                     <v-stepper-content step="2">
                         <v-card
                         class="mb-12"
                         color="grey lighten-1"
-                        height="200px"
-                        ></v-card>
+                        height="550px"
+                        >
+                        <Map></Map>
+                        
+                        </v-card>
 
                         <v-btn
                         color="secondary"
@@ -168,12 +171,14 @@
 </template>
 
 <script>
-import Tiptap from '@/components/TextEditor'
-import axios from 'axios'
+import Tiptap from '@/components/TextEditor';
+import Map from '@/components/Map';
+import axios from 'axios';
 
   export default {
     components: {
-        Tiptap
+        Tiptap,
+        Map,
     },
 
     created () {
@@ -221,11 +226,7 @@ import axios from 'axios'
                                 },
                     )
         },
-        
 
-        showResume(){
-            console.log("hello" + this.content);
-        }
     },
  
     data () {

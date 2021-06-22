@@ -14,19 +14,16 @@ import vuetify from './plugins/vuetify';
 import Vuetify from 'vuetify/lib';
 Vue.use(Vuetify)
 
-//VUELAYERS
-import VueLayers from 'vuelayers';
-import 'vuelayers/lib/style.css'; // needs css-loader
-import { PolygonGeom } from 'vuelayers' 
-import { DrawInteraction } from 'vuelayers'
+
+//LEAFLET
+import VueLayers from 'vuelayers'
+import 'vuelayers/lib/style.css' // needs css-loader
+
 Vue.use(VueLayers)
-Vue.use(PolygonGeom)
-Vue.use(DrawInteraction)
+
 
 //DEV - PROD
 Vue.config.productionTip = false
-
-
 
 
 new Vue({
