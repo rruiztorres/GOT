@@ -112,7 +112,7 @@
                         color="grey lighten-1"
                         height="550px"
                         >
-                        <Map></Map>
+                        <Map :incidencia="incSerial"></Map>
                         
                         </v-card>
 
