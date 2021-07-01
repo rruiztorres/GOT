@@ -67,17 +67,13 @@
         <v-icon>mdi-format-list-numbered</v-icon>
       </v-btn>
 
-      
-
       <v-btn icon @click="editor.chain().focus().toggleBlockquote().run()" :class="{ 'is-active': editor.isActive('blockquote') }">
         <v-icon>mdi-format-quote-close</v-icon> 
       </v-btn>
 
       <v-btn icon  @click="addImage">
         <v-icon>mdi-image</v-icon> 
-      </v-btn>
-
-      
+      </v-btn>      
     </div>
     
       <editor-content 
@@ -97,13 +93,20 @@ export default {
     EditorContent,
   },
 
+  props: {
+    value: {
+      type: String,
+      default: 'Introduzca la descripción del error',
+    },
+  },
+
   data() {
     return {
       editor: null,
     }
   },
 
-  methods: {
+  methods:{
     addImage() {
       const url = window.prompt('URL')
 
@@ -113,13 +116,36 @@ export default {
     },
   },
 
+  watch: {
+    value(value) {
+      // HTML
+      const isSame = this.editor.getHTML() === value
+
+      // JSON
+      // const isSame = this.editor.getJSON().toString() === value.toString()
+
+      if (isSame) {
+        return
+      }
+
+      this.editor.commands.setContent(this.value, false)
+    },
+  },
+
   mounted() {
     this.editor = new Editor({
       extensions: [
         StarterKit,
         Image,
       ],
-      content: 'Introduzca el texto aquí',
+      content: this.value,
+      onUpdate: () => {
+        // HTML
+        this.$emit('editor', this.editor.getHTML())
+
+        // JSON
+        // this.$emit('input', this.editor.getJSON())
+      },
     })
   },
 

@@ -52,7 +52,7 @@
                                 <v-col cols="12">
                                     <v-subheader>Descripción Incidencia</v-subheader>
                                     <div class="ml-4 p-3 border border-gray-200 shadow bg-gray-100">
-                                        <Tiptap></Tiptap>
+                                        <TextEditor @editor = storeDescIncidencia></TextEditor>
                                     </div>
                                 </v-col>
                             </v-row>
@@ -66,6 +66,7 @@
                                         <v-select
                                         dense
                                         :items="inViaEntrada"
+                                        v-model="viaEntrada"
                                         ></v-select>
                                     </v-col>
 
@@ -76,6 +77,7 @@
                                         <v-select
                                         dense
                                         :items="inProcedencia"
+                                        v-model="procedencia"
                                         ></v-select>
                                     </v-col>
                                 </v-row>
@@ -97,7 +99,7 @@
 
                             <v-btn
                             color="primary"
-                            @click="e1 = 2"
+                            @click="recDataIncidencia"
                             class="mr-2"
                             >
                             Siguiente
@@ -105,6 +107,7 @@
                     </v-stepper-content>
 
 
+                <!-- ================================== STEP 2 ============================== -->
 
                     <v-stepper-content step="2">
                         <v-card
@@ -112,7 +115,7 @@
                         color="grey lighten-1"
                         height="550px"
                         >
-                        <Map :incidencia="incSerial"></Map>
+                        <Map @errores="storeErrores" :incidencia="incSerial"></Map>
                         
                         </v-card>
 
@@ -126,13 +129,19 @@
 
                         <v-btn
                         color="primary"
-                        @click="e1 = 3"
+                        @click="getErrores"
                         class="mr-2"
                         >
                         Siguiente
                         </v-btn>
 
                     </v-stepper-content>
+
+
+
+
+
+
 
                     <v-stepper-content step="3">
                         <v-card
@@ -171,13 +180,13 @@
 </template>
 
 <script>
-import Tiptap from '@/components/TextEditor';
+import TextEditor from '@/components/TextEditor';
 import Map from '@/components/Map';
 import axios from 'axios';
 
   export default {
     components: {
-        Tiptap,
+        TextEditor,
         Map,
     },
 
@@ -200,7 +209,6 @@ import axios from 'axios';
             this.incSerial = (this.serial.serial_type)+(this.serial.serial_year)+(this.serial.serial_id)
             })
         },
-
         initializeViaEnt() {
             const url = 'http://10.13.86.114:3000/'; //url del servicio
             axios
@@ -213,7 +221,6 @@ import axios from 'axios';
                                 },
                     )
         },
-
         initializeProced() {
             const url = 'http://10.13.86.114:3000/'; //url del servicio
             axios
@@ -226,19 +233,45 @@ import axios from 'axios';
                                 },
                     )
         },
-
+        storeDescIncidencia(returnedText){
+            this.returnedTextIncidencia = returnedText
+        },
+        recDataIncidencia(){
+            this.incidencia.push({
+                id_inc:this.incSerial,
+                descripcion:this.returnedTextIncidencia,
+                via_entrada: this.viaEntrada,
+                procedencia: this.procedencia,
+                eMailSeguim: this.email,
+            })
+            console.log("Incidencia Grabada -> ", this.incidencia[0])
+            this.e1 = 2 //Avanzamos al paso 2
+        },
+        storeErrores(errors){
+            this.errores = errors
+        },
+        getErrores(){
+            console.log('Errores almacenados: ', this.errores)
+            this.e1 = 3
+        }
     },
  
     data () {
         return {
-        e1: 1,
-        incSerial:'',
-        email:'',
-        emailRules: [
-            v => /.+@.+/.test(v) || 'Debe introducir un email válido, por ejemplo: "usuario@incigeo.com"',
-        ],
-        inViaEntrada: [],
-        inProcedencia: [],
+            e1: 1,
+            incSerial:'',
+            emailRules: [
+                v => /.+@.+/.test(v) || 'Debe introducir un email válido, por ejemplo: "usuario@incigeo.com"',
+            ],
+            inViaEntrada: [],
+            inProcedencia: [],
+
+            incidencia:[],      //Almacen de datos para incidencia
+            viaEntrada:'',      //Select desde formulario
+            procedencia:'',     //Select desde formulario
+            email:'',           //Select desde formulario
+
+            errores:[],         //Almacen de errores
         }
     },
   }
