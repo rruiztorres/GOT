@@ -96,7 +96,7 @@ export default {
   props: {
     value: {
       type: String,
-      default: 'Introduzca la descripción del error',
+      default: 'Introduzca el texto aqui',
     },
   },
 

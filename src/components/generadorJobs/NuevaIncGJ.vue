@@ -99,7 +99,7 @@
 
                             <v-btn
                             color="primary"
-                            @click="recDataIncidencia"
+                            @click="e1 = 2"
                             class="mr-2"
                             >
                             Siguiente
@@ -115,7 +115,7 @@
                         color="grey lighten-1"
                         height="550px"
                         >
-                        <Map @errores="storeErrores" :incidencia="incSerial"></Map>
+                        <Map @jobs="storeJobs" :incidencia="incSerial"></Map>
                         
                         </v-card>
 
@@ -129,7 +129,7 @@
 
                         <v-btn
                         color="primary"
-                        @click="getErrores"
+                        @click="recDataIncidencia"
                         class="mr-2"
                         >
                         Siguiente
@@ -243,17 +243,16 @@ import axios from 'axios';
                 via_entrada: this.viaEntrada,
                 procedencia: this.procedencia,
                 eMailSeguim: this.email,
+                jobsIncidencia: this.jobs,
             })
-            console.log("Incidencia Grabada -> ", this.incidencia[0])
-            this.e1 = 2 //Avanzamos al paso 2
-        },
-        storeErrores(errors){
-            this.errores = errors
-        },
-        getErrores(){
-            console.log('Errores almacenados: ', this.errores)
+            //debug
+            console.log("Incidencia almacenada en Caché -> ", this.incidencia[0])
             this.e1 = 3
-        }
+            
+        },
+        storeJobs(jobs){
+            this.jobs = jobs
+        },
     },
  
     data () {
@@ -272,6 +271,7 @@ import axios from 'axios';
             email:'',           //Select desde formulario
 
             errores:[],         //Almacen de errores
+            jobs:[],            //Almacen de jobs
         }
     },
   }
