@@ -1,6 +1,6 @@
 <template>
-<div class="flex">
-    <div style="height:550px" class="flex-grow">
+<div>
+    <div style="height:550px">
         <!--//4326 wgs84
             //3857 WEB mercator
             //3034 ETRS89 -->
@@ -60,16 +60,24 @@
             </vl-interaction-select>
 
 
-            <!-- PERMITE DIBUJAR GEOMETRIAS EN EL MAPA Y LAS ALMACENA EN ARRAYS -->
-            <vl-interaction-draw type="Polygon" source="jobs" :active="traceJob">
+
+            <!-- PERMITE DIBUJAR y MODIFICAR GEOMETRIAS EN EL MAPA Y LAS ALMACENA EN ARRAYS -->
+            <vl-interaction-draw type="Polygon" source="jobs" :active="(optionActive == 'drawJob')">
             </vl-interaction-draw>  
 
-            <vl-interaction-draw type="Point" source="errores" :active="traceError">
+            <vl-interaction-draw type="Point" source="errores" :active="(optionActive == 'drawError')">
             </vl-interaction-draw> 
+
+            <vl-interaction-modify type="Polygon" source="jobs" :active="(optionActive == 'modifyJob')">
+            </vl-interaction-modify>
+
+            <vl-interaction-modify type="Point" source="errores" :active="(optionActive == 'modifyError')">
+            </vl-interaction-modify>
                
             
 
-            <!-- CAPAS DE MAPAS BASE -->
+            <!-- CAPAS DE MAPAS BASE 
+            TODO: Cambiar los source a WMTS WMS, etc-->
             <div v-if="mapActive=='osm'">
                 <vl-layer-tile id="osm">
                     <vl-source-osm></vl-source-osm>
@@ -87,9 +95,12 @@
                     <vl-source-xyz :url="urlEsriImagery"></vl-source-xyz>
                 </vl-layer-tile>
             </div>
+            <!-- FIN CAPAS MAPA BASE --> 
         </vl-map>
 
-        <!--Introducir datos Jobs -->
+
+        
+        <!--FORMULARIO INTRODUCIR DATOS JOB -->
         <template>
             <div class="text-center">
                 <v-dialog
@@ -179,7 +190,7 @@
         </template>
 
 
-        <!--Introducir datos Error -->
+        <!--IFORMULARIO INTRODUCIR DATOS ERROR -->
         <template>
             <div class="text-center">
                 <v-dialog
@@ -236,7 +247,7 @@
             </div>
 
 
-            <!--Alertas-->
+            <!--ALERTAS-->
             <template>
                 <v-overlay :value="showErrorAlert">
                     <!--NO SE HA SELECCIONADO NINGÚN ERROR-->
@@ -255,23 +266,82 @@
                     </v-alert>
                 </v-overlay>
 
-                <v-overlay :value="showDeleteAlert">
-                    <!--NO SE HA SELECCIONADO NINGÚN ERROR-->
-                    <v-alert
-                        prominent
-                        type="warning"
-                        >
-                        <v-row align="center">
-                            <v-col class="grow mx-2">
-                            {{showDeleteMessage}}
-                            </v-col> 
-                             <v-col class="grow">
-                                <v-btn class="mx-2" color="error" @click="showDeleteAlert=false">CANCELAR</v-btn>
-                                <v-btn class="mx-2" color="success" @click="showDeleteAlert=false">ACEPTAR</v-btn>
-                            </v-col>                        
-                        </v-row>  
-                    </v-alert>
-                </v-overlay>
+                <v-dialog v-model="showDeleteAlert" max-width="500px">
+                  <v-card>
+                   <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
+                   <h3 class="text-center text-l">{{showDeleteMessage}}</h3>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn class="w-24 bg-red-500" dark text @click="showDeleteAlert=false">Cancel</v-btn>
+                        <v-btn class="w-24 bg-green-500" dark text @click="showDeleteAlert=false">OK</v-btn>
+                        <v-spacer></v-spacer>
+                      </v-card-actions>
+                  </v-card>
+                </v-dialog>
+
+                <!-- PANEL CONTROL MAPA -->
+                <!-- TODO: menú flotante encima de mapa ??-->
+                <!-- TODO: optimizar esta parte de codigo -->
+                <v-app class="font-sans" style="float:right; height:2rem;">
+                    <v-card
+                    elevation="2"
+                    tile
+                    class="rounded border-none"
+                    style="padding:1rem; top:-34rem; margin-right:1rem; width:16rem; background-color:rgba(34, 35, 36, 0.502);">
+                        <div
+                            class="rounded bg-blue-600 p-2 md-1 text-white text-l font-bold">
+                            ERRORES 
+                        </div>
+
+                        <div class="mt-2 flex">
+                            <v-btn icon tile dark class="bg-blue-600 flex-grow shadow-lg" @click="activeDrawError"><v-icon>mdi-map-marker-plus</v-icon></v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn icon tile dark class="bg-blue-600 flex-grow shadow-lg" @click="activeSelectError"><v-icon>mdi-cursor-default-click</v-icon></v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn icon tile dark class="bg-blue-600 flex-grow shadow-lg" @click="getErrorInfo"><v-icon>mdi-information</v-icon></v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn icon tile dark class="bg-blue-600 flex-grow shadow-lg" @click="activeModifyError"><v-icon>mdi-map-marker-radius</v-icon></v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn icon tile dark class="bg-blue-600 flex-grow shadow-lg" @click="deleteErrores"><v-icon>mdi-delete</v-icon></v-btn>
+                        </div>
+
+                        <v-spacer class="my-4"></v-spacer>
+
+                        <div
+                            class="rounded bg-blue-600 p-2 md-1 text-white text-l font-bold">
+                            JOBS 
+                        </div>
+                        <div class="mt-2 flex">
+                            <v-btn icon tile dark class="bg-blue-600 flex-grow shadow-lg" @click="activeDrawJob"><v-icon>mdi-vector-square</v-icon></v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn icon tile dark class="bg-blue-600 flex-grow shadow-lg" @click="activeSelectJob"><v-icon>mdi-cursor-default-click</v-icon></v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn icon tile dark class="bg-blue-600 flex-grow shadow-lg" @click="getJobInfo"><v-icon>mdi-information</v-icon></v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn icon tile dark class="bg-blue-600 flex-grow shadow-lg" @click="activeModifyJob"><v-icon>mdi-vector-polygon</v-icon></v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn icon tile dark class="bg-blue-600 flex-grow shadow-lg" @click="deleteJobs"><v-icon>mdi-delete</v-icon></v-btn>
+                        </div>
+                        
+                        <v-spacer class="my-4"></v-spacer>
+
+                        <div
+                            class="rounded bg-blue-600 p-2 md-1 text-white text-l font-bold">
+                            CAPAS
+                        </div>
+                        <v-spacer class="my-2"></v-spacer>
+                        <v-btn color="success" dark class="w-full shadow-lg" @click="activeMap('osm')">Open Street Maps</v-btn><br>
+                        <v-spacer class="my-1"></v-spacer>
+                        <v-btn color="success" dark class="w-full shadow-lg" @click="activeMap('ignBase')">IGN Base</v-btn><br>
+                        <v-spacer class="my-1"></v-spacer>
+                        <v-btn color="success" dark class="w-full shadow-lg" @click="activeMap('')">PNOA</v-btn><br>
+                        <v-spacer class="my-1"></v-spacer>
+                        <v-btn color="success" dark class="w-full shadow-lg" @click="activeMap('urlEsriImagery')">ESRI Imagery</v-btn><br>
+                        <v-spacer class="my-1"></v-spacer>
+                        <v-btn color="success" dark class="w-full shadow-lg" @click="activeMap('')">BDIG</v-btn><br>
+                    </v-card>
+                </v-app>
+
 
 
                 <!--Contenedor general para avisos... mas facil -->
@@ -280,9 +350,10 @@
                     dense
                     type="info"
                     color="#9fbce3"
-                    style="top:-70px; margin:0em 6em 1em 6em;"
+                    style="top:-5rem; margin:1rem;"
                     >
                         {{infoMsg}}
+                        <v-btn class="w-24 bg-green-500" dark text @click="(editJob = true)">OK</v-btn>
                     </v-alert>
                 </div>
 
@@ -290,50 +361,35 @@
         </template>
     </div>
 
-    <!-- PANEL CONTROL MAPA -->
-    <!-- TODO: menú flotante encima de mapa ??-->
-    <!-- TODO: optimizar esta parte de codigo -->
-    <div class="min-w-max border-2 border-gray p-6" style="background-color:rgb(2 62 138 / 50%);">
-        
-        <h1 class="text-white">Errores</h1>
-        <v-btn icon tile dark class="bg-blue-500 m-1 shadow-lg" @click="activeDrawError"><v-icon>mdi-map-marker-remove-variant</v-icon></v-btn>
-        <v-btn icon tile dark class="bg-blue-500 m-1 shadow-lg" @click="activeSelectError"><v-icon>mdi-cursor-default-click</v-icon></v-btn>
-        <v-btn icon tile dark class="bg-blue-500 m-1 shadow-lg" @click="getErrorInfo"><v-icon>mdi-information</v-icon></v-btn>
-        <v-btn icon tile dark class="bg-blue-500 m-1 shadow-lg" @click="dummy"><v-icon>mdi-cog</v-icon></v-btn>
-        <v-btn icon tile dark class="bg-blue-500 m-1 shadow-lg" @click="deleteErrores"><v-icon>mdi-delete</v-icon></v-btn>
-
-        <v-spacer class="my-4"></v-spacer>
-
-        <h1 class="text-white">Jobs</h1>        
-        <v-btn icon tile dark class="bg-blue-500 m-1 shadow-lg" @click="activeDrawJob"><v-icon>mdi-vector-polygon</v-icon></v-btn>
-        <v-btn icon tile dark class="bg-blue-500 m-1 shadow-lg" @click="activeSelectJob"><v-icon>mdi-cursor-default-click</v-icon></v-btn>
-        <v-btn icon tile dark class="bg-blue-500 m-1 shadow-lg" @click="getJobInfo"><v-icon>mdi-information</v-icon></v-btn>
-        <v-btn icon tile dark class="bg-blue-500 m-1 shadow-lg" @click="dummy"><v-icon>mdi-cog</v-icon></v-btn>
-        <v-btn icon tile dark class="bg-blue-500 m-1 shadow-lg" @click="deleteJobs"><v-icon>mdi-delete</v-icon></v-btn>
-
-        <v-spacer class="my-4"></v-spacer>
-
-        <h1 class="text-white">Capas</h1>
-        <v-btn color="success" dark class="w-full m-1 shadow-lg" @click="activeMap('osm')">Open Street Maps</v-btn><br>
-        <v-btn color="success" dark class="w-full m-1 shadow-lg" @click="activeMap('ignBase')">IGN Base</v-btn><br>
-        <v-btn color="success" dark class="w-full m-1 shadow-lg" @click="activeMap('')">PNOA</v-btn><br>
-        <v-btn color="success" dark class="w-full m-1 shadow-lg" @click="activeMap('urlEsriImagery')">ESRI Imagery</v-btn><br>
-        <v-btn color="success" dark class="w-full m-1 shadow-lg" @click="activeMap('')">BDIG</v-btn><br>
-    </div>
-
 </div>
 </template>
 
+
+
+
+
+
+
+
+
+
+
+
 <script>
+
 import TextEditor from '@/components/TextEditor';
 import axios from 'axios';
 
-
   export default {
+    components: {
+        TextEditor,
+    },
+
     props:[
         'incidencia',
         'asignErrors',
     ],
+
     computed: {
         returnIncidencia(){
             return this.incidencia
@@ -342,99 +398,79 @@ import axios from 'axios';
             return this.asignErrors
         }
     },
-    components: {
-        TextEditor,
-    },
+
     mounted(){
         this.initialize();
     },
+    
     methods:{
         dummy(){
-            //TODO: eliminar cuando las funciones del panel de control estén definidas
+        //TODO: eliminar cuando las funciones del panel de control estén definidas
+        },
+        // MODELADO DE PETICION API, se invoca desde initialize
+        // TODO: ¿catch de errores?
+        getArrayFromApi(array, url, route, column){
+            axios
+                .get(url + route)
+                .then(data =>   {
+                                this.object = (data.data.response)
+                                    for (this.index in this.object){
+                                        array.push(this.object[this.index][column]);
+                                    }
+                                })
+                //.catch();
+            return array;
         },
         initialize(){
+            //TODO: no parece que el problema sea de cookies cuando hacemos peticiones WMS/WMTS
             document.cookie = 'SameSite=Secure';
-            const url = 'http://10.13.86.114:3000/'; //url del servicio
-            
-            //TODO: las peticiones get se pueden modelar como funcion, demasiado repetitivo
-            axios
-                .get(url + 'temasError')
-                .then(data =>   {
-                                this.temaObject = (data.data.response)
-                                    for (this.index in this.temaObject){
-                                        this.tema.push(this.temaObject[this.index].tema_error);
-                                    }
-                                },
-                )
-            axios
-                 .get(url + 'tiposError')
-                 .then(data => {
-                                this.tiposObject = (data.data.response)
-                                    for (this.index in this.tiposObject){
-                                        this.tipoError.push(this.tiposObject[this.index].tipo_error);
-                                    }
-                                },
-                )
-        },
 
+            //TODO: lo suyo seria traerselo desde un archivo .env
+            this.url = 'http://10.13.86.114:3000/'; //url del servicio
+            
+            //Peticiones a API para llenar datos en formularios
+            this.getArrayFromApi(this.tema, this.url, 'temasError', 'tema_error');
+            this.getArrayFromApi(this.tipoError, this.url, 'tiposError', 'tipo_error')
+            
+            
+        },
 
         activeMap(map){
             this.mapActive = map;
         },
 
         //TODO: optimizar esta parte de codigo
-                    activeDrawJob(){
-                        //TODO: el mensaje habría que programarlo para que solo se mostrara unos segundos
-                        this.infoMsg = 'Haga clic en el mapa para dibujar los vértices del polígono. Doble clic para finalizar.';
-                        this.selectJobs = false;
-                        this.selectError = false;
-                        this.traceJob = true;
-                        this.traceError = false;
-                    },
-                    activeSelectJob(){
-                        this.selectJobs = true;
-                        this.selectError = false;
-                        this.traceJob = false;
-                        this.traceError = false;
-                    },
-                    activeDrawError(){
-                        this.infoMsg = 'Haga clic en el mapa para situar el punto de error';
-                        this.selectJobs = false;
-                        this.selectError = false;
-                        this.traceJob = false;
-                        this.traceError = true;
-                    },
-                    activeSelectError(){
-                        this.infoMsg = undefined;
-                        this.selectJobs = false;
-                        this.selectError = true;
-                        this.traceJob = false;
-                        this.traceError = false;
-                    },
+            activeDrawJob(){
+                //TODO: el mensaje habría que programarlo para que solo se mostrara unos segundos
+                this.infoMsg = 'Haga clic en el mapa para dibujar los vértices del polígono. Doble clic para finalizar.';
+                this.optionActive = 'drawJob';
+            },
+            activeSelectJob(){
+                this.infoMsg = undefined;
+                this.optionActive = 'selectJob';
+            },
+            activeDrawError(){
+                //TODO: el mensaje habría que programarlo para que solo se mostrara unos segundos
+                this.infoMsg = 'Haga clic en el mapa para situar el punto de error';
+                this.optionActive = 'drawError';
+            },
+            activeSelectError(){
+                this.infoMsg = undefined;
+                this.optionActive = undefined;
+            },
+            activeModifyJob(){
+                if (this.selectedFeatures.length > 0){
+                    this.infoMsg = undefined;
+                } else {
+                    this.infoMsg = "clic en OK para guardar";
+                }
+                this.optionActive = 'modifyJob';
+            },
+            activeModifyError(){
+                this.infoMsg = undefined;
+                this.optionActive = 'modifyError';
+            },
         
-        /*  Algoritmo tipo raycasting
-            Comprueba el numero de veces que un haz emitido desde un punto cruza un poligono dado
-            Si el numero de veces es par el punto está fuera del poligono
-            Si es impar está dentro.
-        */
-        insidePolygon(point, polygon){
-            this.x = point[0];
-            this.y = point[1];
-            this.inside = false;
-
-            for (this.i = 0, this.j = polygon.length-1; this.i < polygon.length; this.j = this.i++) {
-                this.xi = polygon[this.i][0], this.yi = polygon[this.i][1];
-                this.xj = polygon[this.j][0], this.yj = polygon[this.j][1];
-
-                this.intersect = ((this.yi > this.y) != (this.yj > this.y))
-                    && (this.x <(this.xj - this.xi) * (this.y - this.yi) / (this.yj - this.yi) + this.xi);
-                    if (this.intersect) {
-                        this.inside = !this.inside;}
-            }
-            return this.inside;
-        },
-
-
         getErrorInfo(){
             if(this.selectedFeatures.length == 0){
                 this.showErrorAlert = true;
@@ -444,8 +480,7 @@ import axios from 'axios';
                     if (this.selectedFeatures[0].id == this.erroresCache[this.index][0].id){
                         console.log(this.erroresCache[this.index])
                     }
-                }
-                
+                } 
             }
         },
 
@@ -459,7 +494,6 @@ import axios from 'axios';
                         console.log(this.jobsCache[this.index])
                     }
                 }
-                
             }
         },
 
@@ -468,12 +502,13 @@ import axios from 'axios';
         },
 
         deleteErrores(){
-            console.log("estoy borrando esto: ", this.selectedFeatures[0])
+            //Debug
+            //console.log("estoy borrando esto: ", this.selectedFeatures[0])
             if(this.selectedFeatures.length == 0){
                 this.showErrorAlert = true;
                 this.showAlertMessage = 'Debe seleccionar primero algún error'
             } else {
-                this.showDeleteMessage = "ATENCION, EL ERROR (xxxxxxxxxxxxxx) será borrado"
+                this.showDeleteMessage = this.erroresCache[0][0].idError + " será borrado. ¿Desea Continuar?"
                 this.showDeleteAlert = true
                 this.errores.pop();
             }
@@ -482,6 +517,7 @@ import axios from 'axios';
         storeDescError(returnedText){
             this.returnedTextError = returnedText
         },
+
         storeDescJob(returnedText){
             this.returnedTextJob = returnedText
         },
@@ -501,6 +537,7 @@ import axios from 'axios';
             //Cerramos menu
             this.editError = false;
         },
+
         recJobData(){
             //TODO
             this.idJob = this.incidencia + '-J0' + this.jobs.length;
@@ -522,7 +559,7 @@ import axios from 'axios';
             this.editJob = false
         },
 
-         asignErrorToJob(){
+        asignErrorToJob(){
             let pointInPolygon = require('point-in-polygon');
 
             for (this.indexError in this.erroresCache) {
@@ -546,7 +583,14 @@ import axios from 'axios';
             if (this.jobs.length == 0) {
                 this.editJob = false;
             } else {
+                //al almacenar un nuevo job creado
                 this.editJob = true;
+                //evita que el menu jobs aparezca cada vez que editamos un vértice del job
+                if (this.optionActive == 'modifyJob'){
+                    this.editJob = false
+                } else {
+                    this.editJob = true;
+                }
             }
         },
         errores(){
@@ -615,10 +659,10 @@ import axios from 'axios';
         zIndexJob: 1,
         zIndexError: 2,
         showAlertMessage:'',    //Muestra mensajes de error
-        deleting: false,
-
-        showDeleteMessage:'',
-        showDeleteAlert: false,
+        deleting: false,        //Evita que se abra el panel de editar error cuando estamos borrando uno
+        showDeleteMessage:'',   //Envia un mensaje de error a la ventana showDeleteAlert
+        showDeleteAlert: false, //Muestra la ventana showDeleteAlert
+        optionActive: undefined,
 
       }
     },
