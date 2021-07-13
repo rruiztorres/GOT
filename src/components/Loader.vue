@@ -6,13 +6,13 @@
     <div v-if="activarMenu == 'IncBdjGJ'"><IncBdjGJ></IncBdjGJ></div>
     <div v-if="activarMenu == 'JobsDevGJ'"><JobsDevGJ></JobsDevGJ></div>
     <div v-if="activarMenu == 'JobsTriajeGJ'"><JobsTriajeGJ></JobsTriajeGJ></div>
-    <div v-if="activarMenu == 'NuevaIncGJ'"><NuevaIncGJ></NuevaIncGJ></div>
+    <div v-if="activarMenu == 'NuevaIncidenciaGJ'"><NuevaIncidenciaGJ></NuevaIncidenciaGJ></div>
 
 </div>
 </template>
 
 <script>
-import NuevaIncGJ from '@/components/generadorJobs/NuevaIncGJ';
+import NuevaIncidenciaGJ from '@/components/generadorJobs/NuevaIncidenciaGJ';
 import IncTriajeGJ from '@/components/generadorJobs/IncTriajeGJ';
 import IncBdjGJ from '@/components/generadorJobs/IncBdjGJ';
 import JobsDevGJ from '@/components/generadorJobs/JobsDevGJ';
@@ -27,7 +27,7 @@ export default {
         IncBdjGJ,
         JobsDevGJ,
         JobsTriajeGJ,
-        NuevaIncGJ,
+        NuevaIncidenciaGJ,
     },
     props: {
         activarMenu: {

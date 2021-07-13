@@ -77,7 +77,8 @@
     </div>
     
       <editor-content 
-      class="bg-white h-auto border border-gray-500 p-6"
+      class="bg-white border border-gray-400 p-6"
+      style="height:15rem;"
       :editor="editor" 
       />
   </div>
