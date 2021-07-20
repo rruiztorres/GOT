@@ -154,57 +154,106 @@
                             <v-divider></v-divider>
                             <v-spacer class="mt-2"></v-spacer>
 
-                            <v-col class="" cols="12">
-                                <v-select
-                                    class="text-lg"
-                                    :items="deteccion"
-                                    filled
-                                    label="Detección"
-                                    v-model="deteccionJob"
-                                ></v-select>
-                            
-                                <v-select
-                                    class="text-lg"
-                                    :items="arreglo"
-                                    filled
-                                    label="Arreglo"
-                                    v-model="arregloJob"
-                                ></v-select>
+                            <v-col cols="12">
+                                <v-row style="margin-bottom:-2.5rem;">
+                                    <v-col cols="4" class="mt-5"            >                           
+                                    Detectado en:
+                                    </v-col>
+                                    <v-col dense cols="8">
+                                        <v-select
+                                        dense
+                                            filled
+                                            class="text-lg"
+                                            :items="deteccion"
+                                            :label="deteccion[0]"
+                                            v-model="deteccionJob"
+                                        ></v-select>
+                                    </v-col>
+                                </v-row>
 
-                                <v-select
-                                    class="text-lg"
-                                    :items="gravedad"
-                                    filled
-                                    label="Gravedad"
-                                    v-model="gravedadJob"
-                                ></v-select>
+                                <v-row style="margin-bottom:-2.5rem;">
+                                    <v-col cols="4" class="mt-5"            >                           
+                                    Arreglar en:
+                                    </v-col>
+                                    <v-col dense cols="8">
+                                        <v-select
+                                        dense
+                                            filled
+                                            class="text-lg"
+                                            :items="arreglo"
+                                            :label="arreglo[0]"
+                                            v-model="arregloJob"
+                                        ></v-select>
+                                    </v-col>
+                                </v-row>
 
-                                <v-select
-                                    class="text-lg"
-                                    :items="asignacion"
-                                    filled
-                                    label="Asignacion"
-                                    v-model="asignacionJob"
-                                ></v-select>
+                                <v-row style="margin-bottom:-2.5rem;">
+                                    <v-col cols="4" class="mt-5"            >                           
+                                    Gravedad:
+                                    </v-col>
+                                    <v-col dense cols="8">
+                                        <v-select
+                                        dense
+                                            filled
+                                            class="text-lg"
+                                            :items="gravedad"
+                                            :label="gravedad[0]"
+                                            v-model="gravedadJob"
+                                        ></v-select>
+                                    </v-col>
+                                </v-row>
 
-                                <div v-if="asignacionJob == 'Bandeja de Jobs'">
-                                    <v-select
-                                    class="text-lg"
-                                    :items="tipoBandeja"
-                                    filled
-                                    label="Enviar a"
-                                    v-model="bandejaJob"
-                                    ></v-select>
+                                <v-row style="margin-bottom:-2.5rem;">
+                                    <v-col cols="4" class="mt-5"            >                           
+                                    Asignar a:
+                                    </v-col>
+                                    <v-col dense cols="8">
+                                        <v-select
+                                        dense
+                                            filled
+                                            class="text-lg"
+                                            :items="asignacion"
+                                            label="Seleccione Bandeja"
+                                            v-model="asignacionJob"
+                                        ></v-select>
+                                    </v-col>
+                                </v-row>
 
-                                    <v-select
-                                        class="text-lg"
-                                        :items="nombreOperador"
-                                        filled
-                                        label="Asignar a"
-                                        v-model="nombreOperadorJob"
-                                    ></v-select>
-                                </div>
+                                
+                                <v-row v-if="asignacionJob == 'Bandeja de Jobs'" style="margin-bottom:-2.5rem;">
+                                    <v-col cols="4" class="mt-5"            >                           
+                                    Enviar a:
+                                    </v-col>
+                                    <v-col dense cols="8">
+                                        <v-select
+                                        dense
+                                            filled
+                                            class="text-lg"
+                                            :items="tipoBandeja"
+                                            label="Seleccione Bandeja"
+                                            v-model="tipoBandejaJob"
+                                        ></v-select>
+                                    </v-col>
+                                </v-row>
+
+                                <v-row v-if="asignacionJob == 'Bandeja de Jobs'" style="margin-bottom:-2.5rem;">
+                                    <v-col cols="4" class="mt-5"            >                           
+                                    Operador:
+                                    </v-col>
+                                    <v-col dense cols="8">
+                                        <v-select
+                                        dense
+                                            filled
+                                            class="text-lg"
+                                            :items="nombreOperador"
+                                            label="Seleccionar Operador"
+                                            v-model="nombreOperadorJob"
+                                        ></v-select>
+                                    </v-col>
+                                </v-row>                                        
                             </v-col>
+                            
+                            <v-spacer class="mt-5"></v-spacer>
 
                             <v-card-actions>
                                 <v-spacer></v-spacer>
@@ -236,41 +285,54 @@
 
                             <div class="p-1">
                                 <!--TextEditor descripciones error-->
-                                <v-col class="" cols="12">
-                                    <template>
-                                        <v-container fluid>
-                                            <v-textarea
-                                            v-model="descError"
-                                            filled
-                                            label="Descripción del error"
-                                            auto-grow
-                                            value=""
-                                            ></v-textarea>
-                                        </v-container>
-                                    </template>
+                                <v-col class="bg-gray-200" cols="12">
+                                    <v-textarea
+                                        v-model="descError"
+                                        filled
+                                        label="Descripción del error"
+                                        auto-grow
+                                        value=""
+                                    ></v-textarea>
                                 </v-col>
 
                                 <v-divider></v-divider>
                                 <v-spacer class="mt-2"></v-spacer>
 
-                                <v-col class="p-5" cols="12">
-                                    <v-select
-                                        class="text-lg"
-                                        :items="tema"
-                                        item-value="temaError"
-                                        filled
-                                        label="Tema"
-                                        v-model="temaError"
-                                    ></v-select>
-                                
-                                    <v-select
-                                        class="text-lg"
-                                        :items="tipoError"
-                                        filled
-                                        label="Error de"
-                                        v-model="errorDe"
-                                    ></v-select>
+                                <v-col cols="12">
+                                    <v-row style="margin-bottom:-2.5rem;">
+                                        <v-col cols="4" class="mt-5"            >                           
+                                        Tema:
+                                        </v-col>
+                                        <v-col dense cols="8">
+                                            <v-select
+                                            dense
+                                                filled
+                                                class="text-lg"
+                                                :items="tema"
+                                                :label="tema[0]"
+                                                v-model="temaError"
+                                            ></v-select>
+                                        </v-col>
+                                    </v-row>
+
+                                    <v-row style="margin-bottom:-2.5rem;">
+                                        <v-col cols="4" class="mt-5"            >                           
+                                        Tipo:
+                                        </v-col>
+                                        <v-col dense cols="8">
+                                            <v-select
+                                            dense
+                                                filled
+                                                class="text-lg"
+                                                :items="tipoError"
+                                                :label="tipoError[0]"
+                                                v-model="errorDe"
+                                            ></v-select>
+                                        </v-col>
+                                    </v-row>
                                 </v-col>
+
+                                <v-spacer class="mt-5"></v-spacer>
 
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
@@ -332,7 +394,7 @@
                                 <v-spacer></v-spacer>
                                 
                                 <v-btn dark text @click="show = !show">
-                                    INCIGEO
+                                    TOOLS
                                    <v-icon>{{ show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
                                 </v-btn>
                         </v-card-actions>
@@ -480,7 +542,13 @@ import axios from 'axios';
             
             //Peticiones a API para llenar datos en formularios
             this.getArrayFromApi(this.tema, this.url, 'temasError', 'tema_error');
-            this.getArrayFromApi(this.tipoError, this.url, 'tiposError', 'tipo_error')
+            this.getArrayFromApi(this.tipoError, this.url, 'tiposError', 'tipo_error');
+            this.getArrayFromApi(this.deteccion, this.url, 'deteccionJob', 'detect_job');
+            this.getArrayFromApi(this.arreglo, this.url, 'arregloJob', 'arreglo_job');
+            this.getArrayFromApi(this.gravedad, this.url, 'gravedadJob', 'gravedad_job');
+            this.getArrayFromApi(this.asignacion, this.url, 'asignacionJob', 'asignacion_job')
+            this.getArrayFromApi(this.tipoBandeja, this.url, 'tipoBandejaJob', 'tipo_bandeja')
+            this.getArrayFromApi(this.nombreOperador, this.url, 'operadores', 'nombre_operador')
         },
 
         activeMap(map){
@@ -702,12 +770,12 @@ import axios from 'axios';
         
 
         //Jobs
-        deteccion: ['MTN25','MTN50','BTN25','MP200','BTN100','BCN200','M.AUTONOMICO','ME500','BCN500','M1','CARTOCIUDAD','RT','HI','POB','Mundo Real o Fuente de Referencia','IGN Base', 'Otros'],          //Inicializa la variable que luego llenamos desde initialize
-        arreglo: ['BDIG','BTN25','RT'],            //Inicializa la variable que luego llenamos desde initialize
-        gravedad: ['Normal','Grave'],           //Inicializa la variable que luego llenamos desde initialize
-        asignacion: ['Bandeja de Jobs', 'Departamento Externo'],         //Inicializa la variable que luego llenamos desde initialize
-        tipoBandeja: ['Operadores', 'Operadores Especializados'],        //Inicializa la variable que luego llenamos desde initialize
-        nombreOperador: ['Raul Ruiz Torres', 'John Doe'],     //Inicializa la variable que luego llenamos desde initialize
+        deteccion: [],          //Inicializa la variable que luego llenamos desde initialize
+        arreglo: [],            //Inicializa la variable que luego llenamos desde initialize
+        gravedad: [],           //Inicializa la variable que luego llenamos desde initialize
+        asignacion: [],         //Inicializa la variable que luego llenamos desde initialize
+        tipoBandeja: [],        //Inicializa la variable que luego llenamos desde initialize
+        nombreOperador: [],     //Inicializa la variable que luego llenamos desde initialize
         //TODO: determinar los arrays de Jobs desde BD
         
         descJob:'',             //Valor que recogemos en formulario

@@ -71,6 +71,7 @@
                                     <v-row align="center" class="ml-1 p-3">
                                         <v-select
                                         filled
+                                        :label="inViaEntrada[0]"
                                         :items="inViaEntrada"
                                         v-model="viaEntrada"
                                         ></v-select>
@@ -80,6 +81,7 @@
                                     <v-row align="center" class="ml-1 p-3">
                                         <v-select
                                         filled
+                                        :label="inProcedencia[0]"
                                         :items="inProcedencia"
                                         v-model="procedencia"
                                         ></v-select>
