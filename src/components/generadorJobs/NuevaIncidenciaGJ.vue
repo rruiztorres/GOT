@@ -21,7 +21,7 @@
             <v-toolbar-title>Alta de Incidencia {{incSerial}}</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn class="w-24 bg-red-500 mr-5" dark text @click="closeDialog">CANCELAR</v-btn>
-                <v-btn class="w-38 bg-gray-500 mr-5" dark text>GUARDAR DATOS</v-btn>
+                <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="recDataIncidencia">GUARDAR DATOS</v-btn>
                 <v-btn class="w-24 bg-green-500 mr-5" dark text>GENERAR</v-btn>
         </v-toolbar>
 
@@ -71,9 +71,9 @@
                                     <v-row align="center" class="ml-1 p-3">
                                         <v-select
                                         filled
-                                        :label="inViaEntrada[0]"
+                                        return-object
                                         :items="inViaEntrada"
-                                        v-model="viaEntrada"
+                                        v-model='selectViaEntrada'
                                         ></v-select>
                                     </v-row>
 
@@ -81,12 +81,10 @@
                                     <v-row align="center" class="ml-1 p-3">
                                         <v-select
                                         filled
-                                        :label="inProcedencia[0]"
                                         :items="inProcedencia"
-                                        v-model="procedencia"
+                                        v-model='selectProcedencia'
                                         ></v-select>
-                                        </v-row>
-                                    
+                                    </v-row>
 
                                     <v-subheader>E-mail seguimiento</v-subheader>
                                     <v-row align="center" class="ml-1 p-3">
@@ -108,6 +106,7 @@
                         <v-card 
                         flat
                         class="p-8"
+                        style="height:50rem;"
                         >
                             <Map @jobs="storeJobs" @errores="storeErrors" :incidencia="incSerial"></Map>
                          </v-card>
@@ -132,7 +131,7 @@
                             <template>
                                     <v-data-table
                                         :headers="jobHeaders"
-                                        :items="jobitos"
+                                        :items="fakeJobs"
                                         class="elevation-1"
                                         hide-default-footer
                                     ></v-data-table>
@@ -169,31 +168,28 @@ import {getColor} from '@/assets/mixins/getColor.js';
         this.initializeProced();
     },
 
+    mounted(){
+        //Si no se cambia el select del formulario guardará los valores por defecto
+        this.viaEntrada = this.selectViaEntrada
+        this.procedencia = this.selectProcedencia
+    },
+
     watch:{
-        returnedTextIncidencia(){
-            this.recDataIncidencia() 
+        selectViaEntrada(){
+            this.viaEntrada = this.selectViaEntrada
         },
-        viaEntrada(){
-            this.recDataIncidencia() 
-        },
-        procedencia(){
-            this.recDataIncidencia() 
-        },
-        email(){
-            this.recDataIncidencia() 
-        }, 
-        jobs(){
-            this.storeJobs()
-        },
-        errors(){
-            this.storeErrors()
+        selectProcedencia(){
+            this.procedencia = this.selectProcedencia
         },
     },
 
     methods: {
         closeDialog() {
             this.dialog = false;
+            //Al cerrar el dialogo devuelve el valor por defecto para GJ a loader
+            this.$emit('closed', 'IncTriajeGJ');
         },
+        //TODO: Mejorar la gestion de los numeros de serie
         initializeIncSerial () {
             const type = 'IGN_C_'; //Al estar en Generador de JOBS el tipo es "C"
             const date = new Date();
@@ -242,6 +238,7 @@ import {getColor} from '@/assets/mixins/getColor.js';
                 procedencia: this.procedencia,
                 eMailSeguim: this.email,
             }
+            console.log(this.incidencia)
         },
         storeJobs(jobs){
             this.jobs = jobs;
@@ -251,6 +248,7 @@ import {getColor} from '@/assets/mixins/getColor.js';
             this.errores = errores;
             console.log('Errores ', this.errores)
         },
+
     },
  
     data () {
@@ -262,15 +260,17 @@ import {getColor} from '@/assets/mixins/getColor.js';
                 v => /.+@.+/.test(v) || 'Debe introducir un email válido, por ejemplo: "usuario@incigeo.com"',
             ],
             inViaEntrada: [],
+            selectViaEntrada: 'Directo',        //Determina valor por defecto para el formulario
             inProcedencia: [],
+            selectProcedencia: 'IGN / CNIG',    //Determina valor por defecto para el formulario
 
-            incidencia:[],      //Almacen de datos para incidencia
-            viaEntrada:'',      //Select desde formulario
-            procedencia:'',     //Select desde formulario
-            email:'',           //Select desde formulario
+            incidencia:[],                      //Almacen de datos para incidencia
+            viaEntrada:'',                      //Select desde formulario si no se cambia recoge valor por defecto
+            procedencia:''  ,                   //Select desde formulario si no se cambia recoge valor por defecto
+            email:'',                           //Select desde formulario
 
-            errores:[],         //Almacen de errores
-            jobs:[],            //Almacen de jobs
+            errores:[],                         //Almacen de errores
+            jobs:[],                            //Almacen de jobs
 
 
             jobHeaders : [                
@@ -290,7 +290,7 @@ import {getColor} from '@/assets/mixins/getColor.js';
             ],
             expanded: [],
 
-            jobitos: [
+            fakeJobs: [
                 {
                     idJob: 'IGN_C_202100001-J01',
                     deteccion: 'BTN25',
