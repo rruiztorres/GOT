@@ -3,6 +3,7 @@
 <v-dialog 
     v-model="dialog" 
     fullscreen
+    persistent
     hide-overlay
     transition="dialog-bottom-transition"
     class="h-full">
@@ -151,6 +152,7 @@ import TextEditor from '@/components/TextEditor';
 import Map from '@/components/Map';
 import axios from 'axios';
 import {getColor} from '@/assets/mixins/getColor.js';
+import pointInPolygon from 'point-in-polygon';
 
   export default {
     components: {
@@ -238,19 +240,36 @@ import {getColor} from '@/assets/mixins/getColor.js';
                 procedencia: this.procedencia,
                 eMailSeguim: this.email,
             }
-            console.log(this.incidencia)
+            this.asignErrorToJob();
+            console.log('Incidencia: ', this.incidencia, 'Errores: ', this.errores, 'Jobs: ', this.jobs)
         },
         storeJobs(jobs){
             this.jobs = jobs;
-            console.log('Jobs ', this.jobs)
         },
         storeErrors(errores){
             this.errores = errores;
-            console.log('Errores ', this.errores)
         },
+        asignErrorToJob() {
+            for (this.indexError in this.errores) {
+                //reinicia el valor, necesario para detectar ediciones
+                this.errores[this.indexError].job = '';
+                this.point = [
+                    this.errores[this.indexError].geometry.coordinates[0],
+                    this.errores[this.indexError].geometry.coordinates[1],
+                ];
 
+                for (this.indexJob in this.jobs) {
+                    this.polygon = [this.jobs[this.indexJob].geometry.coordinates[0]];
+                    this.inside = pointInPolygon(this.point, this.polygon[0]);
+                    if (this.inside == true) {
+                        //Esta dentro del Job
+                        this.errores[this.indexError].job = this.jobs[this.indexJob].idJob;
+                    }
+                }
+            }
+        },
     },
- 
+
     data () {
         return {
             dialog: true,
