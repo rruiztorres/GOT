@@ -1,29 +1,43 @@
 <template>
-    <div class="mx-8">
-
-      <h1 class="ml-2 text-2xl font-bold my-6">
+    <div>
+      <v-app class="font-sans shadow-md rounded">
+        
+      <h1 class="ml-4 text-xl font-bold my-6">
       Incidencias en Triaje
       </h1>
-
-      <v-app> 
+      
         <div class="overflow-y-auto">
-        
+          <v-card elevation="0" class="mb-4">
+            <div>
+              <div class="p-4 flex bg-blue-500 w-full items-center">
+                <v-btn disabled dark color="#3B82F6" class="mr-3">ACCION 1</v-btn>
+                <v-btn disabled dark color="#3B82F6" class="mr-3">ACCION 2</v-btn>
+                <v-btn disabled dark color="#3B82F6" class="mr-3">ACCION 3</v-btn>
+                <v-btn disabled dark color="#3B82F6" class="mr-3">ACCION 4</v-btn>
+                <v-btn disabled dark color="#3B82F6" class="mr-3">ACCION 5</v-btn>              
+                
+                <v-spacer></v-spacer>
+
+                <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  label="Buscar"
+                  single-line
+                  hide-details
+                  class="bg-white p-3"
+                ></v-text-field>
+              </div>
+            </div>
+          </v-card>
+
           <v-data-table
             :headers="headers"
             :items="incidencias"
             :search="search"
             class="font-sans"
-            style="max-height:47rem;"
+            show-select
             >
             <template v-slot:top>
-              <v-text-field
-                v-model="search"
-                label="Buscar"
-                class="mx-4"
-              ></v-text-field>
-            
-              <v-toolbar flat>
-                
                 <!-- VENTANA EDICION INCIDENCIA -->
                 <v-dialog 
                 v-model="dialog" 
@@ -52,8 +66,6 @@
                       </v-card-actions>
                   </v-card>
                 </v-dialog>
-
-              </v-toolbar>
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
@@ -66,13 +78,11 @@
             </template>
 
             <template v-slot:[`item.inc_estado`]="{ item }">
-              <v-chip :color="getColor(item.inc_estado)" dark>
-                {{ item.inc_estado }}
-              </v-chip>
+              <v-chip :color="getColor(item.inc_estado)" dark class="m-1 w-32">{{ item.inc_estado }}</v-chip>
             </template>
 
           </v-data-table>
-        </div>
+        </div> 
       </v-app>
     </div>
  
@@ -101,7 +111,6 @@ import VerIncidencia from '@/components/VerIncidencia';
         { text: 'Estado', align: 'start', sortable: true, value: 'inc_estado' },
         { text: 'Vía Entrada', align: 'start', sortable: true, value: 'inc_via_ent' },
         { text: 'Prioridad', align: 'start', sortable: true, value: 'inc_prioridad' },
-        { text: 'Seguimiento', align: 'start', sortable: true, value: 'inc_seguimiento' },
         { text: 'Procedencia', align: 'start', sortable: true, value: 'inc_procedencia' },
         { text: 'Acciones', value: 'actions', sortable: false },
       ],
@@ -112,7 +121,6 @@ import VerIncidencia from '@/components/VerIncidencia';
         inc_estado:'',
         inc_via_ent:'',
         inc_prioridad:'',
-        inc_seguimiento:'',
         inc_procedencia:'',
       },
       defaultItem: {
@@ -120,7 +128,6 @@ import VerIncidencia from '@/components/VerIncidencia';
         inc_estado:'',
         inc_via_ent:'',
         inc_prioridad:'',
-        inc_seguimiento:'',
         inc_procedencia:'',
       },
     }),

@@ -111,7 +111,7 @@ export default {
     data() {
         return {
         gestIncidencias: [
-          {name:'Nueva Incidencia', icon:'mdi-map-marker-alert'},
+          {name:'Nueva Incidencia', icon:'mdi-map-marker-alert', active: 'NuevaIncidenciaGJ'},
           {name:'Incidencias en Bandeja', icon:'mdi-inbox-arrow-down', active:'IncBdjGJ'},
           {name:'Incidencias en Triaje', icon:'mdi-ambulance', active:'IncTriajeGJ'},
           {name:'Acciones globales', icon:'mdi-table-eye'},

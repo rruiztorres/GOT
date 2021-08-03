@@ -1,14 +1,13 @@
 <template >
     <div >
         <div class="h-screen font-sans text-left text-sm">
-            <!--container-->
+            
             <div class="w-full h-screen" >
-                <!--menu-->
                 <Navigation @cambiomenu="cambiarMenu" :mini="newMini" class="float-left mr-8"></Navigation>
-                <!--header-->
+               
                 <Header @cambiarMini="cambioMini"></Header>
-                <!--paneles de rol-->
-                <Loader class="mr-8" :activarMenu="newMenu" :userRole="userRole"></Loader>
+                
+                <v-main><Loader class="mr-8" @cambiomenu="cambiarMenu" :activarMenu="newMenu" :userRole="userRole"></Loader></v-main>
             </div>
         </div>
     </div>
@@ -47,6 +46,7 @@ import {roles} from '@/assets/mixins/roles.js';
                         this.newMenu = roles[this.rol].default;
                     }
                 }
+                console.log("Login correcto, datos de usuario grabados")
             },
 
             //...   
