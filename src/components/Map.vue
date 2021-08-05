@@ -133,9 +133,8 @@
                 <v-col class="bg-gray-200" cols="12">
                   <v-textarea
                     v-model="descJob"
-                    filled
+                    dense filled auto-grow
                     label="Descripción del Job"
-                    auto-grow
                     value=""
                   ></v-textarea>
                 </v-col>
@@ -145,23 +144,21 @@
 
                 <v-col cols="12">
                   <v-row style="margin-bottom: -2.5rem">
-                    <v-col cols="4" class="mt-5"> Detectado en: </v-col>
+                    <v-col cols="4" class="mt-3"> Detectado en: </v-col>
                     <v-col cols="8">
                       <v-select
-                        filled
-                        class="text-lg"
+                        dense filled class="text-m"
                         :items="deteccion"
                         v-model="deteccionJob"
                       ></v-select>
                     </v-col>
                   </v-row>
-
+                  
                   <v-row style="margin-bottom: -2.5rem">
-                    <v-col cols="4" class="mt-5"> Arreglar en: </v-col>
+                    <v-col cols="4" class="mt-3"> Arreglar en: </v-col>
                     <v-col cols="8">
                       <v-select
-                        filled
-                        class="text-lg"
+                        dense filled class="text-m"
                         :items="arreglo"
                         v-model="arregloJob"
                       ></v-select>
@@ -169,11 +166,10 @@
                   </v-row>
 
                   <v-row style="margin-bottom: -2.5rem">
-                    <v-col cols="4" class="mt-5"> Gravedad: </v-col>
+                    <v-col cols="4" class="mt-3"> Gravedad: </v-col>
                     <v-col cols="8">
                       <v-select
-                        filled
-                        class="text-lg"
+                        dense filled class="text-m"
                         :items="gravedad"
                         v-model="gravedadJob"
                       ></v-select>
@@ -181,11 +177,10 @@
                   </v-row>
 
                   <v-row style="margin-bottom: -2.5rem">
-                    <v-col cols="4" class="mt-5"> Asignar a: </v-col>
+                    <v-col cols="4" class="mt-3"> Asignar a: </v-col>
                     <v-col cols="8">
                       <v-select
-                        filled
-                        class="text-lg"
+                        dense filled class="text-m"
                         :items="asignacion"
                         v-model="asignacionJob"
                       ></v-select>
@@ -196,11 +191,10 @@
                     v-if="asignacionJob == 'Bandeja de Jobs'"
                     style="margin-bottom: -2.5rem"
                   >
-                    <v-col cols="4" class="mt-5"> Enviar a: </v-col>
+                    <v-col cols="4" class="mt-3"> Enviar a: </v-col>
                     <v-col cols="8">
                       <v-select
-                        filled
-                        class="text-lg"
+                        dense filled class="text-m"
                         :items="tipoBandeja"
                         v-model="tipoBandejaJob"
                       ></v-select>
@@ -211,11 +205,10 @@
                     v-if="asignacionJob == 'Bandeja de Jobs'"
                     style="margin-bottom: -2.5rem"
                   >
-                    <v-col cols="4" class="mt-5"> Operador: </v-col>
+                    <v-col cols="4" class="mt-3"> Operador: </v-col>
                     <v-col cols="8">
                       <v-select
-                        filled
-                        class="text-lg"
+                        dense filled class="text-m"
                         :items="nombreOperador"
                         v-model="nombreOperadorJob"
                       ></v-select>
@@ -261,8 +254,7 @@
                   <v-col class="bg-gray-200" cols="12">
                     <v-textarea
                       v-model="descError"
-                      filled
-                      label="Descripción del error"
+                      filled label="Descripción del error"
                       auto-grow
                       value=""
                     ></v-textarea>
@@ -273,11 +265,10 @@
 
                   <v-col cols="12">
                     <v-row style="margin-bottom: -2.5rem">
-                      <v-col cols="4" class="mt-5"> Tema: </v-col>
+                      <v-col cols="4" class="mt-3"> Tema: </v-col>
                       <v-col cols="8">
                         <v-select
-                          filled
-                          class="text-lg"
+                          filled dense class="text-m"
                           :items="tema"
                           v-model="selectTema"
                         ></v-select>
@@ -285,11 +276,10 @@
                     </v-row>
 
                     <v-row style="margin-bottom: -2.5rem">
-                      <v-col cols="4" class="mt-5"> Tipo: </v-col>
+                      <v-col cols="4" class="mt-3"> Tipo: </v-col>
                       <v-col cols="8">
                         <v-select
-                          filled
-                          class="text-lg"
+                          filled dense class="text-m"
                           :items="tipoError"
                           v-model="selectTipoError"
                         ></v-select>
@@ -484,6 +474,43 @@
             </v-card>
           </v-dialog>
 
+          <!-- PANEL CONTROL CAPAS -->
+          <v-app class="font-sans" style="float:left; height: 0rem">
+            <div class="flex">
+              <v-card
+                class="border-2 p-1"
+                style="
+                  top: -45.5rem;
+                  margin-left: 0.5rem;
+                  margin-top: 4rem;
+                  box-shadow: 5px 5px 5px gray;
+                  background-color: rgba(0, 60, 136, 0.5);"
+              >
+              <div class="flex">
+                <v-btn dark icon @click="showLayerTools = !showLayerTools" class="mt-2">
+                  <v-icon>{{showLayerTools ? "mdi-layers-outline" : "mdi-layers-outline"}}</v-icon>
+                </v-btn>
+
+                <v-expand-transition>
+                  <div v-show="showLayerTools" class="p-2 w-44">
+                    <div class="rounded bg-blue-800 p-2 mb-1 text-white text-l text-center">
+                    CAPAS
+                    </div>
+                    <v-btn
+                    v-for="service in wmsServices"
+                    :key="service.name"
+                    text dark class="bg-green-500 mb-1 flex-grow shadow-lg w-full"
+                    @click="activeMap(service)"
+                    >{{service.name}}</v-btn>
+                    <v-spacer class="my-1"></v-spacer>
+                  </div>
+                </v-expand-transition>
+              </div>
+              </v-card>
+            </div>
+          </v-app>
+
+
           <!-- PANEL CONTROL MAPA -->
           <v-app class="font-sans" style="float: right; height: 0rem">
             <v-card
@@ -491,7 +518,7 @@
               style="
                 top: -45.5rem;
                 margin-right: 1rem;
-                width: 15rem;
+                width: 16rem;
                 box-shadow: 5px 5px 5px gray;
                 background-color: rgba(0, 60, 136, 0.5);
               "
@@ -503,19 +530,26 @@
                 <v-btn dark icon>
                   <v-icon>mdi-map-search</v-icon>
                 </v-btn>
-
+                <v-spacer></v-spacer>
+                <v-btn dark icon>
+                  <v-icon>mdi-hand-right</v-icon>
+                </v-btn>
+                <v-spacer></v-spacer>
+                <v-btn dark icon>
+                  <v-icon>mdi-arrow-expand-all</v-icon>
+                </v-btn>
                 <v-spacer></v-spacer>
 
-                <v-btn dark text @click="show = !show">
+                <v-btn dark text @click="showMapTools = !showMapTools">
                   TOOLS
                   <v-icon>{{
-                    show ? "mdi-chevron-up" : "mdi-chevron-down"
+                    showMapTools ? "mdi-chevron-up" : "mdi-chevron-down"
                   }}</v-icon>
                 </v-btn>
               </v-card-actions>
 
               <v-expand-transition>
-                <div v-show="show">
+                <div v-show="showMapTools">
                   <v-divider></v-divider>
 
                   <div class="rounded bg-blue-800 p-2 md-1 text-white text-l">
@@ -525,10 +559,7 @@
                     <v-btn
                       v-for="item in errorPanel"
                       :key="item.title"
-                      icon
-                      tile
-                      dark
-                      class="bg-blue-600 flex-grow shadow-lg mr-1"
+                      icon tile dark class="bg-blue-600 flex-grow shadow-lg mr-2"
                       :title="item.title"
                       :disabled="panelOption.buttonActive == item.disabled"
                       @click="item.click()"
@@ -546,10 +577,7 @@
                     <v-btn
                       v-for="item in jobsPanel"
                       :key="item.title"
-                      icon
-                      tile
-                      dark
-                      class="bg-blue-600 flex-grow shadow-lg mr-1"
+                      icon tile dark class="bg-blue-600 flex-grow shadow-lg mr-1"
                       :title="item.title"
                       :disabled="panelOption.buttonActive == item.disabled"
                       @click="item.click()"
@@ -557,22 +585,7 @@
                       <v-icon>{{ item.icon }}</v-icon>
                     </v-btn>
                   </div>
-
-                  <v-spacer class="my-4"></v-spacer>
-
-                  <div class="rounded bg-blue-800 p-2 md-1 text-white text-l">
-                    CAPAS
-                  </div>
-
-                  <v-spacer class="my-2"></v-spacer>
-                    <v-btn
-                    v-for="service in wmsServices"
-                    :key="service.name"
-                    text dark class="w-full bg-green-500 mb-1 flex-grow shadow-lg"
-                    @click="activeMap(service)"
-                    >{{service.name}}</v-btn>
-                    <v-spacer class="my-1"></v-spacer>
-               
+                  <v-spacer class="my-4"></v-spacer>                              
                 </div>
               </v-expand-transition>
             </v-card>
@@ -887,6 +900,7 @@ export default {
         selectTipoError: this.selectTipoError,
         descripcion: this.descError,
         job: "",
+        estado: "En Triaje",
       };
       this.erroresCache.push(this.newError);
       //Cerramos menu
@@ -1046,7 +1060,7 @@ export default {
       asignacionJob: "Bandeja de Jobs", //Define el Valor por defecto de asignacion, recoge el dato desde el formulario si es distinto
       nombreOperadorJob: "",            //Recoge el dato del operador desde el formulario
       tipoBandejaJob: "Operadores",     //Define el Valor por defecto de tipo bandeja, recoge el dato desde el formulario si es distinto
-
+      
       //Misc
       infoMsgWindow: false,     //Activa ventana información
       showErrorAlert: false,    //Muestra la ventana de error cuando no se ha seleccionado ningún error
@@ -1058,7 +1072,8 @@ export default {
       deleting: false,          //Evita que se abra el panel de editar error cuando estamos borrando uno
       showDeleteMessage: "",    //Envia un mensaje de error a la ventana showDeleteAlert
       showDeleteAlert: false,   //Muestra la ventana showDeleteAlert
-      show: false,              //Despliegue panel herramientas mapa
+      showMapTools: false,              //Despliegue panel herramientas mapa
+      showLayerTools: false,    //Despliegue herramientas capas
 
       //HERRAMIENTAS PANELES DE CONTROL
       panelOption: {},          //Objeto que define los botones activados y las opciones de cada uno de ellos

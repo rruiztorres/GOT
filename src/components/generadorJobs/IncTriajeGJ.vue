@@ -10,12 +10,8 @@
           <v-card elevation="0" class="mb-4">
             <div>
               <div class="p-4 flex bg-blue-500 w-full items-center">
-                <v-btn disabled dark color="#3B82F6" class="mr-3">ACCION 1</v-btn>
-                <v-btn disabled dark color="#3B82F6" class="mr-3">ACCION 2</v-btn>
-                <v-btn disabled dark color="#3B82F6" class="mr-3">ACCION 3</v-btn>
-                <v-btn disabled dark color="#3B82F6" class="mr-3">ACCION 4</v-btn>
-                <v-btn disabled dark color="#3B82F6" class="mr-3">ACCION 5</v-btn>              
-                
+                <v-btn :disabled=disabledEliminar dark color="#EF4444" class="mr-3" @click="deleteItem()">ELIMINAR</v-btn>           
+                <v-btn dark color="primary" class="mr-3" @click="dummy()">VER INFO</v-btn> 
                 <v-spacer></v-spacer>
 
                 <v-text-field
@@ -31,6 +27,7 @@
           </v-card>
 
           <v-data-table
+          v-model="selected"
             :headers="headers"
             :items="incidencias"
             :search="search"
@@ -38,6 +35,7 @@
             show-select
             >
             <template v-slot:top>
+           
                 <!-- VENTANA EDICION INCIDENCIA -->
                 <v-dialog 
                 v-model="dialog" 
@@ -60,7 +58,7 @@
                    <h3 class="text-center text-l">Esta acción borrará la incidencia ¿Desea continuar?</h3>
                       <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn class="w-24 bg-red-500" dark text @click="closeDelete">Cancel</v-btn>
+                        <v-btn class="w-24 bg-red-500" dark text @click="closeDelete">CANCELAR</v-btn>
                         <v-btn class="w-24 bg-green-500" dark text @click="deleteItemConfirm">OK</v-btn>
                         <v-spacer></v-spacer>
                       </v-card-actions>
@@ -69,8 +67,9 @@
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
-              <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
-              <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
+              <v-btn title="editar" icon dark class="bg-blue-500 mr-1" @click="editItem(item)"><v-icon small> mdi-pencil </v-icon></v-btn>
+              <v-btn title="consultar" icon dark class="bg-green-500"><v-icon small @click="editItem(item)"> mdi-eye </v-icon></v-btn>
+
             </template>
 
             <template v-slot:no-data>
@@ -102,35 +101,39 @@ import VerIncidencia from '@/components/VerIncidencia';
       VerIncidencia,
     },
 
-    data: () => ({
-      dialog: false,
-      dialogDelete: false,
-      search:'',
-      headers: [
-        { text: 'Incidencia', align: 'start', sortable: true, value: 'id_inc' },
-        { text: 'Estado', align: 'start', sortable: true, value: 'inc_estado' },
-        { text: 'Vía Entrada', align: 'start', sortable: true, value: 'inc_via_ent' },
-        { text: 'Prioridad', align: 'start', sortable: true, value: 'inc_prioridad' },
-        { text: 'Procedencia', align: 'start', sortable: true, value: 'inc_procedencia' },
-        { text: 'Acciones', value: 'actions', sortable: false },
-      ],
-      incidencias: [],
-      editedIndex: -1,
-      editedItem: {
-        id_inc:'',
-        inc_estado:'',
-        inc_via_ent:'',
-        inc_prioridad:'',
-        inc_procedencia:'',
-      },
-      defaultItem: {
-        id_inc:'',
-        inc_estado:'',
-        inc_via_ent:'',
-        inc_prioridad:'',
-        inc_procedencia:'',
-      },
-    }),
+    data() {
+      return {
+        dialog: false,
+        dialogDelete: false,
+        disabledEliminar: true,
+        search:'',
+        headers: [
+          { text: 'Incidencia', align: 'start', sortable: true, value: 'id_inc' },
+          { text: 'Estado', align: 'start', sortable: true, value: 'inc_estado' },
+          { text: 'Vía Entrada', align: 'start', sortable: true, value: 'inc_via_ent' },
+          { text: 'Prioridad', align: 'start', sortable: true, value: 'inc_prioridad' },
+          { text: 'Procedencia', align: 'start', sortable: true, value: 'inc_procedencia' },
+          { text: 'Acciones', value: 'actions', sortable: false },
+        ],
+        selected: [],
+        incidencias: [],
+        editedIndex: -1,
+        editedItem: {
+          id_inc:'',
+          inc_estado:'',
+          inc_via_ent:'',
+          inc_prioridad:'',
+          inc_procedencia:'',
+        },
+        defaultItem: {
+          id_inc:'',
+          inc_estado:'',
+          inc_via_ent:'',
+          inc_prioridad:'',
+          inc_procedencia:'',
+        },
+      }
+    },
 
     computed: {
       formTitle () {
@@ -145,12 +148,24 @@ import VerIncidencia from '@/components/VerIncidencia';
       dialogDelete (val) {
         val || this.closeDelete()
       },
+      selected(){
+        if (this.selected.length > 0){
+          this.disabledEliminar = false;
+        } else {
+          this.disabledEliminar = true;
+        }
+      },
     },
     created () {
       this.initialize()
     },
     
     methods: {
+
+      dummy() {
+          console.log(this.selected)
+      },
+
       initialize () {
         const url = 'http://10.13.86.114:3000/'; //url del servicio
         axios
@@ -174,14 +189,21 @@ import VerIncidencia from '@/components/VerIncidencia';
         this.dialog = true
       },
 
-      deleteItem (item) {
-        this.editedIndex = this.incidencias.indexOf(item)
-        this.editedItem = Object.assign({}, item)
+      deleteItem () {
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
-        this.incidencias.splice(this.editedIndex, 1)
+        for (this.index in this.selected) {
+          this.incidenciaBorrar = this.selected[this.index].id_inc
+          for (this.indexIncidencia in this.incidencias){
+            this.incidenciaAlmacenada = this.incidencias[this.indexIncidencia].id_inc;
+            if (this.incidenciaBorrar == this.incidenciaAlmacenada){
+              //TODO: El borrado debe ser en base de datos y array
+              this.incidencias.splice(this.indexIncidencia,1)
+            }
+          }
+        }
         this.closeDelete()
       },
 

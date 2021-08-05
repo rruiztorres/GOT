@@ -37,8 +37,8 @@
                 >
                     <v-tab>Descripción de Incidencia</v-tab>
                     <v-tab>Localización en el Mapa</v-tab>
-                    <v-tab>Datos Adjuntos</v-tab>
                     <v-tab>Resumen de la Incidencia</v-tab>
+                    <v-tab>Datos Adjuntos</v-tab>
 
                     <v-tabs-slider color="#76aff5"></v-tabs-slider>
                 
@@ -113,6 +113,57 @@
                          </v-card>
                     </v-tab-item> <!-- FIN LOCALIZACION EN EL MAPA -->
 
+                    <!--RESUMEN DE LA INCIDENCIA-->
+                    <v-tab-item>
+                        <v-card 
+                        flat
+                        class="p-8"
+                        >
+                            <h1 class="text-2xl font-black mb-2">Incidencia</h1>
+                            <p>Resumen de la incidencia tal</p>
+
+                            <v-spacer class="m-4"></v-spacer>
+                            
+                            <h1 class="text-2xl font-black mb-2">Jobs</h1>
+                                <v-data-table
+                                    :loading="jobLoading"
+                                    loading-text="Esperando jobs"
+                                    :headers="jobHeaders"
+                                    :items="jobs"
+                                    class="elevation-1"
+                                    hide-default-footer
+                                >
+                                    <template v-slot:[`item.estado`]="{ item }">
+                                        <v-chip :color="getColor(item.estado)" dark>
+                                            {{ item.estado }}
+                                        </v-chip>
+                                    </template>
+
+                                </v-data-table>
+
+                        
+                            <v-spacer class="m-4"></v-spacer>
+
+                            
+                            <h1 class="text-2xl font-black mb-2">Errores</h1>
+                                <v-data-table
+                                    :loading="errorLoading"
+                                    loading-text="Esperando errores"
+                                    :headers="errorHeaders"
+                                    :items="errores"
+                                    class="elevation-1"
+                                    hide-default-footer
+                                >
+                                    <template v-slot:[`item.estado`]="{ item }">
+                                        <v-chip :color="getColor(item.estado)" dark>
+                                            {{ item.estado }}
+                                        </v-chip>
+                                    </template>
+                                </v-data-table>
+                            
+                        </v-card>
+                    </v-tab-item> <!--FIN RESUMEN DE LA INCIDENCIA-->
+
                     <!--DATOS ADJUNTOS-->
                     <v-tab-item>
                         <v-card 
@@ -123,22 +174,7 @@
                          </v-card>
                     </v-tab-item> <!-- FIN DATOS ADJUNTOS -->
 
-                    <!--RESUMEN DE LA INCIDENCIA-->
-                    <v-tab-item>
-                        <v-card 
-                        flat
-                        class="p-8"
-                        >
-                            <template>
-                                    <v-data-table
-                                        :headers="jobHeaders"
-                                        :items="fakeJobs"
-                                        class="elevation-1"
-                                        hide-default-footer
-                                    ></v-data-table>
-                            </template>
-                        </v-card>
-                    </v-tab-item> <!--FIN RESUMEN DE LA INCIDENCIA-->
+
                 </v-tabs>
             </v-card>
             </template>
@@ -183,6 +219,16 @@ import pointInPolygon from 'point-in-polygon';
         selectProcedencia(){
             this.procedencia = this.selectProcedencia
         },
+        jobs(){
+            if (this.jobs.length != 0){
+                this.jobLoading=false;
+            }
+        },
+        errores(){
+            if (this.errores.length != 0){
+                this.errorLoading=false;
+            }
+        }
     },
 
     methods: {
@@ -292,34 +338,27 @@ import pointInPolygon from 'point-in-polygon';
             jobs:[],                            //Almacen de jobs
 
 
-            jobHeaders : [                
+            jobLoading: true,
+            errorLoading: true,
+
+            jobHeaders : [
+                { text: 'Estado', value:'estado'},                
                 { text: 'Id Job', value:'idJob'},
                 { text: 'Arreglar en', value:'arreglo' },
                 { text: 'Asignación', value: 'deteccion' },
                 { text: 'Descripcion', value: 'descripcion' },
                 { text: 'Asignación', value: 'asignacion' },
-                { text: 'Tipo operador', value: 'operador' },
+                { text: 'Tipo operador', value: 'bandeja' },
             ],
 
-            errorHeaders : [                
+            errorHeaders : [
+                { text: 'Estado', value: 'estado' },                
                 { text: 'Id Error', value:'idError'},
-                { text: 'Error de', value: 'errorDe' },
-                { text: 'Tema Error', value: 'temaError' },
+                { text: 'Asignado a Job', value: 'job' },
+                { text: 'Error de', value: 'selectTipoError' },
+                { text: 'Tema Error', value: 'selectTema' },
                 { text: 'Descripcion', value: 'descripcion' },
             ],
-            expanded: [],
-
-            fakeJobs: [
-                {
-                    idJob: 'IGN_C_202100001-J01',
-                    deteccion: 'BTN25',
-                    arreglo: 'BDIG',
-                    detectado: 'deteccion',
-                    descripcion: 'Datos estaticos solo de prueba esta parte no está hecha',
-                    asignacion: 'Bandeja de Jobs',
-                    operador: 'Operadores',
-                },
-            ]
         }
     },
   }
