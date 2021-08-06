@@ -1,12 +1,11 @@
 <template>
 <v-app class="font-sans h-full">
   <v-navigation-drawer 
-    dark v-model="drawer" :mini-variant.sync="mini" permanent src="https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg">
-   
+    v-model="drawer" :mini-variant.sync="mini" floating permanent color="#EFF6FF">
 
 <!-- PANEL USUARIO -->
     <template>
-      <div class="text-center pt-6">
+      <div class="text-center" >
         <v-menu
         v-model="menu"
         :close-on-click="closeOnClick"
@@ -15,8 +14,8 @@
         class="transition duration-1500 ease-in-out"
         >
           <template v-slot:activator="{ on, attrs }">
+          <div class="bg-blue-800 pt-7 h-52">
             <v-img
-            dark
             v-bind="attrs"
             v-on="on"
             > 
@@ -38,22 +37,22 @@
 
             <v-list-item-content>
               <div v-if="mini==false">
-                <v-list-item-title 
-                v-model="userName"
-                class="text-white"
-                >
-                {{userName}}
+                <v-list-item-title v-model="userName" class="text-white">
+                  {{userName}}
                 </v-list-item-title>
               
-                <v-list-item-subtitle 
-                v-model="userRole"
-                class="text-white"
-                > 
-                {{userRole}}
+                <v-list-item-subtitle v-model="userRole" class="text-white"> 
+                  {{userRole}}
                 </v-list-item-subtitle>
               </div>
             </v-list-item-content>
 
+            <div v-if="mini==false" class="flex" style="height:2.85rem; border-top:0.05rem solid #EFF6FF">
+              <v-icon class="hover:bg-blue-700 w-1/2 border-r border-blue-100" dark>mdi-cog</v-icon>
+              <v-icon class="hover:bg-blue-700 w-1/2" dark>mdi-bell-outline</v-icon>
+            </div>
+
+          </div>
           </template>
 
           <!-- MENU DESPLEGABLE USUARIO -->
@@ -126,15 +125,17 @@
 
 
 <!-- MENU OPCIONES SEGUN ROL -->
-
-  <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="cambiarMenu" :hacerMini="mini"></NavGJ></div>
-  <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="cambiarMenu" :hacerMini="mini"></NavOpEsp></div>
-  <div v-if="userRole=='Control de Calidad'"><Ccalidad @cambiomenu="cambiarMenu" :hacerMini="mini"></Ccalidad></div>
-  
+  <div class="ml-1">
+    <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="cambiarMenu" :hacerMini="mini"></NavGJ></div>
+    <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="cambiarMenu" :hacerMini="mini"></NavOpEsp></div>
+    <div v-if="userRole=='Control de Calidad'"><Ccalidad @cambiomenu="cambiarMenu" :hacerMini="mini"></Ccalidad></div>
+  </div>
 
 <!-- FIN MENU OPCIONES SEGUN ROL -->
-
-  <v-divider></v-divider>
+    <div v-if="mini==false">
+      <v-spacer class="mt-4"></v-spacer>
+      <v-btn color="green" dark class="w-56 ml-4">SIGN OUT</v-btn>
+    </div>
   </v-navigation-drawer>
 </v-app>
 </template>

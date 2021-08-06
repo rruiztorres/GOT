@@ -1,16 +1,16 @@
-<template >
-    <div >
+<template>
+    <v-app class="font-sans">
         <div class="h-screen font-sans text-left text-sm">
             
-            <div class="w-full h-screen" >
-                <Navigation @cambiomenu="cambiarMenu" :mini="newMini" class="float-left mr-8"></Navigation>
+            <div class="w-full h-screen bg-blue-50" >
+                <Navigation @cambiomenu="cambiarMenu" :mini="newMini" class="float-left"></Navigation>
                
                 <Header @cambiarMini="cambioMini"></Header>
                 
-                <v-main><Loader class="mr-8" @cambiomenu="cambiarMenu" :activarMenu="newMenu" :userRole="userRole"></Loader></v-main>
+                <v-main><Loader class="" @cambiomenu="cambiarMenu" :activarMenu="newMenu" :userRole="userRole"></Loader></v-main>
             </div>
         </div>
-    </div>
+    </v-app>
 </template>
 
 <script>

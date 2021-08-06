@@ -1,13 +1,13 @@
 <template>
-<div class="mt-4">
-
-    <!--Generador de Jobs-->
-    <div v-if="activarMenu == 'IncTriajeGJ'"><IncTriajeGJ></IncTriajeGJ></div>
-    <div v-if="activarMenu == 'IncBdjGJ'"><IncBdjGJ></IncBdjGJ></div>
-    <div v-if="activarMenu == 'JobsDevGJ'"><JobsDevGJ></JobsDevGJ></div>
-    <div v-if="activarMenu == 'JobsTriajeGJ'"><JobsTriajeGJ></JobsTriajeGJ></div>
-    <div v-if="activarMenu == 'NuevaIncidenciaGJ'"><NuevaIncidenciaGJ @closed="menuDefault"></NuevaIncidenciaGJ></div>
-
+<div>
+    <div class="h-32 bg-blue-800">
+        <!--Generador de Jobs-->
+        <div v-if="activarMenu == 'IncTriajeGJ'"><IncTriajeGJ></IncTriajeGJ></div>
+        <div v-if="activarMenu == 'IncBdjGJ'"><IncBdjGJ></IncBdjGJ></div>
+        <div v-if="activarMenu == 'JobsDevGJ'"><JobsDevGJ></JobsDevGJ></div>
+        <div v-if="activarMenu == 'JobsTriajeGJ'"><JobsTriajeGJ></JobsTriajeGJ></div>
+        <div v-if="activarMenu == 'NuevaIncidenciaGJ'"><NuevaIncidenciaGJ @closed="menuDefault"></NuevaIncidenciaGJ></div>
+    </div>
 </div>
 </template>
 
