@@ -1,7 +1,6 @@
 <template>
     <v-app class="font-sans">
         <div class="h-screen font-sans text-left text-sm">
-            
             <div class="w-full h-screen bg-blue-50" >
                 <Navigation @cambiomenu="cambiarMenu" :mini="newMini" class="float-left"></Navigation>
                
