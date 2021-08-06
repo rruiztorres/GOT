@@ -47,9 +47,9 @@
               </div>
             </v-list-item-content>
 
-            <div v-if="mini==false" class="flex" style="height:2.85rem; border-top:0.05rem solid #EFF6FF">
-              <v-icon class="hover:bg-blue-700 w-1/2 border-r border-blue-100" dark>mdi-cog</v-icon>
-              <v-icon class="hover:bg-blue-700 w-1/2" dark>mdi-bell-outline</v-icon>
+            <div v-if="mini==false" class="bg-blue-700 flex" style="height:2.85rem;">
+              <v-icon class="hover:bg-blue-600 w-1/2 border-r border-blue-800" dark>mdi-cog</v-icon>
+              <v-icon class="hover:bg-blue-600 w-1/2" dark>mdi-bell-outline</v-icon>
             </div>
 
           </div>
@@ -78,7 +78,6 @@
                   </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
-                
             </v-list>
 
             <v-divider></v-divider>
@@ -134,7 +133,10 @@
 <!-- FIN MENU OPCIONES SEGUN ROL -->
     <div v-if="mini==false">
       <v-spacer class="mt-4"></v-spacer>
-      <v-btn color="green" dark class="w-56 ml-4">SIGN OUT</v-btn>
+      <v-btn color="green" dark class="w-56 ml-4">
+        <v-icon class="mr-6">mdi-account-arrow-left-outline</v-icon>
+        LOGOUT
+        </v-btn>
     </div>
   </v-navigation-drawer>
 </v-app>
