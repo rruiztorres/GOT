@@ -35,8 +35,10 @@
             @click="activar(opcionJob.active)"
             class="hover:bg-blue-100"
           >
-            <v-icon color="#1E40AF" class="mr-3">{{ opcionJob.icon }}</v-icon>
-            <v-list-item-content><v-list-item-title class="text-xs text-black">{{ opcionJob.name }}</v-list-item-title></v-list-item-content>
+            <v-list-item-icon>
+              <v-icon color="#1E40AF" class="mr-3">{{ opcionJob.icon }}</v-icon>
+              <v-list-item-title class="text-xs text-black">{{ opcionJob.name }}</v-list-item-title>
+            </v-list-item-icon>
           </v-list-item>
       </v-list>
 
@@ -53,9 +55,12 @@
           v-for="informe in informes"
           :key="informe.name"
           class="hover:bg-blue-100"
+          @click="activar(opcionJob.active)"
         >
+          <v-list-item-icon>
             <v-icon color="#1E40AF" class="mr-3">{{ informe.icon }}</v-icon>
-            <v-list-item-content><v-list-item-title class="text-xs text-black">{{ informe.name }}</v-list-item-title></v-list-item-content>
+            <v-list-item-title class="text-xs text-black">{{ informe.name }}</v-list-item-title>
+          </v-list-item-icon>
         </v-list-item>
       </v-list>
   </div> 

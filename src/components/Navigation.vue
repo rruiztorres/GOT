@@ -14,11 +14,8 @@
         class="transition duration-1500 ease-in-out"
         >
           <template v-slot:activator="{ on, attrs }">
-          <div class="bg-blue-800 pt-7 h-52">
-            <v-img
-            v-bind="attrs"
-            v-on="on"
-            > 
+          <div class="bg-blue-800 pt-7 h-50">
+            <v-img> 
 
             <div v-if="mini==false">
               <img
@@ -47,10 +44,24 @@
               </div>
             </v-list-item-content>
 
-            <div v-if="mini==false" class="bg-blue-700 flex" style="height:2.85rem;">
-              <v-icon class="hover:bg-blue-600 w-1/2 border-r border-blue-800" dark>mdi-cog</v-icon>
-              <v-icon class="hover:bg-blue-600 w-1/2" dark>mdi-bell-outline</v-icon>
-            </div>
+            <!--BOTONES CONFIGURACION USUARIO -->
+            <v-list v-if="mini==false" class="flex pt-0">
+                <v-btn title="Configuración" dark class="m-1 flex-grow justify-center" color="#2563EB">
+                  <v-icon title="Configuración" dark>mdi-cog</v-icon>
+                </v-btn>
+
+                <v-btn title="Avisos" dark class="m-1 flex-grow justify-center" color="#2563EB">
+                  <v-badge overlap content="1" color="error">
+                    <v-icon title="Avisos" dark>mdi-bell-outline</v-icon>
+                  </v-badge>
+                </v-btn>
+
+                <v-btn title="Cambio de Rol" dark class="m-1 flex-grow justify-center" color="#2563EB" 
+                  v-bind="attrs"
+                  v-on="on">
+                  <v-icon title="Cambio de Rol" dark>mdi-account-convert</v-icon>
+                </v-btn>
+            </v-list>
 
           </div>
           </template>
