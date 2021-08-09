@@ -1,6 +1,6 @@
 <template>
     <div>
-      <v-app class="font-sans shadow-md rounded">
+      <v-app class="font-sans shadow-md rounded p-8 mr-8">
         
       <h1 class="ml-4 text-xl font-bold my-6">
       Incidencias en Triaje
@@ -33,7 +33,8 @@
             :search="search"
             class="font-sans"
             show-select
-            >
+          >
+
             <template v-slot:top>
            
                 <!-- VENTANA EDICION INCIDENCIA -->
@@ -69,7 +70,6 @@
             <template v-slot:[`item.actions`]="{ item }">
               <v-btn title="editar" icon dark class="bg-blue-500 mr-1" @click="editItem(item)"><v-icon small> mdi-pencil </v-icon></v-btn>
               <v-btn title="consultar" icon dark class="bg-green-500"><v-icon small @click="editItem(item)"> mdi-eye </v-icon></v-btn>
-
             </template>
 
             <template v-slot:no-data>
@@ -79,7 +79,6 @@
             <template v-slot:[`item.inc_estado`]="{ item }">
               <v-chip :color="getColor(item.inc_estado)" dark class="m-1 w-32">{{ item.inc_estado }}</v-chip>
             </template>
-
           </v-data-table>
         </div> 
       </v-app>
@@ -174,7 +173,7 @@ import VerIncidencia from '@/components/VerIncidencia';
           .then(data => {
                           this.incidenciasBruto = data.data.response;
                           for (this.elemento in this.incidenciasBruto) {
-                              if (this.incidenciasBruto[this.elemento].inc_estado == 'En Triaje') {
+                              if (this.incidenciasBruto[this.elemento].inc_estado !== '') {
                                this.incidencias.push(this.incidenciasBruto[this.elemento])            
                               }     
                           }
@@ -242,6 +241,10 @@ import VerIncidencia from '@/components/VerIncidencia';
 <style>
   .v-application--wrap {
     min-height: 1vh !important;
+  }
+
+  .v-data-table-header {
+    background-color:#E5E7EB;
   }
 </style>
 

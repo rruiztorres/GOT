@@ -1,69 +1,69 @@
 <template>
-  <div>
-    <v-list>
-      <div v-if="hacerMini == false">
-        <v-list-item-title class="ml-4 my-2">Gestión de Jobs</v-list-item-title>
-      </div>
-      <div v-if="hacerMini == true">
-        <v-list-item-title class="ml-3 my-2">JOB</v-list-item-title>
-      </div>
-      <v-divider></v-divider>
-      <v-list-item v-for="jobs in gestJobs" :key="jobs.name" link>
-        <v-list-item-icon>
-          <v-icon>{{ jobs.icon }}</v-icon>
-        </v-list-item-icon>
+    <div>
+      <v-list class="mb-4">
+        <div v-if="hacerMini==false">
+          <v-list-item-title class="ml-4 my-2 text-l font-bold">Gestion de Jobs</v-list-item-title>
+        </div>
+        <div v-if="hacerMini==true">
+        </div>
+          <v-list-item
+          dense
+            v-for="opcionJob in gestJobs"
+            :key="opcionJob.name"
+            @click="activar(opcionJob.active)"
+            class="hover:bg-blue-100"
+          >
+            <v-list-item-icon>
+              <v-icon color="#1E40AF" class="mr-3">{{ opcionJob.icon }}</v-icon>
+              <v-list-item-title class="text-xs text-black">{{ opcionJob.name }}</v-list-item-title>
+            </v-list-item-icon>
+          </v-list-item>
+      </v-list>
 
-        <v-list-item-content>
-          <v-list-item-title class="text-xs">{{ jobs.name }}</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
 
-    <v-divider></v-divider>
+      <v-list class="mb-4">
+        <div v-if="hacerMini==false">
+          <v-list-item-title class="ml-4 my-2 text-l font-bold">Gestión IDVs</v-list-item-title>
+        </div>
+        <div v-if="hacerMini==true">
+        </div>
 
-    <v-list>
-      <div v-if="hacerMini == false">
-        <v-list-item-title class="ml-4 my-2">Incidencias</v-list-item-title>
-      </div>
-      <div v-if="hacerMini == true">
-        <v-list-item-title class="ml-3 my-2">IDV</v-list-item-title>
-      </div>
-      <v-divider></v-divider>
-      <v-list-item v-for="idv in idvs" :key="idv.name" link>
-        <v-list-item-icon>
-          <v-icon>{{ idv.icon }}</v-icon>
-        </v-list-item-icon>
+          <v-list-item
+            dense
+            v-for="opcionIDV in idvs"
+            :key="opcionIDV.name"
+            @click="activar(opcionIDV.active)"
+            class="hover:bg-blue-100"
+          >
+            <v-list-item-icon>
+              <v-icon color="#1E40AF" class="mr-3">{{ opcionIDV.icon }}</v-icon>
+              <v-list-item-title class="text-xs text-black">{{ opcionIDV.name }}</v-list-item-title>
+            </v-list-item-icon>
+          </v-list-item>
+      </v-list>
 
-        <v-list-item-content>
-          <v-list-item-title class="text-xs">{{ idv.name }}</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
 
-    <v-divider></v-divider>
-    
-
-    <v-list>
-      <div v-if="hacerMini == false">
-        <v-list-item-title class="ml-4 my-2">Informes</v-list-item-title>
-      </div>
-      <div v-if="hacerMini == true">
-        <v-list-item-title class="ml-3 my-2">KPI</v-list-item-title>
-      </div>
-      <v-divider></v-divider>
-      <v-list-item v-for="informe in informes" :key="informe.name" link>
-        <v-list-item-icon>
-          <v-icon>{{ informe.icon }}</v-icon>
-        </v-list-item-icon>
-
-        <v-list-item-content>
-          <v-list-item-title class="text-xs">{{
-            informe.name
-          }}</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
-  </div>
+      <v-list class="mb-4">
+        <div v-if="hacerMini==false">
+          <v-list-item-title class="ml-4 my-2 text-l font-bold">Informes</v-list-item-title>
+        </div>
+        <div v-if="hacerMini==true">
+          
+        </div>
+        <v-list-item
+        dense
+          v-for="informe in informes"
+          :key="informe.name"
+          class="hover:bg-blue-100"
+          @click="activar(opcionJob.active)"
+        >
+          <v-list-item-icon>
+            <v-icon color="#1E40AF" class="mr-3">{{ informe.icon }}</v-icon>
+            <v-list-item-title class="text-xs text-black">{{ informe.name }}</v-list-item-title>
+          </v-list-item-icon>
+        </v-list-item>
+      </v-list>
+  </div> 
 </template>
 
 <script>

@@ -1,28 +1,40 @@
 <template>
-    <div class="mx-8">
-
-      <h1 class="ml-2 text-2xl font-bold my-6">
-      Jobs Devueltos
-      </h1>
-
-      <v-app> 
-        <div class="overflow-y-auto">
+    <div>
+      <v-app class="font-sans shadow-md rounded p-8 mr-8">
         
+      <h1 class="ml-4 text-xl font-bold my-6">
+      Jobs devueltos
+      </h1>
+      
+        <div class="overflow-y-auto">
+          <v-card elevation="0" class="mb-4">
+            <div>
+              <div class="p-4 flex bg-blue-500 w-full items-center">
+                <v-btn disabled dark color="primary" class="mr-3">ACCION 1</v-btn>           
+                <v-btn disabled dark color="primary" class="mr-3">ACCION 2</v-btn> 
+                <v-spacer></v-spacer>
+
+                <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  label="Buscar"
+                  single-line
+                  hide-details
+                  class="bg-white p-3"
+                ></v-text-field>
+              </div>
+            </div>
+          </v-card>
+
           <v-data-table
+          v-model="selected"
             :headers="headers"
             :items="jobs"
             :search="search"
             class="font-sans"
-            style="max-height:47rem;"
-            >
+            show-select
+          >
             <template v-slot:top>
-              <v-text-field
-                v-model="search"
-                label="Buscar"
-                class="mx-4"
-              ></v-text-field>
-            
-              <v-toolbar flat>
                 
                 <!-- VENTANA EDICION INCIDENCIA -->
                 <v-dialog 
@@ -55,10 +67,9 @@
                   </v-card>
                 </v-dialog>
 
-              </v-toolbar>
             </template>
 
-            <template v-slot:item.actions="{ item }">
+            <template v-slot:[`item.actions`]="{ item }">
               <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
               <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
             </template>
@@ -67,7 +78,7 @@
               <v-btn color="primary" @click="initialize">Reset</v-btn>
             </template>
 
-            <template v-slot:item.job_estado="{item}">
+            <template v-slot:[`item.job_estado`]="{ item }">
               <v-chip :color="getColor(item.job_estado)" dark>
                 {{ item.job_estado }}
               </v-chip>
@@ -97,6 +108,7 @@ import VerIncidencia from '@/components/VerIncidencia';
     data: () => ({
       dialog: false,
       dialogDelete: false,
+      selected:[],
       search:'',
       headers: [
         { text: 'Job', align: 'start', sortable: true, value: 'id_inc'},
@@ -104,7 +116,7 @@ import VerIncidencia from '@/components/VerIncidencia';
         { text: 'Prioridad', align: 'start', sortable: true, value: 'job_prioridad' },
         { text: 'Detectado en', align: 'start', sortable: true, value: 'job_detectado' },
         { text: 'Arreglar en', align: 'start', sortable: true, value: 'job_arreglar' },
-        // pendiente determinar acciones
+        //pendiente determinar acciones
         //{ text: 'Acciones', value: 'actions', sortable: false },
       ],
       jobs: [],
@@ -160,7 +172,7 @@ import VerIncidencia from '@/components/VerIncidencia';
                               }     
                           }
           //debug
-          //console.log('InciGEO (JobsDevGJ) -> Jobs recuperados y filtrados correctamente'); 
+          //console.log('InciGEO (JobsDevueltosGJ) -> Jobs recuperados y filtrados correctamente'); 
           })
       },
 

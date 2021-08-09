@@ -1,12 +1,11 @@
 <template>
 <v-app class="font-sans h-full">
   <v-navigation-drawer 
-    dark v-model="drawer" :mini-variant.sync="mini" permanent src="https://cdn.vuetifyjs.com/images/backgrounds/bg-2.jpg">
-   
+    v-model="drawer" :mini-variant.sync="mini" floating permanent color="#EFF6FF">
 
 <!-- PANEL USUARIO -->
     <template>
-      <div class="text-center pt-6">
+      <div class="text-center" >
         <v-menu
         v-model="menu"
         :close-on-click="closeOnClick"
@@ -15,11 +14,8 @@
         class="transition duration-1500 ease-in-out"
         >
           <template v-slot:activator="{ on, attrs }">
-            <v-img
-            dark
-            v-bind="attrs"
-            v-on="on"
-            > 
+          <div class="bg-blue-800 pt-7 h-50">
+            <v-img> 
 
             <div v-if="mini==false">
               <img
@@ -38,22 +34,36 @@
 
             <v-list-item-content>
               <div v-if="mini==false">
-                <v-list-item-title 
-                v-model="userName"
-                class="text-white"
-                >
-                {{userName}}
+                <v-list-item-title v-model="userName" class="text-white">
+                  {{userName}}
                 </v-list-item-title>
               
-                <v-list-item-subtitle 
-                v-model="userRole"
-                class="text-white"
-                > 
-                {{userRole}}
+                <v-list-item-subtitle v-model="userRole" class="text-white"> 
+                  {{userRole}}
                 </v-list-item-subtitle>
               </div>
             </v-list-item-content>
 
+            <!--BOTONES CONFIGURACION USUARIO -->
+            <v-list v-if="mini==false" class="flex pt-0">
+                <v-btn title="Configuración" dark class="m-1 flex-grow justify-center" color="#2563EB">
+                  <v-icon title="Configuración" dark>mdi-cog</v-icon>
+                </v-btn>
+
+                <v-btn title="Avisos" dark class="m-1 flex-grow justify-center" color="#2563EB">
+                  <v-badge overlap content="1" color="error">
+                    <v-icon title="Avisos" dark>mdi-bell-outline</v-icon>
+                  </v-badge>
+                </v-btn>
+
+                <v-btn title="Cambio de Rol" dark class="m-1 flex-grow justify-center" color="#2563EB" 
+                  v-bind="attrs"
+                  v-on="on">
+                  <v-icon title="Cambio de Rol" dark>mdi-account-convert</v-icon>
+                </v-btn>
+            </v-list>
+
+          </div>
           </template>
 
           <!-- MENU DESPLEGABLE USUARIO -->
@@ -79,7 +89,6 @@
                   </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
-                
             </v-list>
 
             <v-divider></v-divider>
@@ -126,15 +135,20 @@
 
 
 <!-- MENU OPCIONES SEGUN ROL -->
-
-  <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="cambiarMenu" :hacerMini="mini"></NavGJ></div>
-  <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="cambiarMenu" :hacerMini="mini"></NavOpEsp></div>
-  <div v-if="userRole=='Control de Calidad'"><Ccalidad @cambiomenu="cambiarMenu" :hacerMini="mini"></Ccalidad></div>
-  
+  <div class="ml-1">
+    <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="cambiarMenu" :hacerMini="mini"></NavGJ></div>
+    <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="cambiarMenu" :hacerMini="mini"></NavOpEsp></div>
+    <div v-if="userRole=='Control de Calidad'"><Ccalidad @cambiomenu="cambiarMenu" :hacerMini="mini"></Ccalidad></div>
+  </div>
 
 <!-- FIN MENU OPCIONES SEGUN ROL -->
-
-  <v-divider></v-divider>
+    <div v-if="mini==false">
+      <v-spacer class="mt-4"></v-spacer>
+      <v-btn color="green" dark class="w-56 ml-4">
+        <v-icon class="mr-6">mdi-account-arrow-left-outline</v-icon>
+        LOGOUT
+        </v-btn>
+    </div>
   </v-navigation-drawer>
 </v-app>
 </template>

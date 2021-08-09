@@ -1,28 +1,40 @@
 <template>
-    <div class="mx-8">
-
-      <h1 class="ml-2 text-2xl font-bold my-6">
+    <div>
+      <v-app class="font-sans shadow-md rounded p-8 mr-8">
+        
+      <h1 class="ml-4 text-xl font-bold my-6">
       Jobs en Triaje
       </h1>
-
-      <v-app> 
+      
         <div class="overflow-y-auto">
-        
+          <v-card elevation="0" class="mb-4">
+            <div>
+              <div class="p-4 flex bg-blue-500 w-full items-center">
+                <v-btn disabled dark color="primary" class="mr-3">ACCION 1</v-btn>           
+                <v-btn disabled dark color="primary" class="mr-3">ACCION 2</v-btn> 
+                <v-spacer></v-spacer>
+
+                <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  label="Buscar"
+                  single-line
+                  hide-details
+                  class="bg-white p-3"
+                ></v-text-field>
+              </div>
+            </div>
+          </v-card>
+
           <v-data-table
+          v-model="selected"
             :headers="headers"
             :items="jobs"
             :search="search"
             class="font-sans"
-            style="max-height:47rem;"
-            >
+            show-select
+          >
             <template v-slot:top>
-              <v-text-field
-                v-model="search"
-                label="Buscar"
-                class="mx-4"
-              ></v-text-field>
-            
-              <v-toolbar flat>
                 
                 <!-- VENTANA EDICION INCIDENCIA -->
                 <v-dialog 
@@ -55,7 +67,6 @@
                   </v-card>
                 </v-dialog>
 
-              </v-toolbar>
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
@@ -88,7 +99,7 @@ import VerIncidencia from '@/components/VerIncidencia';
 
 
   export default {
-    name:'JobsDevGJ',
+    name:'JobsTriajeGJ',
     mixins: [getColor],
     components: {
       VerIncidencia,
@@ -97,6 +108,7 @@ import VerIncidencia from '@/components/VerIncidencia';
     data: () => ({
       dialog: false,
       dialogDelete: false,
+      selected:[],
       search:'',
       headers: [
         { text: 'Job', align: 'start', sortable: true, value: 'id_inc'},
@@ -148,7 +160,7 @@ import VerIncidencia from '@/components/VerIncidencia';
         const url = 'http://10.13.86.114:3000/'; //url del servicio
         axios
           .get(url+'jobs')
-          //se realiza el filtro para los jobs en Triaje y la asignación del job_id
+          //se realiza el filtro para los jobs en triaje y la asignación del job_id
           .then(data => {
                           this.jobsBruto = data.data.response;
                           for (this.elemento in this.jobsBruto) {

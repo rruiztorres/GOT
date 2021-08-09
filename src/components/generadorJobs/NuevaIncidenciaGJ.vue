@@ -7,7 +7,7 @@
     hide-overlay
     transition="dialog-bottom-transition"
     class="h-full">
-    <div class="bg-gray-200 h-full pb-6">
+    <div class="bg-blue-50 h-full pb-6">
         <v-toolbar
             dark
             color="primary"
@@ -49,7 +49,7 @@
                         class="p-8"
                         >
                             <v-card
-                            class="p-4 mb-12 mt-4 h-full"
+                            class="p-4 mb-12 mt-4" style="height:42rem;"
                             >
                             <v-row align="center">
                                 <v-subheader class="ml-3">Código Incidencia</v-subheader>
@@ -61,7 +61,7 @@
                                     <v-subheader>Descripción Incidencia</v-subheader>
                                     <div 
                                     class="ml-4 p-3 border border-gray-200 shadow bg-gray-100"
-                                    style="height:20rem;"
+                                    style="height:33rem;"
                                     >
                                         <TextEditor @editor = storeDescIncidencia></TextEditor>
                                     </div>
@@ -87,9 +87,20 @@
                                         ></v-select>
                                     </v-row>
 
+                                    <v-subheader>Realizar seguimiento</v-subheader>
+                                    <v-row align="center" class="ml-1">
+                                        <v-container fluid>
+                                            <v-switch
+                                            v-model="switch1"
+                                            :label="switch1"
+                                            ></v-switch>
+                                        </v-container>
+                                    </v-row>
+
                                     <v-subheader>E-mail seguimiento</v-subheader>
                                     <v-row align="center" class="ml-1 p-3">
                                         <v-text-field
+                                        :disabled = !switch1
                                         filled
                                         v-model="email"
                                         :rules="emailRules"
@@ -332,6 +343,7 @@ import pointInPolygon from 'point-in-polygon';
             incidencia:[],                      //Almacen de datos para incidencia
             viaEntrada:'',                      //Select desde formulario si no se cambia recoge valor por defecto
             procedencia:''  ,                   //Select desde formulario si no se cambia recoge valor por defecto
+            switch1:'',
             email:'',                           //Select desde formulario
 
             errores:[],                         //Almacen de errores
