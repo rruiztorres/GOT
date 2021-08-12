@@ -1,15 +1,15 @@
 <template>
     <div>
-      <v-app class="font-sans shadow-md rounded p-8 mr-8">
+      <v-app class="font-sans shadow-md rounded px-8 mr-8">
         
-      <h1 class="ml-4 text-xl font-bold my-6">
+      <h1 class="text-xl font-bold py-4 mt-2">
       Incidencias en Bandeja
       </h1>
       
         <div class="overflow-y-auto">
           <v-card elevation="0" class="mb-4">
             <div>
-              <div class="p-4 flex bg-blue-500 w-full items-center">
+              <div class="p-3 flex bg-blue-500 w-full items-center">
                 <v-btn :disabled=disabledEliminar dark color="#EF4444" class="mr-3" @click="deleteItem()">ELIMINAR</v-btn>           
                 <v-btn dark color="primary" class="mr-3" @click="dummy()">VER INFO</v-btn> 
                 <v-spacer></v-spacer>
@@ -20,7 +20,7 @@
                   label="Buscar"
                   single-line
                   hide-details
-                  class="bg-white p-3"
+                  class="bg-white p-2"
                 ></v-text-field>
               </div>
             </div>
@@ -169,7 +169,7 @@ import VerIncidencia from '@/components/VerIncidencia';
         const url = 'http://10.13.86.114:3000/'; //url del servicio
         axios
           .get(url+'incidencias')
-          //se realiza el filtro para las incidencias en bandeja
+          //se realiza el filtro para las incidencias en Bandeja
           .then(data => {
                           this.incidenciasBruto = data.data.response;
                           for (this.elemento in this.incidenciasBruto) {
@@ -178,7 +178,7 @@ import VerIncidencia from '@/components/VerIncidencia';
                               }     
                           }
           //debug
-          //console.log('InciGEO (IncBdjGJ) -> Incidencias recuperadas y filtradas correctamente'); 
+          //console.log('InciGEO (IncBandejaGJ) -> Incidencias recuperadas y filtradas correctamente'); 
           })
       },
 

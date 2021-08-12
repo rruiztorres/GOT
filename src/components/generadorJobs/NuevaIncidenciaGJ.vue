@@ -7,7 +7,7 @@
     hide-overlay
     transition="dialog-bottom-transition"
     class="h-full">
-    <div class="bg-blue-50 h-full pb-6">
+    <div class="bg-blue-50 h-full">
         <v-toolbar
             dark
             color="primary"
@@ -49,7 +49,7 @@
                         class="p-8"
                         >
                             <v-card
-                            class="p-4 mb-12 mt-4" style="height:42rem;"
+                            class="p-4 mb-8 mt-4" style="height:43rem;"
                             >
                             <v-row align="center">
                                 <v-subheader class="ml-3">Código Incidencia</v-subheader>
@@ -61,7 +61,7 @@
                                     <v-subheader>Descripción Incidencia</v-subheader>
                                     <div 
                                     class="ml-4 p-3 border border-gray-200 shadow bg-gray-100"
-                                    style="height:33rem;"
+                                    style="height:34.5rem;"
                                     >
                                         <TextEditor @editor = storeDescIncidencia></TextEditor>
                                     </div>
@@ -87,27 +87,43 @@
                                         ></v-select>
                                     </v-row>
 
-                                    <v-subheader>Realizar seguimiento</v-subheader>
-                                    <v-row align="center" class="ml-1">
-                                        <v-container fluid>
-                                            <v-switch
-                                            v-model="switch1"
-                                            :label="switch1"
-                                            ></v-switch>
-                                        </v-container>
+                                    <v-subheader>Prioridad</v-subheader>
+                                    <v-row align="center" class="ml-1 p-3">
+                                        <v-select
+                                        filled
+                                        :items="inPrioridad"
+                                        v-model='selectPrioridad'
+                                        ></v-select>
+                                    </v-row>
+
+                                    <v-row align="center" style="margin-left:1px; margin-bottom:1rem;">
+                                    <v-subheader>Realizar seguimiento</v-subheader><v-switch v-model="activaSeguimiento"></v-switch>
                                     </v-row>
 
                                     <v-subheader>E-mail seguimiento</v-subheader>
                                     <v-row align="center" class="ml-1 p-3">
                                         <v-text-field
-                                        :disabled = !switch1
+                                        :disabled = !activaSeguimiento
                                         filled
                                         v-model="email"
                                         :rules="emailRules"
                                         ></v-text-field>
                                     </v-row>   
                                 </v-col>
-                            </v-row>                                   
+                            </v-row>   
+
+                            <!-- ALERTAS NO VAN <v-overlay :value=showAlertWindow >
+                                <v-alert prominent type="success">
+                                <v-row align="center">
+                                    <v-col class="grow">
+                                    {{alertMessage}}
+                                    </v-col>
+                                    <v-col class="shrink">
+                                    </v-col>
+                                </v-row>
+                                </v-alert>
+                            </v-overlay> -->
+
                             </v-card>
 
                         </v-card>
@@ -130,15 +146,32 @@
                         flat
                         class="p-8"
                         >
-                            <h1 class="text-2xl font-black mb-2">Incidencia</h1>
-                            <p>Resumen de la incidencia tal</p>
+                        <!--revisar esto-->
+                            <h1 class="text-2xl font-black mb-2">Incidencia {{incidencia.id_inc}}</h1>
+                                <v-data-table
+                                    :headers="incidenciaHeaders"
+                                    :items="incidencia"
+                                    class="elevation-1"
+                                    hide-default-footer
+                                >
+                                    <template v-slot:[`item.estado`]="{ item }">
+                                        <v-chip :color="getColor(item.estado)" dark>
+                                            {{ item.estado }}
+                                        </v-chip>
+                                    </template>
+
+                                    <template v-slot:[`item.descripcion`]="{ item }">
+                                        <span v-html="item.descripcion"></span>
+                                    </template>
+
+                                </v-data-table>
 
                             <v-spacer class="m-4"></v-spacer>
                             
                             <h1 class="text-2xl font-black mb-2">Jobs</h1>
                                 <v-data-table
                                     :loading="jobLoading"
-                                    loading-text="Esperando jobs"
+                                    loading-text="Esperando jobs. Si registró jobs haga clic en Guardar datos para ver los cambios."
                                     :headers="jobHeaders"
                                     :items="jobs"
                                     class="elevation-1"
@@ -159,7 +192,7 @@
                             <h1 class="text-2xl font-black mb-2">Errores</h1>
                                 <v-data-table
                                     :loading="errorLoading"
-                                    loading-text="Esperando errores"
+                                    loading-text="Esperando errore. Si registró errores haga clic en Guardar datos para ver los cambios."
                                     :headers="errorHeaders"
                                     :items="errores"
                                     class="elevation-1"
@@ -184,8 +217,6 @@
                            EMPTY
                          </v-card>
                     </v-tab-item> <!-- FIN DATOS ADJUNTOS -->
-
-
                 </v-tabs>
             </v-card>
             </template>
@@ -215,6 +246,7 @@ import pointInPolygon from 'point-in-polygon';
         this.initializeIncSerial();
         this.initializeViaEnt();
         this.initializeProced();
+        this.initializePrioridad();
     },
 
     mounted(){
@@ -229,6 +261,9 @@ import pointInPolygon from 'point-in-polygon';
         },
         selectProcedencia(){
             this.procedencia = this.selectProcedencia
+        },
+        selectPrioridad(){
+            this.prioridad = this.selectPrioridad
         },
         jobs(){
             if (this.jobs.length != 0){
@@ -285,20 +320,83 @@ import pointInPolygon from 'point-in-polygon';
                                 },
                     )
         },
+        initializePrioridad() {
+            const url = 'http://10.13.86.114:3000/'; //url del servicio
+            axios
+                .get(url + 'prioridad')
+                .then(data =>   {
+                                this.objProced = (data.data.response)
+                                    for (this.index in this.objProced) {
+                                        this.inPrioridad.push(this.objProced[this.index].inc_prioridad)
+                                    }
+                                },
+                    )
+        },
         //Lo que recogemos del text editor
         storeDescIncidencia(returnedText){
             this.returnedTextIncidencia = returnedText
         },
         recDataIncidencia(){
-            this.incidencia = {
+            this.incidencia = [{
                 id_inc:this.incSerial,
-                descripcion:this.returnedTextIncidencia,
-                via_entrada: this.viaEntrada,
+                via_ent: this.viaEntrada,
+                prioridad: 'Normal',
+                seguimiento: this.activaSeguimiento,
                 procedencia: this.procedencia,
-                eMailSeguim: this.email,
-            }
+                estado: 'En Triaje',
+                descripcion:this.returnedTextIncidencia,         
+                eMail: this.email,
+            }]
             this.asignErrorToJob();
-            console.log('Incidencia: ', this.incidencia, 'Errores: ', this.errores, 'Jobs: ', this.jobs)
+
+            const url = 'http://10.13.86.114:3000/'; //url del servicio
+            const id_inc = this.incidencia[0].id_inc;
+            axios
+            //comprobamos que la incidencia no existía previamente si existe hacemos un update (puede ser una edicion??)
+            .get(url+'incidencias/'+ id_inc)
+            .then(data => {
+                            if (data.data.mensaje.length != 0) {
+                                axios
+                                .put(url + 'updateIncidencia', this.incidencia[0])
+                                .then (data => {console.log(data.data.mensaje)})
+                                .catch(error => {console.warn("Algo fue mal al actualizar la incidencia", error)})
+                                
+                            } else {
+                                axios
+                                .post(url+'postIncidencia', this.incidencia[0])
+                                .then(  data => {console.log(data.data.mensaje)
+                                        //grabamos jobs
+                                        if (this.jobs.length > 0) {
+                                            for (this.index in this.jobs) {
+                                                axios
+                                                .post( url + 'postJobs', this.jobs[this.index])
+                                                .then( data => {console.log(data.data.mensaje)})
+                                                .catch(error => {
+                                                    console.log(error)
+                                                    })                                              
+                                            }
+                                            //grabamos errores
+                                            if (this.errores.length > 0){
+                                                for (this.index in this.errores) {
+                                                axios
+                                                .post( url + 'postErrores', this.errores[this.index])
+                                                .then( data => {console.log(data.data.mensaje)})
+                                                .catch(error => {console.log(error)})                                              
+                                                }
+                                            } else {
+                                                console.log("no hay errores para grabar")
+                                            }
+                                        } else {
+                                            console.log("no jobs que grabar")
+                                        }
+                                 })
+                                .catch(error => {console.warning("Algo fue mal al grabar la incidencia", error)})
+                                //info accion
+                                
+
+                                
+                            }
+                })
         },
         storeJobs(jobs){
             this.jobs = jobs;
@@ -339,11 +437,14 @@ import pointInPolygon from 'point-in-polygon';
             selectViaEntrada: 'Directo',        //Determina valor por defecto para el formulario
             inProcedencia: [],
             selectProcedencia: 'IGN / CNIG',    //Determina valor por defecto para el formulario
+            inPrioridad:[],
+            selectPrioridad: 'Normal',          //Determina valor por defecto para el formulario
+            plainString:'',
 
             incidencia:[],                      //Almacen de datos para incidencia
             viaEntrada:'',                      //Select desde formulario si no se cambia recoge valor por defecto
             procedencia:''  ,                   //Select desde formulario si no se cambia recoge valor por defecto
-            switch1:'',
+            activaSeguimiento: false,
             email:'',                           //Select desde formulario
 
             errores:[],                         //Almacen de errores
@@ -352,6 +453,15 @@ import pointInPolygon from 'point-in-polygon';
 
             jobLoading: true,
             errorLoading: true,
+
+            incidenciaHeaders: [
+                {text: 'Estado', value: 'estado' },
+                {text: 'Descripción', value:'descripcion' },
+                {text: 'Vía Entrada', value:'via_ent' },
+                {text: 'Procedencia', value:'procedencia'},
+                {text: 'Seguimiento', value:'seguimiento' },
+                {text: 'E-mail', value:'eMail' },
+            ],
 
             jobHeaders : [
                 { text: 'Estado', value:'estado'},                

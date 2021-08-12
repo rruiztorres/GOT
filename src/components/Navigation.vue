@@ -14,7 +14,7 @@
         class="transition duration-1500 ease-in-out"
         >
           <template v-slot:activator="{ on, attrs }">
-          <div class="bg-blue-800 pt-7 h-50">
+          <div class="bg-blue-800 pt-7" style="height:14rem;">
             <v-img> 
 
             <div v-if="mini==false">
@@ -26,23 +26,22 @@
             <div v-if="mini==true">
               <img
               :src="avatar"
-              class="w-10 border-2 border-gray-400 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
+              class="w-10 mt-16 border-2 border-gray-400 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
               >
             </div>
 
             </v-img>
 
-            <v-list-item-content>
-              <div v-if="mini==false">
-                <v-list-item-title v-model="userName" class="text-white">
-                  {{userName}}
-                </v-list-item-title>
-              
-                <v-list-item-subtitle v-model="userRole" class="text-white"> 
-                  {{userRole}}
-                </v-list-item-subtitle>
-              </div>
-            </v-list-item-content>
+            <v-list class="pt-0">
+              <v-list-item-content v-if="mini == false" class="text-white">
+                  <v-list-item-title v-model="userName">
+                    {{userName}}
+                  </v-list-item-title>
+                  <v-list-item-subtitle v-model="userRole"> 
+                    {{userRole}}
+                  </v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list>
 
             <!--BOTONES CONFIGURACION USUARIO -->
             <v-list v-if="mini==false" class="flex pt-0">
@@ -145,8 +144,8 @@
     <div v-if="mini==false">
       <v-spacer class="mt-4"></v-spacer>
       <v-btn color="green" dark class="w-56 ml-4">
-        <v-icon class="mr-6">mdi-account-arrow-left-outline</v-icon>
-        LOGOUT
+        <v-icon class="mr-6">mdi-email-outline</v-icon>
+        Enviar Mensaje
         </v-btn>
     </div>
   </v-navigation-drawer>

@@ -894,6 +894,7 @@ export default {
       this.index = this.errores.length - 1;
       this.newError = {
         id: this.errores[this.index].id,
+        id_inc: this.incidencia,
         geometry: this.errores[this.index].geometry,
         idError: this.idError,
         selectTema: this.selectTema,
@@ -909,6 +910,23 @@ export default {
       setTimeout(this.avanceSerialError, 1000);
     },
 
+    //Formatea la geometria para la insercion en BD
+    stringifyGeometry(geometry){
+        this.coordinates = geometry.coordinates[0];
+        this.string = 'POLYGON((';
+
+          for (this.index in this.coordinates) {
+              this.coordinate = this.coordinates[this.index].toString();
+              this.coordinate = this.coordinate.replace(',',' ');
+              this.string = this.string + this.coordinate + ','
+          }
+          this.string = this.string + '))';
+          this.string = this.string.replace(',))', '))"');
+
+        this.string = this.string + ',\'3857';
+        return this.string;
+    },
+
     recJobData() {
       //TODO: Mejorar el tema de los numeros de serie
       this.idJob = this.incidencia + "-J0" + this.serialJob;
@@ -917,6 +935,7 @@ export default {
         id_inc: this.incidencia,
         id: this.jobs[this.index].id,
         geometry: this.jobs[this.index].geometry,
+        stringGeometry: this.stringifyGeometry(this.jobs[this.index].geometry),
         idJob: this.idJob,
         descripcion: this.descJob,
         deteccion: this.deteccionJob,
@@ -995,11 +1014,11 @@ export default {
   data() {
     return {
       //Config Map Vuelayers
-      zoom: 5.5, //Determina el nivel de zoom por defecto
+      zoom: 5.5,                            //Determina el nivel de zoom por defecto
       center: [-700000, 4329241.805683324], //Determina el centro de mapa por defecto
-      selectedFeatures: [], //Array para indicar que un elemento está seleccionado TODO: seleccion multiple?
-      drawType: undefined, //Determina si la función dibujar está activada
-      mapActive: "osm", //Mapa Activo por defecto
+      selectedFeatures: [],                 //Array para indicar que un elemento está seleccionado TODO: seleccion multiple?
+      drawType: undefined,                  //Determina si la función dibujar está activada
+      mapActive: "osm",                     //Mapa Activo por defecto
       //TODO: Pendiente de parametrizar servicios WMS
 
       //Para añadir servicio solo hay añadir un nuevo objeto al array la posición 0 es el mapa por defecto
@@ -1060,6 +1079,7 @@ export default {
       asignacionJob: "Bandeja de Jobs", //Define el Valor por defecto de asignacion, recoge el dato desde el formulario si es distinto
       nombreOperadorJob: "",            //Recoge el dato del operador desde el formulario
       tipoBandejaJob: "Operadores",     //Define el Valor por defecto de tipo bandeja, recoge el dato desde el formulario si es distinto
+      stringGeometry:'',                //Geometría en string plano para hacer el insert en BD
       
       //Misc
       infoMsgWindow: false,     //Activa ventana información

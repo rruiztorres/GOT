@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div class="bg-blue-800" style="height:8.4rem;">
+    <div class="bg-blue-800" style="height:9rem;">
         <!--Generador de Jobs-->
         <div v-if="activarMenu == 'IncTriajeGJ'"><IncTriajeGJ></IncTriajeGJ></div>
         <div v-if="activarMenu == 'IncBdjGJ'"><IncBdjGJ></IncBdjGJ></div>
