@@ -887,6 +887,18 @@ export default {
     },
     //FIN PANEL DE CONTROL
 
+    //Formatea la geometria de jobs para la insercion en BD
+    stringifyErrorGeometry(geometry){
+        this.coordinates = geometry.coordinates;
+        this.string = 'POINT(';
+
+        this.coordinate = this.coordinates.toString();
+        this.coordinate = this.coordinate.replace(',',' ');
+        this.string = this.string + this.coordinate;
+          
+        this.string = this.string + ')\','+ 3857;
+        return this.string;
+    },
 
     recErrorData() {
       //TODO: Mejorar el tema de los numeros de serie
@@ -896,9 +908,10 @@ export default {
         id: this.errores[this.index].id,
         id_inc: this.incidencia,
         geometry: this.errores[this.index].geometry,
+        stringGeometry: this.stringifyErrorGeometry(this.errores[this.index].geometry),
         idError: this.idError,
-        selectTema: this.selectTema,
-        selectTipoError: this.selectTipoError,
+        tema: this.selectTema,
+        tipoError: this.selectTipoError,
         descripcion: this.descError,
         job: "",
         estado: "En Triaje",
@@ -910,8 +923,8 @@ export default {
       setTimeout(this.avanceSerialError, 1000);
     },
 
-    //Formatea la geometria para la insercion en BD
-    stringifyGeometry(geometry){
+    //Formatea la geometria de jobs para la insercion en BD
+    stringifyJobGeometry(geometry){
         this.coordinates = geometry.coordinates[0];
         this.string = 'POLYGON((';
 
@@ -935,7 +948,7 @@ export default {
         id_inc: this.incidencia,
         id: this.jobs[this.index].id,
         geometry: this.jobs[this.index].geometry,
-        stringGeometry: this.stringifyGeometry(this.jobs[this.index].geometry),
+        stringGeometry: this.stringifyJobGeometry(this.jobs[this.index].geometry),
         idJob: this.idJob,
         descripcion: this.descJob,
         deteccion: this.deteccionJob,

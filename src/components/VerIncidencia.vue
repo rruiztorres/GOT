@@ -395,11 +395,10 @@ import axios from 'axios';
     methods:{
         //inicializa la tabla de jobs asociados a la incidencia
         initialize () {
-            const url = 'http://10.13.86.114:3000/'; //url del servicio
-            const id_inc = this.incidencia.id_inc;
+            this.id_inc = this.incidencia.id_inc;
             document.cookie = 'SameSite = Strict';
             axios
-                .get(url+'jobs/'+ id_inc)
+                .get(this.url+'jobs/'+ this.id_inc)
                 //se realiza el filtro para las incidencias en bandeja
                 .then(data => {this.jobs = data.data;
                 //debug

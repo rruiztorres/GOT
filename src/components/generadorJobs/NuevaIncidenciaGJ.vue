@@ -22,8 +22,8 @@
             <v-toolbar-title>Alta de Incidencia {{incSerial}}</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn class="w-24 bg-red-500 mr-5" dark text @click="closeDialog">CANCELAR</v-btn>
-                <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="recDataIncidencia">GUARDAR DATOS</v-btn>
-                <v-btn class="w-24 bg-green-500 mr-5" dark text>GENERAR</v-btn>
+                <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="guardarDatos">GUARDAR DATOS</v-btn>
+                <v-btn class="w-24 bg-green-500 mr-5" dark text >GENERAR</v-btn>
         </v-toolbar>
 
 
@@ -283,23 +283,49 @@ import pointInPolygon from 'point-in-polygon';
             //Al cerrar el dialogo devuelve el valor por defecto para GJ a loader
             this.$emit('closed', 'IncTriajeGJ');
         },
-        //TODO: Mejorar la gestion de los numeros de serie
-        initializeIncSerial () {
-            const type = 'IGN_C_'; //Al estar en Generador de JOBS el tipo es "C"
-            const date = new Date();
-            const year = (date.getFullYear()).toString();
-            const url = 'http://10.13.86.114:3000/'; //url del servicio
+
+        /*TODO: Mejorar la gestion de los numeros de serie
+        avanzaIncSerial e initializeIncSerial tienen una parte común que habría que hacer
+        en función única
+        */
+        avanzaIncSerial(){
+            this.type = "IGN_C_";
             axios
-            .get(url + 'serials/' + type +'/'+ year)
+            .get(this.url + 'serials/' + this.type)
             //recuperamos el ultimo serial registrado en BD
-            .then(data => {this.serial = (data.data[0]);
-            this.incSerial = (this.serial.serial_type)+(this.serial.serial_year)+(this.serial.serial_id)
+            .then(data => { 
+                if (data != null){
+                    this.id = data.data.mensaje[0].serial_id;
+                    this.id = this.id + 1;
+
+                    //grabamos nuevo serial en BD
+                    this.serial = {
+                        id: this.id,
+                        type: this.type,
+                    };
+                    axios
+                    .put(this.url + 'updateSerial/', this.serial)
+                    .then( data => {console.log(data.data.mensaje)})
+                }
             })
         },
-        initializeViaEnt() {
-            const url = 'http://10.13.86.114:3000/'; //url del servicio
+        initializeIncSerial () {
+            this.type = "IGN_C_";
             axios
-                .get(url + 'viaentrada')
+            .get(this.url + 'serials/' + this.type)
+            //recuperamos el ultimo serial registrado en BD
+            .then(data => { 
+                if (data != null){
+                    this.id = data.data.mensaje[0].serial_id;
+                    this.incSerial = this.type + parseInt(this.id);
+                }
+            })
+
+        },
+
+        initializeViaEnt() {
+            axios
+                .get(this.url + 'viaentrada')
                 .then(data =>   {
                                 this.objViaEnt = (data.data.response)
                                     for (this.index in this.objViaEnt) {
@@ -336,7 +362,143 @@ import pointInPolygon from 'point-in-polygon';
         storeDescIncidencia(returnedText){
             this.returnedTextIncidencia = returnedText
         },
+
+        recDataError(){
+            //Comprueba si hay errores registrados en mapa
+            if (this.errores.length > 0){
+                //Si hay Jobs registrados asigna errores a jobs espacialmente
+                this.asignErrorToJob();
+                for (this.index in this.errores) {
+                    axios
+                    .post( this.url + 'postErrores', this.errores[this.index])
+                    .then( data => {console.log(data.data.mensaje)})
+                    .catch(error => {console.warn("algo fue mal al grabar el error ", error)})
+                }
+            }
+        },
+
+        recDataJob(){
+            if(this.jobs.length > 0){
+                for (this.index in this.jobs) {
+                    axios
+                    .post( this.url + 'postJobs', this.jobs[this.index])
+                    .then( data => {console.log(data.data.mensaje)})
+                    .catch(error => {console.warn("Algo fue mal al grabar el job ",error)})                                              
+                }
+            }
+        },
+
         recDataIncidencia(){
+            axios
+            .post(this.url + 'postIncidencia', this.incidencia[0])
+            .then( data => {console.log(data.data.mensaje)})
+            .catch(error => {console.warn("Algo fue mal al grabar la incidencia ",error)}) 
+        },
+
+        updateDataIncidencia(){
+            this.storeIncidencia();
+            axios
+            .put(this.url + 'updateIncidencia' + this.incidencia)
+            .then(data => { console.log( "Incidencia actualizada correctamente ", data)})
+        },
+
+        updateDataError(){
+            axios
+            .put(this.url + 'updateErrores' + this.errores)
+            .then(data => { console.log ("Errores actualizados correctamente ", data)})
+        },
+
+        updateDataJobs(){
+            axios
+            .put(this.url + 'updateJobs' + this.jobs)
+            .then(data => { console.log ("Jobs actualizados correctamente ", data)})
+        },
+
+        compruebaIncidenciaBd(){
+            axios
+            .get(this.url + 'incidencias/'+ this.incidencia[0].id_inc)
+            .then(data => {
+                if (data.data.mensaje.length > 0){
+                        this.existe = true;
+                    } else {
+                        this.existe = false;
+                    }    
+            })
+            return this.existe;
+        },
+
+        compruebaErrorBD(){
+            for (this.index in this.errores){
+                axios
+                .get(this.url + 'errores/' + this.errores[this.index].idError)
+                .then(data => {
+                    if (data.data.mensaje.length > 0){
+                        this.existe = true;
+                    } else {
+                        this.existe = false;
+                    }
+                })
+            }
+            return this.existe;
+        },
+
+        compruebaJobBD(){
+            for (this.index in this.jobs){
+                axios
+                .get(this.url + 'jobs/' + this.jobs[this.index].id_job)
+                .then(data => {
+                    if (data.data.mensaje.length > 0){
+                        this.existe = true;
+                    } else {
+                        this.existe = false;
+                    }
+                })
+            }
+            return this.existe;
+        },
+
+        guardarDatos(){
+            //Grabamos datos de incidencia antes de comenzar
+            this.storeIncidencia(); 
+            //Existe la incidencia existe en BD?
+            this.existeIncidencia = this.compruebaIncidenciaBd(); 
+            if (this.existeIncidencia == true) {
+                //La Incidencia existe en BD -> Actualizamos 
+                this.updateDataIncidencia();
+                //Existen errores asociados a la incidencia en BD?
+                this.existeError = this.compruebaErrorBD();
+                if (this.existeError == true) {
+                    //existen errores asociados a incidencia en BD -> Actualizamos 
+                    this.updateDataError();
+                    //existen jobs asociados a incidencia en BD?
+                    this.existeJob = this.compruebaJobBD();
+                    if (this.existeJob == true){
+                        //existen jobs asociados a incidencia en BD -> Actualizamos
+                        this.updateDataJobs();
+                    } else {
+                        //no existen jobs asociados a incidencia en BD -> Grabamos
+                        this.recDataJob();
+                    }
+                } else {
+                    //no existen errores asociados a incidencia en BD
+                    //hay errores registrados para grabar? -> Grabamos
+                    this.recDataError();
+                    //hay jobs registrados para grabar? -> Afirmativo Grabamos
+                    this.recDataJob();
+                }
+            } else {
+                //La Incidencia no existe en BD -> Grabamos
+                this.recDataIncidencia();
+                //Hay errores registrados para grabar? -> Afirmativo Grabamos
+                this.recDataError();
+                //Hay Jobs registrados para grabar? -> Afirmativo Grabamos
+                this.recDataJob();
+                //Avanzamos Serial de incidencias
+                this.avanzaIncSerial();                
+            }          
+        },
+
+        storeIncidencia(){
             this.incidencia = [{
                 id_inc:this.incSerial,
                 via_ent: this.viaEntrada,
@@ -347,57 +509,8 @@ import pointInPolygon from 'point-in-polygon';
                 descripcion:this.returnedTextIncidencia,         
                 eMail: this.email,
             }]
-            this.asignErrorToJob();
-
-            const url = 'http://10.13.86.114:3000/'; //url del servicio
-            const id_inc = this.incidencia[0].id_inc;
-            axios
-            //comprobamos que la incidencia no existía previamente si existe hacemos un update (puede ser una edicion??)
-            .get(url+'incidencias/'+ id_inc)
-            .then(data => {
-                            if (data.data.mensaje.length != 0) {
-                                axios
-                                .put(url + 'updateIncidencia', this.incidencia[0])
-                                .then (data => {console.log(data.data.mensaje)})
-                                .catch(error => {console.warn("Algo fue mal al actualizar la incidencia", error)})
-                                
-                            } else {
-                                axios
-                                .post(url+'postIncidencia', this.incidencia[0])
-                                .then(  data => {console.log(data.data.mensaje)
-                                        //grabamos jobs
-                                        if (this.jobs.length > 0) {
-                                            for (this.index in this.jobs) {
-                                                axios
-                                                .post( url + 'postJobs', this.jobs[this.index])
-                                                .then( data => {console.log(data.data.mensaje)})
-                                                .catch(error => {
-                                                    console.log(error)
-                                                    })                                              
-                                            }
-                                            //grabamos errores
-                                            if (this.errores.length > 0){
-                                                for (this.index in this.errores) {
-                                                axios
-                                                .post( url + 'postErrores', this.errores[this.index])
-                                                .then( data => {console.log(data.data.mensaje)})
-                                                .catch(error => {console.log(error)})                                              
-                                                }
-                                            } else {
-                                                console.log("no hay errores para grabar")
-                                            }
-                                        } else {
-                                            console.log("no jobs que grabar")
-                                        }
-                                 })
-                                .catch(error => {console.warning("Algo fue mal al grabar la incidencia", error)})
-                                //info accion
-                                
-
-                                
-                            }
-                })
         },
+
         storeJobs(jobs){
             this.jobs = jobs;
         },
@@ -427,6 +540,7 @@ import pointInPolygon from 'point-in-polygon';
 
     data () {
         return {
+            url: 'http://10.13.86.114:3000/',    //url del servicio API
             dialog: true,
 
             incSerial:'',
@@ -477,8 +591,8 @@ import pointInPolygon from 'point-in-polygon';
                 { text: 'Estado', value: 'estado' },                
                 { text: 'Id Error', value:'idError'},
                 { text: 'Asignado a Job', value: 'job' },
-                { text: 'Error de', value: 'selectTipoError' },
-                { text: 'Tema Error', value: 'selectTema' },
+                { text: 'Error de', value: 'tipoError' },
+                { text: 'Tema Error', value: 'tema' },
                 { text: 'Descripcion', value: 'descripcion' },
             ],
         }
