@@ -1,15 +1,15 @@
 <template>
     <div>
-      <v-app class="font-sans shadow-md rounded p-8 mr-8">
+      <v-app class="font-sans shadow-md rounded px-8 mr-8">
         
-      <h1 class="ml-4 text-xl font-bold my-6">
-      Jobs devueltos
+      <h1 class="text-xl font-bold py-4 mt-2">
+      Jobs Devueltos
       </h1>
       
         <div class="overflow-y-auto">
           <v-card elevation="0" class="mb-4">
             <div>
-              <div class="p-4 flex bg-blue-500 w-full items-center">
+              <div class="p-3 flex bg-blue-500 w-full items-center">
                 <v-btn disabled dark color="primary" class="mr-3">ACCION 1</v-btn>           
                 <v-btn disabled dark color="primary" class="mr-3">ACCION 2</v-btn> 
                 <v-spacer></v-spacer>
@@ -20,7 +20,7 @@
                   label="Buscar"
                   single-line
                   hide-details
-                  class="bg-white p-3"
+                  class="bg-white p-2"
                 ></v-text-field>
               </div>
             </div>
@@ -111,11 +111,12 @@ import VerIncidencia from '@/components/VerIncidencia';
       selected:[],
       search:'',
       headers: [
-        { text: 'Job', align: 'start', sortable: true, value: 'id_inc'},
+        { text: 'Job', align: 'start', sortable: true, value: 'job_id'},
         { text: 'Estado', align: 'start', sortable: true, value: 'job_estado' },
-        { text: 'Prioridad', align: 'start', sortable: true, value: 'job_prioridad' },
+        { text: 'Gravedad', align: 'start', sortable: true, value: 'job_gravedad' },
         { text: 'Detectado en', align: 'start', sortable: true, value: 'job_detectado' },
         { text: 'Arreglar en', align: 'start', sortable: true, value: 'job_arreglar' },
+        { text: 'Descripción', align: 'start', sortable: true, value: 'job_desc' },
         //pendiente determinar acciones
         //{ text: 'Acciones', value: 'actions', sortable: false },
       ],
@@ -160,19 +161,15 @@ import VerIncidencia from '@/components/VerIncidencia';
         const url = 'http://10.13.86.114:3000/'; //url del servicio
         axios
           .get(url+'jobs')
-          //se realiza el filtro para los jobs devueltos y la asignación del job_id
+          //se realiza el filtro para los jobs devueltos
           .then(data => {
                           this.jobsBruto = data.data.response;
                           for (this.elemento in this.jobsBruto) {
-                              //referenciamos los -J01, -J02, etc. por cada incidencia.
-                              this.jobsBruto[this.elemento].id_inc = this.jobsBruto[this.elemento].id_inc+'-J'+this.jobsBruto[this.elemento].job_id
                               //filtramos jobs segun estado
                               if (this.jobsBruto[this.elemento].job_estado == 'Devuelto') {
                                this.jobs.push(this.jobsBruto[this.elemento])            
                               }     
                           }
-          //debug
-          //console.log('InciGEO (JobsDevueltosGJ) -> Jobs recuperados y filtrados correctamente'); 
           })
       },
 

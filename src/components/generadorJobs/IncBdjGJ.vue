@@ -10,8 +10,8 @@
           <v-card elevation="0" class="mb-4">
             <div>
               <div class="p-3 flex bg-blue-500 w-full items-center">
-                <v-btn :disabled=disabledEliminar dark color="#EF4444" class="mr-3" @click="deleteItem()">ELIMINAR</v-btn>           
-                <v-btn dark color="primary" class="mr-3" @click="dummy()">VER INFO</v-btn> 
+                <v-btn :disabled=disabledEliminar dark color="#EF4444" class="mr-3" @click="deleteItem()">RECHAZAR</v-btn>           
+                <v-btn :disabled=disabledEliminar dark color="#10B981" class="mr-3" @click="dummy()">COMENZAR TRIAJE</v-btn> 
                 <v-spacer></v-spacer>
 
                 <v-text-field
@@ -53,18 +53,19 @@
                 </v-dialog>
                 <!-- FIN VENTANA EDICION INCIDENCIA -->
                 
-                <v-dialog v-model="dialogDelete" max-width="500px">
-                  <v-card>
+                <v-overlay :value="dialogDelete">
+                  <v-card class="p-3 w-80">
                    <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
-                   <h3 class="text-center text-l">Esta acción borrará la incidencia ¿Desea continuar?</h3>
+                   <h3 class="text-center text-l">Esta acción eliminará la incidencia seleccionada ¿Desea continuar?</h3>
                       <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn class="w-24 bg-red-500" dark text @click="closeDelete">CANCELAR</v-btn>
-                        <v-btn class="w-24 bg-green-500" dark text @click="deleteItemConfirm">OK</v-btn>
-                        <v-spacer></v-spacer>
+                        <div class="mt-6 flex">
+                            <v-btn class="w-24 bg-red-500" dark text @click="closeDelete">CANCELAR</v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn class="w-24 bg-green-500" dark text @click="deleteItemConfirm">OK</v-btn>
+                        </div>
                       </v-card-actions>
                   </v-card>
-                </v-dialog>
+                </v-overlay>
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">

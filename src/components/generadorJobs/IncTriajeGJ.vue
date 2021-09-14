@@ -10,8 +10,9 @@
           <v-card elevation="0" class="mb-4">
             <div>
               <div class="p-3 flex bg-blue-500 w-full items-center">
-                <v-btn :disabled=disabledEliminar dark color="#EF4444" class="mr-3" @click="deleteItem()">ELIMINAR</v-btn>           
+                <v-btn :disabled=disabledEliminar dark color="#EF4444" class="mr-3" @click="deleteItem()">ELIMINAR</v-btn>  
                 <v-btn dark color="primary" class="mr-3" @click="dummy()">VER INFO</v-btn> 
+                <v-btn :disabled=disabledEliminar dark color="#10B981" class="mr-3" @click="dummy()">GENERAR</v-btn>
                 <v-spacer></v-spacer>
 
                 <v-text-field
@@ -53,18 +54,25 @@
                 </v-dialog>
                 <!-- FIN VENTANA EDICION INCIDENCIA -->
                 
-                <v-dialog v-model="dialogDelete" max-width="500px">
-                  <v-card>
+                <v-overlay :value="dialogDelete">
+                  <v-card class="p-3 w-80">
                    <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
-                   <h3 class="text-center text-l">Esta acción borrará la incidencia ¿Desea continuar?</h3>
+                   <h3 class="text-center text-l">
+                     Esta acción eliminará la incidencia seleccionada, 
+                     asi como los errores y jobs asociados a la misma</h3>
+                     <br/>
+                     <h3 class="text-center text-l"> 
+                     ¿Desea continuar?</h3>
                       <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn class="w-24 bg-red-500" dark text @click="closeDelete">CANCELAR</v-btn>
-                        <v-btn class="w-24 bg-green-500" dark text @click="deleteItemConfirm">OK</v-btn>
-                        <v-spacer></v-spacer>
+                        <div class="mt-6 flex">
+                            <v-btn class="w-24 bg-red-500" dark text @click="closeDelete">CANCELAR</v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn class="w-24 bg-green-500" dark text @click="deleteItemConfirm">OK</v-btn>
+                        </div>
                       </v-card-actions>
                   </v-card>
-                </v-dialog>
+                </v-overlay>
+
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
@@ -73,7 +81,11 @@
             </template>
 
             <template v-slot:no-data>
-              <v-btn color="primary" @click="initialize">Reset</v-btn>
+              En estos momentos no tiene incidencias en triaje.
+              <!--<v-btn color="primary" @click="initialize">
+                <v-icon class="mr-2">mdi-reload</v-icon>
+                Recargar
+              </v-btn>-->
             </template>
 
             <template v-slot:[`item.inc_estado`]="{ item }">
@@ -102,6 +114,8 @@ import VerIncidencia from '@/components/VerIncidencia';
 
     data() {
       return {
+        url: 'http://10.13.86.114:3000/',    //url:puerto del servicio API
+
         dialog: false,
         dialogDelete: false,
         disabledEliminar: true,
@@ -198,7 +212,15 @@ import VerIncidencia from '@/components/VerIncidencia';
           for (this.indexIncidencia in this.incidencias){
             this.incidenciaAlmacenada = this.incidencias[this.indexIncidencia].id_inc;
             if (this.incidenciaBorrar == this.incidenciaAlmacenada){
-              //TODO: El borrado debe ser en base de datos y array
+              //Borramos en Base de datos
+              axios
+                .delete(this.url + 'incidencias/' + this.incidenciaBorrar)
+                .then(data => {
+                                if (data.data.status == 200) {
+                                  console.log("success") 
+                                }
+                })
+              //Borramos de nuestro array para no mostrarlo
               this.incidencias.splice(this.indexIncidencia,1)
             }
           }

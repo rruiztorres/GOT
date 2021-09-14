@@ -35,7 +35,7 @@
             </vl-style-box>
             <!-- fin estilos seleccion -->
 
-            <!-- MUESTRA LAS GEOMETRIAS ALMACENADAS EN JOBS Y ERRORES -->
+            <!-- MUESTRA LAS GEOMETRIAS DE EDICION ALMACENADAS EN JOBS Y ERRORES -->
             <vl-layer-vector :z-index="zIndexJob">
               <vl-source-vector
                 :features.sync="jobs"
@@ -59,7 +59,8 @@
                 </vl-style-circle>
               </vl-style-box>
             </vl-layer-vector>
-            <!-- fin geometrías -->
+            <!-- fin geometrías edicion -->
+
           </template>
         </vl-interaction-select>
 
@@ -101,15 +102,41 @@
         
         <!--CAPAS DE MAPAS-->
         <div>
+          <!--MAPA BASE SIEMPRE ACTIVO POR DEBAJO-->
+          <!--<vl-layer-tile>
+            <vl-source-wms
+              layerName="IGNBase-gris"
+              matrixSet="EPSG:3857"
+              styleName="default"
+              url="https://www.ign.es/wmts/ign-base"
+            >
+            </vl-source-wms>
+          </vl-layer-tile>-->          
+
+          <!--<vl-layer-tile>
+            <vl-source-wmts
+              :layerName="mapActive.layers"
+              :matrix-set="mapActive.matrixSet"
+              :style-name="mapActive.style"
+              :url="mapActive.url"
+            >
+            </vl-source-wmts>
+          </vl-layer-tile>-->
+
           <vl-layer-tile>
             <vl-source-wms
               :layers="mapActive.layers"
               :matrixSet="mapActive.matrixSet"
-              :style="mapActive.style"
+              :styleName="mapActive.style"
               :url="mapActive.url"
             >
             </vl-source-wms>
           </vl-layer-tile>
+
+          <!--<vl-layer-tile>
+            <vl-source-xyz url="https://tms-ign-base.ign.es/1.0.0/IGNBaseTodo/{z}/{x}/{-y}.jpeg"></vl-source-xyz>
+          </vl-layer-tile>-->
+
         </div>
       </vl-map>
 
@@ -142,7 +169,20 @@
                 <v-divider></v-divider>
                 <v-spacer class="mt-2"></v-spacer>
 
+                <!--TODO: Repetitivo, se puede optimizar -->
+
                 <v-col cols="12">
+                  <v-row style="margin-bottom: -2.5rem">
+                    <v-col cols="4" class="mt-3"> Job Grande: </v-col>
+                    <v-col cols="8" style="padding:0rem 0.7rem 1rem; 0rem;">
+                        <v-switch
+                          style="padding-top:0.5rem;"
+                          inset
+                          v-model="jobGrande"
+                        ></v-switch>
+                    </v-col>
+                  </v-row>
+
                   <v-row style="margin-bottom: -2.5rem">
                     <v-col cols="4" class="mt-3"> Detectado en: </v-col>
                     <v-col cols="8">
@@ -220,9 +260,6 @@
 
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="error" dark @click="editJob = false"
-                    >CANCELAR</v-btn
-                  >
                   <v-btn color="success" dark @click="recJobData"
                     >ACEPTAR</v-btn
                   >
@@ -291,9 +328,6 @@
 
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="error" dark @click="editError = false"
-                      >CANCELAR</v-btn
-                    >
                     <v-btn color="success" dark @click="recErrorData"
                       >ACEPTAR</v-btn
                     >
@@ -417,6 +451,12 @@
               <div class="p-3">
                 <table class="bg-blue-100 w-full">
                   <tr>
+                    <td class="p-1">Job Grande</td>
+                    <td class="p-1" style="border: 1px solid white">
+                      {{ this.infoJobGrande }}
+                    </td>
+                  </tr>
+                  <tr>
                     <td class="p-1">Descripción</td>
                     <td class="p-1" style="border: 1px solid white">
                       {{ this.infoDescripcionJob }}
@@ -478,8 +518,9 @@
           <v-app class="font-sans" style="float:left; height: 0rem">
             <div class="flex">
               <v-card
-                class="border-2 p-1"
+                class="border-2 p-0"
                 style="
+                  height: 40rem;
                   top: -45.5rem;
                   margin-left: 0.5rem;
                   margin-top: 4rem;
@@ -488,21 +529,12 @@
               >
               <div class="flex">
                 <v-btn dark icon @click="showLayerTools = !showLayerTools" class="mt-2">
-                  <v-icon>{{showLayerTools ? "mdi-layers-outline" : "mdi-layers-outline"}}</v-icon>
+                  <v-icon>{{showLayerTools ? "mdi-cog" : "mdi-cog"}}</v-icon>
                 </v-btn>
 
                 <v-expand-transition>
                   <div v-show="showLayerTools" class="p-2 w-44">
-                    <div class="rounded bg-blue-800 p-2 mb-1 text-white text-l text-center">
-                    CAPAS
-                    </div>
-                    <v-btn
-                    v-for="service in wmsServices"
-                    :key="service.name"
-                    text dark class="bg-green-500 mb-1 flex-grow shadow-lg w-full"
-                    @click="activeMap(service)"
-                    >{{service.name}}</v-btn>
-                    <v-spacer class="my-1"></v-spacer>
+                    Empty
                   </div>
                 </v-expand-transition>
               </div>
@@ -532,7 +564,7 @@
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn dark icon>
-                  <v-icon>mdi-hand-right</v-icon>
+                  <v-icon>mdi-cursor-pointer</v-icon>
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn dark icon>
@@ -552,47 +584,73 @@
                 <div v-show="showMapTools">
                   <v-divider></v-divider>
 
-                  <div class="rounded bg-blue-800 p-2 md-1 text-white text-l">
+                  <div class="text-center rounded bg-blue-800 p-2 md-1 text-white text-l">
                     ERRORES
                   </div>
                   <div class="mt-2 flex">
+                  <v-btn-toggle v-model="toggleBtnError" color="blue accent-4">
                     <v-btn
                       v-for="item in errorPanel"
                       :key="item.title"
-                      icon tile dark class="bg-blue-600 flex-grow shadow-lg mr-2"
+                      icon tile
                       :title="item.title"
-                      :disabled="panelOption.buttonActive == item.disabled"
                       @click="item.click()"
+                      :disabled="item.aplicarPerfil"
                     >
-                      <v-icon>{{ item.icon }}</v-icon>
+                      <v-icon color="#1E40AF">{{ item.icon }}</v-icon>
                     </v-btn>
+                  </v-btn-toggle>
                   </div>
 
                   <v-spacer class="my-4"></v-spacer>
 
-                  <div class="rounded bg-blue-800 p-2 md-1 text-white text-l">
+                  <div class="text-center rounded bg-blue-800 p-2 md-1 text-white text-l">
                     JOBS
                   </div>
                   <div class="mt-2 flex">
-                    <v-btn
-                      v-for="item in jobsPanel"
-                      :key="item.title"
-                      icon tile dark class="bg-blue-600 flex-grow shadow-lg mr-1"
-                      :title="item.title"
-                      :disabled="panelOption.buttonActive == item.disabled"
-                      @click="item.click()"
-                    >
-                      <v-icon>{{ item.icon }}</v-icon>
-                    </v-btn>
+                    <v-btn-toggle v-model="toggleBtnJob" color="blue accent-4">
+                      <v-btn
+                        v-for="item in jobsPanel"
+                        :key="item.title"
+                        icon tile
+                        :title="item.title"
+                        @click="item.click()"
+                        :disabled="item.aplicarPerfil"
+                      >
+                        <v-icon color="#1E40AF">{{ item.icon }}</v-icon>
+                      </v-btn>
+                    </v-btn-toggle>
                   </div>
-                  <v-spacer class="my-4"></v-spacer>                              
+                  <v-spacer class="my-8"></v-spacer>
+
+                  <div class="rounded bg-blue-800 p-2 mb-1 text-white text-l text-center">
+                    CAPAS WMTS
+                    </div>
+                    <!--<v-btn
+                    v-for="service in wmtsServices"
+                    :key="service.name"
+                    text dark class="bg-green-500 mb-1 flex-grow shadow-lg w-full"
+                    @click="activeMap(service)"
+                    >{{service.name}}</v-btn>-->
+                    <v-spacer class="my-1"></v-spacer>
+
+                    <div class="rounded bg-blue-800 p-2 mb-1 text-white text-l text-center">
+                    CAPAS WMS
+                    </div>
+                    <v-btn
+                    v-for="service in wmsServices"
+                    :key="service.name"
+                    text dark class="bg-green-500 mb-1 flex-grow shadow-lg w-full"
+                    @click="activeMap(service)"
+                    >{{service.name}}</v-btn>
+                    <v-spacer class="my-1"></v-spacer>
+
                 </div>
               </v-expand-transition>
             </v-card>
           </v-app>
 
           <!--Contenedor general para avisos... mas facil -->
-
           <v-alert
             v-if="infoMsgWindow == true"
             transition="fade-transition"
@@ -624,23 +682,75 @@
 import axios from "axios";
 
 export default {
-  props: ["incidencia"],
+  props: ["incidencia", "perfil", "jobsRecibidos", "erroresRecibidos", "reset"],
 
   computed: {
     returnIncidencia() {
       return this.incidencia;
     },
+    returnPerfil(){
+      return this.perfil;
+    },
+    returnJobsRecibidos(){
+      return this.jobsRecibidos;
+    },
+    returnErroresRecibidos(){
+      return this.erroresRecibidos;
+    },
+    returnReset(){
+      return this.reset;
+    },
+   
   },
 
   created(){
     this.activeMap(this.wmsServices[0]);
-  },
-
-  mounted() {
     this.initialize();
   },
 
   methods: {
+    retrieveJobsFromBD(){
+      this.jobNewGeometry = [];
+      //Evita un bucle infinito si no se reciben jobs, solo ejecuta si estamos en perfil visualizar
+      if(this.perfil == 'visualizar'){
+        if(this.jobsRecibidos.length !== 0){
+          for (this.index in this.jobsRecibidos) {
+            this.jobNewGeometry.push(this.jobsRecibidos[this.index].job_geometria_json);
+          }
+          this.jobs = this.jobNewGeometry;
+        }
+      }
+    },
+
+    retrieveErroresFromBD(){
+      this.errorNewGeometry = [];
+      //Evita un bucle infinito si no se reciben jobs, solo ejecuta si estamos en perfil visualizar
+      if(this.perfil == 'visualizar'){
+        if(this.erroresRecibidos.length !== 0){
+          for (this.index in this.erroresRecibidos) {
+            this.errorNewGeometry.push(this.erroresRecibidos[this.index].error_geometria_json);
+          }
+          this.errores = this.errorNewGeometry;
+        }
+      }
+    },
+
+    aplicarPerfil(item) {
+      if (this.perfil == "editar") {
+        //El perfil editar no desactiva ningún botón
+        return false
+      }
+      else if (this.perfil == "visualizar") {
+        //Los botones de editar se desactivan en modo visualizar
+        if (item == "editar"){
+          return true
+        }
+        else if (item == "visualizar"){
+          //Los botones de visualizar se dejan activados en modo visualizar
+          return false
+        }
+      }
+    },
 
     avanceSerialError() {
         this.serialError++;
@@ -663,8 +773,10 @@ export default {
     },
 
     initialize() {
-      //TODO: lo suyo seria traerselo desde un archivo .env
-      this.url = "http://10.13.86.114:3000/"; //url del servicio
+      this.zoom = 5.5,                                //Determina el nivel de zoom por defecto
+      this.center = [-700000, 4329241.805683324],     //Determina el centro de mapa por defecto
+      this.retrieveJobsFromBD();
+      this.retrieveErroresFromBD();
 
       //Peticiones a API para llenar datos en formularios
       //TODO: Igual podríamos llenar todos los formularios con una peticion ??
@@ -687,90 +799,86 @@ export default {
     },
 
     //FUNCIONES PANEL DE CONTROL
-    //PANEL CONTROL ERRORES
-    drawError() {
-    this.panelOption = {
-        infoMsg: 'Haga clic en el mapa para situar el punto de error',
-        optionActive: 'drawError',
-        buttonActive: 'drawError'            
-        };
-    },
+      //PANEL CONTROL ERRORES
 
-    selectError() {
-    this.panelOption = {
-        infoMsg: undefined,
-        optionActive: 'selectError',
-        buttonActive: 'selectError'    
-        }
-    },
+      drawError() {
+      this.panelOption = {
+          infoMsg: 'Haga clic en el mapa para situar el punto de error',
+          optionActive: 'drawError',          
+          };
+      },
 
-    getErrorInfo() {
-    this.panelOption = {
-        infoMsg: undefined,
-        optionActive: undefined,
-        buttonActive: undefined,
-        }
-    this.executeGetErrorInfo();    
-    },
+      selectError() {
+      this.panelOption = {
+          infoMsg: undefined,
+          optionActive: 'selectError',  
+          }
+      },
 
-    modifyError() {
-    this.panelOption = {
-        infoMsg: undefined,
-        optionActive: "modifyError",
-        buttonActive: 'modifyError'
-        }
-    },
+      getErrorInfo() {
+      this.panelOption = {
+          infoMsg: undefined,
+          optionActive: undefined,
+          }
+      this.executeGetErrorInfo();    
+      },
 
-    deleteErrores() {
-    this.panelOption = {
-        infoMsg: undefined,
-        optionActive: 'deleteErrores',
-        buttonActive: 'deleteErrores'
-        }
-    this.executeDeleteErrores();
-    },
+      modifyError() {
+      this.panelOption = {
+          infoMsg: undefined,
+          optionActive: "modifyError",
+          }
+      },
 
-    //PANEL DE CONTROL JOBS
-    drawJob() {
-    this.panelOption = {
-        infoMsg: "Haga clic en el mapa para dibujar los vértices del polígono. Doble clic para finalizar.",
-        optionActive: "drawJob",
-        buttonActive: 'drawJob'
-        };
-    },
-    selectJob() {
-    this.panelOption = {
-        infoMsg : undefined,
-        optionActive : "selectJob",
-        buttonActive : "selectJob",
-        };
-    },
-    getJobInfo() {
-    this.panelOption = {
-        infoMsg : undefined,
-        optionActive : undefined,
-        buttonActive : undefined,
-        };
-    this.executeGetJobInfo();
-    },
+      deleteErrores() {
+      this.panelOption = {
+          infoMsg: undefined,
+          optionActive: 'deleteErrores',
+          }
+      this.executeDeleteErrores();
+      },
 
-    modifyJob() {
-    this.panelOption = {
-        infoMsg : undefined,
-        optionActive : "modifyJob",
-        buttonActive : "modifyJob",
-        };
-    this.executemodifyJob(); 
-    },
+      //PANEL DE CONTROL JOBS
+      drawJob() {
+      this.panelOption = {
+          infoMsg: "Haga clic en el mapa para dibujar los vértices del polígono. Doble clic para finalizar.",
+          optionActive: "drawJob",
+          buttonActive: 'drawJob'
+          };
+      },
+      selectJob() {
+      this.panelOption = {
+          infoMsg : undefined,
+          optionActive : "selectJob",
+          buttonActive : "selectJob",
+          };
+      },
+      getJobInfo() {
+      this.panelOption = {
+          infoMsg : undefined,
+          optionActive : undefined,
+          buttonActive : undefined,
+          };
+      this.executeGetJobInfo();
+      },
 
-    deleteJobs() {
-    this.panelOption = {
-        infoMsg : undefined,
-        optionActive : "deleteJobs",
-        buttonActive : "deleteJobs",
-        };
-    this.executeDeleteJobs();
-    },
+      modifyJob() {
+      this.panelOption = {
+          infoMsg : undefined,
+          optionActive : "modifyJob",
+          buttonActive : "modifyJob",
+          };
+      this.executemodifyJob(); 
+      },
+
+      deleteJobs() {
+      this.panelOption = {
+          infoMsg : undefined,
+          optionActive : "deleteJobs",
+          buttonActive : "deleteJobs",
+          };
+      this.executeDeleteJobs();
+      },
 
     //FUNCIONES PANEL DE CONTROL 
     executeGetJobInfo(){
@@ -784,7 +892,8 @@ export default {
             for (this.index in this.jobsCache) {
                 if (this.selectedFeatures[0].id == this.jobsCache[this.index].id) {
                     this.jobMostrar = this.jobsCache[this.index];
-               
+
+                    this.infoJobGrande = this.jobMostrar.jobGrande;
                     this.infoidJob = this.jobMostrar.idJob;
                     this.infoDescripcionJob = this.jobMostrar.descripcion;
                     this.infoDetectado = this.jobMostrar.deteccion;
@@ -942,6 +1051,7 @@ export default {
 
     recJobData() {
       //TODO: Mejorar el tema de los numeros de serie
+      //TODO: Incluir el BD el campo JobGrande
       this.idJob = this.incidencia + "-J0" + this.serialJob;
       this.index = this.jobs.length - 1;
       this.newJob = {
@@ -950,6 +1060,7 @@ export default {
         geometry: this.jobs[this.index].geometry,
         stringGeometry: this.stringifyJobGeometry(this.jobs[this.index].geometry),
         idJob: this.idJob,
+        jobGrande: this.jobGrande,
         descripcion: this.descJob,
         deteccion: this.deteccionJob,
         arreglo: this.arregloJob,
@@ -968,6 +1079,21 @@ export default {
   },
 
   watch: {
+    jobsRecibidos() {
+      if (this.jobsRecibidos.length > 0) {
+        for (this.index in this.jobsRecibidos)
+        this.retrieveJobsFromBD();
+      }
+    },
+
+    reset(){
+      if (this.reset == true ){
+        this.initialize();
+      } else {
+        this.retrieveJobsFromBD();
+      }
+    },
+
     jobs() {
       if (this.jobs.length == 0) {
         this.editJob = false;
@@ -979,8 +1105,13 @@ export default {
             else {
                 this.editJob = true;
             }
-        }
+      }
+       // Evita que se despliegue el panel de grabar jobs cuando cargamos jobs desde fuera 
+      if (this.jobNewGeometry.length > 0) {
+        this.editJob = false;
+      }
     },
+
     errores() {
         if (this.errores.length == 0) {
         this.editError = false;
@@ -992,6 +1123,11 @@ export default {
             else {
                 this.editError = true;
             }
+        }
+
+         // Evita que se despliegue el panel de grabar jobs cuando cargamos errores desde fuera 
+        if (this.errorNewGeometry.length > 0) {
+          this.editError = false;
         }
 
         //Actualiza las coordenadas en la cache de errores si se detecta una edición.
@@ -1027,19 +1163,61 @@ export default {
   data() {
     return {
       //Config Map Vuelayers
-      zoom: 5.5,                            //Determina el nivel de zoom por defecto
-      center: [-700000, 4329241.805683324], //Determina el centro de mapa por defecto
-      selectedFeatures: [],                 //Array para indicar que un elemento está seleccionado TODO: seleccion multiple?
-      drawType: undefined,                  //Determina si la función dibujar está activada
-      mapActive: "osm",                     //Mapa Activo por defecto
-      //TODO: Pendiente de parametrizar servicios WMS
+      zoom: 5.5,                                //Zoom de mapa por defecto
+      center: [],                               //Centro de mapa al cargar, determinamos desde initialize
+      selectedFeatures: [],                     //Array para indicar que un elemento está seleccionado TODO: seleccion multiple?
+      drawType: undefined,                      //Determina si la función dibujar está activada
+      mapActive: "ignBase",                     //Mapa Activo por defecto
+      
 
       //Para añadir servicio solo hay añadir un nuevo objeto al array la posición 0 es el mapa por defecto
+      //TODO: Errores de GET en WMTS
+      /*wmtsServices: [
+        { name: "IGN Base", 
+          layers: "IGNBaseTodo", 
+          activeMap: 'ignBase', 
+          matrixSet: "EPSG:3857", 
+          style: "default", 
+          url: "https://www.ign.es/wmts/ign-base"
+        },
+        { name: "PNOA",
+          layers: "OI.OrthoimageCoverage", 
+          activeMap: 'pnoa', 
+          matrixSet: "EPSG:3857", 
+          style: "default", 
+          url: "https://www.ign.es/wmts/pnoa-ma"
+        },
+        { name: "Mapa Ráster",
+          layers: "MTN", 
+          activeMap: 'mtn25', 
+          matrixSet: "EPSG:3857", 
+          style: "default", 
+          url: "https://www.ign.es/wmts/mapa-raster"
+        },
+      ],*/
+
       wmsServices: [
-        {name: "IGN Base", layers: "IGNBaseTodo", activeMap: 'ignBase', matrixSet: "EPSG:3857", style: "default", url: "https://www.ign.es/wms-inspire/ign-base"},
-        {name: "PNOA", layers: "OI.OrthoimageCoverage", activeMap: 'pnoa', matrixSet: "EPSG:3857", style: "default", url: "https://www.ign.es/wms-inspire/pnoa-ma"},
-        {name: "Mapa Ráster", layers: "mtn_rasterizado", activeMap: 'mtn25', matrixSet: "EPSG:3857", style: "default", url: "https://www.ign.es/wms-inspire/mapa-raster"},
-        {name: "rt", layers: "TN.RoadTransportNetwork.RoadLink", activeMap: 'rt', matrixSet: "EPSG:3857", style: "TN.RoadTransportNetwork.RoadLink.Default", url: "https://servicios.idee.es/wms-inspire/transportes"},
+        { name: "IGN Base WMS",
+          layers: "IGNBaseTodo", 
+          activeMap: 'ignBase', 
+          matrixSet: "EPSG:3857", 
+          style: "default", 
+          url: "	https://www.ign.es/wms-inspire/ign-base"
+        },
+        { name: "Mapa Ráster", 
+          layers: "mtn_rasterizado", 
+          activeMap: 'cartoRaster', 
+          matrixSet: "EPSG:3857", 
+          style: "default", 
+          url: "https://www.ign.es/wms-inspire/mapa-raster"
+        },     
+        { name: "PNOA - MA", 
+          layers: "OI.OrthoimageCoverage", 
+          activeMap: 'pnoa-ma', 
+          matrixSet: "EPSG:3857", 
+          style: "default", 
+          url: "https://www.ign.es/wms-inspire/pnoa-ma"
+        },     
       ],
 
       //Errores
@@ -1063,6 +1241,7 @@ export default {
 
       // Ventana dialogo Info Job
       infoidJob: "",
+      infoJobGrande:"",
       infoDescripcionJob: "",
       infoDetectado: "",
       infoArreglar: "",
@@ -1072,7 +1251,8 @@ export default {
       infoOperador: "",
 
 
-      //Jobs TODO: falta definir funcionamiento de herramientas
+      //Jobs
+      jobGrande: false,     
       deteccion: [],        //Inicializa la variable que luego llenamos desde initialize
       arreglo: [],          //Inicializa la variable que luego llenamos desde initialize
       gravedad: [],         //Inicializa la variable que luego llenamos desde initialize
@@ -1082,6 +1262,7 @@ export default {
       jobs: [],             //Almacenamiento por defecto de vuelayers
       jobsCache: [],        //Donde almacenamos nosotros los jobs antes de grabar en BD
       editJob: false,       //Activa el formulario de alta job
+      
 
       //Atributos del Job
       serialJob: 1,                     //Incializamos serial jobs
@@ -1095,36 +1276,90 @@ export default {
       stringGeometry:'',                //Geometría en string plano para hacer el insert en BD
       
       //Misc
-      infoMsgWindow: false,     //Activa ventana información
-      showErrorAlert: false,    //Muestra la ventana de error cuando no se ha seleccionado ningún error
-      showErrorInfo: false,     //Muestra la ventana de información de un error seleccionado
-      showJobInfo: false,       //Muestra la ventana de información de un job seleccionado
+      //TODO: lo suyo seria traerselo desde un archivo .env
+      url: "http://10.13.86.114:3000/", //url del servicio
+      infoMsgWindow: false,             //Activa ventana información
+      showErrorAlert: false,            //Muestra la ventana de error cuando no se ha seleccionado ningún error
+      showErrorInfo: false,             //Muestra la ventana de información de un error seleccionado
+      showJobInfo: false,               //Muestra la ventana de información de un job seleccionado
       zIndexJob: 1,
       zIndexError: 2,
-      showAlertMessage: "",     //Muestra mensajes de error
-      deleting: false,          //Evita que se abra el panel de editar error cuando estamos borrando uno
-      showDeleteMessage: "",    //Envia un mensaje de error a la ventana showDeleteAlert
-      showDeleteAlert: false,   //Muestra la ventana showDeleteAlert
+      showAlertMessage: "",             //Muestra mensajes de error
+      deleting: false,                  //Evita que se abra el panel de editar error cuando estamos borrando uno
+      showDeleteMessage: "",            //Envia un mensaje de error a la ventana showDeleteAlert
+      showDeleteAlert: false,           //Muestra la ventana showDeleteAlert
       showMapTools: false,              //Despliegue panel herramientas mapa
-      showLayerTools: false,    //Despliegue herramientas capas
+      showLayerTools: false,            //Despliegue herramientas capas
+      toggleBtnError: 9,                //Muestra el boton seleccionado en panel control errores
+      toggleBtnJob: 9,                  //Muestra el boton seleccionado en panel control jobs
 
       //HERRAMIENTAS PANELES DE CONTROL
       panelOption: {},          //Objeto que define los botones activados y las opciones de cada uno de ellos
 
       errorPanel: [             //Array de objetos que definen las opciones disponibles en el panel de control
-        {title: "Dibujar Error",disabled: "drawError",click: this.drawError,icon: "mdi-map-marker-plus"},
-        {title: "Seleccionar Error",disabled: "selectError", click: this.selectError, icon: "mdi-cursor-default"},
-        {title: "Información del Error", disabled: "getErrorInfo", click: this.getErrorInfo, icon: "mdi-information"},
-        {title: "Editar posición del Error", disabled: "modifyError", click: this.modifyError, icon: "mdi-arrow-all"},
-        {title: "Eliminar Error", disabled: "deleteErrores", click: this.deleteErrores, icon: "mdi-delete"},
+        { title: "Dibujar Error",
+          active: "drawError",
+          click: this.drawError,
+          icon: "mdi-map-marker-plus", 
+          aplicarPerfil: this.aplicarPerfil("editar")
+        },
+        { title: "Seleccionar Error",
+          active: "selectError", 
+          click: this.selectError, 
+          icon: "mdi-cursor-default", 
+          aplicarPerfil: this.aplicarPerfil("visualizar")
+        },
+        { title: "Información del Error",
+          active: "getErrorInfo", 
+          click: this.getErrorInfo, 
+          icon: "mdi-information", 
+          aplicarPerfil: this.aplicarPerfil("visualizar")
+        },
+        { title: "Editar posición del Error",
+          active: "modifyError", 
+          click: this.modifyError, 
+          icon: "mdi-arrow-all", 
+          aplicarPerfil: this.aplicarPerfil("editar")
+        },
+        { title: "Eliminar Error", 
+          active: "deleteErrores", 
+          click: this.deleteErrores, 
+          icon: "mdi-delete", 
+          aplicarPerfil: this.aplicarPerfil("editar")
+        },
       ],
 
       jobsPanel: [              //Array de objetos que definen las opciones disponibles en el panel de control
-        {title: "Dibujar Job", disabled: "drawJob", click: this.drawJob, icon: "mdi-vector-square"},
-        {title: "Seleccionar Job", disabled: "selectJob", click: this.selectJob, icon: "mdi-cursor-default"},
-        {title: "Información del Job", disabled: "getJobInfo", click: this.getJobInfo, icon: "mdi-information"},
-        {title: "Editar geometría de Job", disabled: "modifyJob", click: this.modifyJob, icon: "mdi-vector-polygon"},
-        {title: "Eliminar Job", disabled: "deleteJobs", click: this.deleteJobs, icon: "mdi-delete"},
+        { title: "Dibujar Job", 
+          active: "drawJob", 
+          click: this.drawJob, 
+          icon: "mdi-vector-square", 
+          aplicarPerfil: this.aplicarPerfil("editar")
+        },
+        { title: "Seleccionar Job", 
+          active: "selectJob", 
+          click: this.selectJob, 
+          icon: "mdi-cursor-default", 
+          aplicarPerfil: this.aplicarPerfil("visualizar")
+        },
+        { title: "Información del Job", 
+          active: "getJobInfo", 
+          click: this.getJobInfo, 
+          icon: "mdi-information", 
+          aplicarPerfil: this.aplicarPerfil("visualizar")
+        },
+        { title: "Editar geometría de Job", 
+          active: "modifyJob", 
+          click: this.modifyJob, 
+          icon: "mdi-vector-polygon", 
+          aplicarPerfil: this.aplicarPerfil("editar")
+        },
+        { title: "Eliminar Job", 
+          active: "deleteJobs", 
+          click: this.deleteJobs, 
+          icon: "mdi-delete",
+          aplicarPerfil: this.aplicarPerfil("editar")
+        },
       ],
 
     };
