@@ -1,4 +1,4 @@
-# incigeo
+# CartoDesk
 
 ## Project setup
 ```
