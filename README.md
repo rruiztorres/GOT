@@ -1,5 +1,14 @@
 # GOT (Gestor de órdenes de trabajo)
 
+##About
+```
+GOT, Gestor de órdenes de trabajo en el Instituto Geográfico Nacional - Área de bases de datos topográficas. 
+Actualmente en fase de desarrollo.
+
+![image](https://user-images.githubusercontent.com/47773015/134678775-485f36ac-cc36-4ac8-a993-a08ed80e67e9.png)
+
+```
+
 ## Project setup
 ```
 npm install
@@ -19,6 +28,3 @@ npm run build
 ```
 npm run lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
