@@ -340,14 +340,15 @@
             },
 
             initializeIncSerial () {
-                this.type = "IGN_C_";
+                this.type = 'IGN_C_'
                 axios
-                .get(this.url + 'serials/' + this.type)
+                .get(this.url + 'serials')
                 //recuperamos el ultimo serial registrado en BD
                 .then(data => { 
                     if (data != null){
+                        console.log(data.data.mensaje[0])
                         this.id = data.data.mensaje[0].serial_id;
-                        this.incSerial = this.type + parseInt(this.id);
+                        this.incSerial = this.type + this.id.toString();
                     }
                 })
 

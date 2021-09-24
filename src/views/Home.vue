@@ -129,7 +129,8 @@
                 >
                   <div class="rounded-t mb-0 px-6 py-6">
                     <div class="text-center mb-3">
-                      <h1 class="text-gray-500 text-3xl">InciGEO</h1>
+                      <h1 class="text-gray-500 text-3xl">GOT</h1>
+                      <h3 class="text-gray-500 text-xl">No, no es Game Of Thrones</h3>
                     </div>
                     <div class="btn-wrapper text-center">
                       <!--logo-->
