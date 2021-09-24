@@ -4,7 +4,17 @@
             <div class="w-full h-screen bg-blue-50" >
                 <Navigation @cambiomenu="cambiarMenu" :mini="newMini" class="float-left"></Navigation>
                
-                <Header @cambiarMini="cambioMini"></Header>
+                <div>
+                    <div class="h-20 bg-blue-800 text-white shadow-xl p-5">
+                            <div class="flex">
+                                <v-btn tile icon dark @click="hacerMini()">
+                                    <v-icon large>mdi-view-headline</v-icon>
+                                </v-btn>
+                                <h6 class="text-xl flex-grow"></h6>
+                                <img class="border border-white h-10 mr-6" src="@/assets/logoIGNmini.png">
+                            </div>
+                    </div>
+                </div>
                 
                 <v-main><Loader class="" @cambiomenu="cambiarMenu" :activarMenu="newMenu" :userRole="userRole"></Loader></v-main>
             </div>
@@ -15,7 +25,6 @@
 <script>
 
 //componentes
-import Header from '@/components/common/Header';
 import Loader from '@/components/common/Loader';
 import Navigation from '@/components/common/Navigation';
 
@@ -26,7 +35,6 @@ import {roles} from '@/assets/mixins/roles.js';
         name:"Dashboard",
         mixins: [roles],
         components:{
-            Header,
             Navigation,
             Loader,
             },
@@ -45,6 +53,7 @@ import {roles} from '@/assets/mixins/roles.js';
                         this.newMenu = roles[this.rol].default;
                     }
                 }
+                //debug
                 console.log("Login correcto, datos de usuario grabados")
             },
 
@@ -55,10 +64,8 @@ import {roles} from '@/assets/mixins/roles.js';
                 //console.log("DB -> recibido cambio menu")
             },
             //..
-            cambioMini(data){
-                this.newMini = data;
-                //debug
-                //console.log("DB -> recibido cambio mini a " + this.newMini)
+             hacerMini(){
+                this.newMini = !this.newMini;
             },
         },
 
