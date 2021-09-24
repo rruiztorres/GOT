@@ -102,7 +102,7 @@
 import axios from 'axios';
 import {getColor} from '@/assets/mixins/getColor.js';
 
-import VerIncidencia from '@/components/VerIncidencia';
+import VerIncidencia from '@/components/common/VerIncidencia';
 
 
   export default {

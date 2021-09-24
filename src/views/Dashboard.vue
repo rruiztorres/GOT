@@ -15,9 +15,9 @@
 <script>
 
 //componentes
-import Header from '@/components/Header';
-import Loader from '@/components/Loader';
-import Navigation from '@/components/Navigation';
+import Header from '@/components/common/Header';
+import Loader from '@/components/common/Loader';
+import Navigation from '@/components/common/Navigation';
 
 //mixins
 import {roles} from '@/assets/mixins/roles.js';

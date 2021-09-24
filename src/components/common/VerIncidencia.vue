@@ -286,7 +286,7 @@
 import {getColor} from '@/assets/mixins/getColor.js';
 import axios from 'axios';
 
-import Map from '@/components/Map';
+import Map from '@/components/common/Map';
 
   export default {
     props: [

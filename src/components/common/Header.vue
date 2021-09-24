@@ -6,7 +6,7 @@
                     <v-icon large>mdi-view-headline</v-icon>
                 </v-btn>
                 <h6 class="text-xl flex-grow"></h6>
-                <img class="border border-white h-10 mr-6" src="../assets/logoIGNmini.png">
+                <img class="border border-white h-10 mr-6" src="@/assets/logoIGNmini.png">
             </div>
     </div>
 </div>

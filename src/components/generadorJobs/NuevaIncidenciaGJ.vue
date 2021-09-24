@@ -234,8 +234,8 @@
 
 <script>
 
-    import TextEditor from '@/components/TextEditor';
-    import Map from '@/components/Map';
+    import TextEditor from '@/components/common/TextEditor';
+    import Map from '@/components/common/Map';
     import axios from 'axios';
     import {getColor} from '@/assets/mixins/getColor.js';
     import pointInPolygon from 'point-in-polygon';

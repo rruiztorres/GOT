@@ -1079,6 +1079,20 @@ export default {
   },
 
   watch: {
+    //Evita que una herramienta job y una herramienta errores puedan estar seleccionadas al mismo tiempo
+    toggleBtnJob() {
+      if (this.toggleBtnJob < 4) {
+        this.toggleBtnError = 9
+      }
+    },
+    
+  //Evita que una herramienta job y una herramienta errores puedan estar seleccionadas al mismo tiempo
+    toggleBtnError() {
+      if (this.toggleBtnError < 4){
+        this.toggleBtnJob = 9
+      }
+    },
+
     jobsRecibidos() {
       if (this.jobsRecibidos.length > 0) {
         for (this.index in this.jobsRecibidos)
@@ -1291,7 +1305,7 @@ export default {
       showMapTools: false,              //Despliegue panel herramientas mapa
       showLayerTools: false,            //Despliegue herramientas capas
       toggleBtnError: 9,                //Muestra el boton seleccionado en panel control errores
-      toggleBtnJob: 9,                  //Muestra el boton seleccionado en panel control jobs
+      toggleBtnJob: 1,                  //Muestra el boton seleccionado en panel control jobs
 
       //HERRAMIENTAS PANELES DE CONTROL
       panelOption: {},          //Objeto que define los botones activados y las opciones de cada uno de ellos
