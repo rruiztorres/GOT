@@ -16,7 +16,6 @@ const routes = [
     name: 'Dashboard',
     component: Dashboard
   },
-  
 ]
 
 const router = new VueRouter({

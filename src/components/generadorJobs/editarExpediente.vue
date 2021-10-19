@@ -2,15 +2,15 @@
   <div>
     <v-app class="font-sans shadow-md rounded px-8 mr-8">
       <h1 class="text-xl font-bold py-4 mt-2">
-        Jobs Devueltos
+        Editar Expedientes
       </h1>
 
       <div class="overflow-y-auto">
         <v-card elevation="0" class="mb-4">
           <div>
             <div class="p-3 flex bg-blue-500 w-full items-center">
-              <v-btn disabled dark color="success" class="mr-3">REASIGNAR JOBS</v-btn>
-              <v-btn disabled dark color="error" class="mr-3">RECHAZAR JOBS</v-btn>
+              <v-btn disabled dark color="success" class="mr-3">ASOCIAR A JOBS</v-btn>
+              <v-btn disabled dark color="error" class="mr-3">FINALIZAR</v-btn>
               <v-spacer></v-spacer>
 
               <v-text-field
@@ -28,7 +28,7 @@
         <v-data-table
           v-model="selected"
           :headers="headers"
-          :items="jobs"
+          :items="expedientes"
           :search="search"
           class="font-sans"
           show-select
@@ -88,9 +88,9 @@
             <v-btn color="primary" @click="initialize">Reset</v-btn>
           </template>
 
-          <template v-slot:[`item.job_estado`]="{ item }">
-            <v-chip :color="getColor(item.job_estado)" dark>
-              {{ item.job_estado }}
+          <template v-slot:[`item.finalizado`]="{ item }">
+            <v-chip :color="getColor(item.finalizado)" dark>
+              {{ item.finalizado }}
             </v-chip>
           </template>
         </v-data-table>
@@ -106,7 +106,7 @@ import VerIncidencia from "@/components/common/VerIncidencia";
 
 
 export default {
-  name: "JobsDevGJ",
+  name: "EditarExpediente",
   mixins: [getColor],
   components: {
     VerIncidencia,
@@ -118,16 +118,13 @@ export default {
     selected: [],
     search: "",
     headers: [
-      { text: "Estado", align: "start", sortable: true, value: "job_estado"},
-      { text: "Job", align: "start", sortable: true, value: "job_id"},
-      { text: "Expediente", align: "start", sortable: true, value: ""},
-      { text: "Gravedad", align: "start", sortable: true, value: "job_gravedad"},
-      { text: "Detectado en", align: "start", sortable: true, value: "job_detectado"},
-      { text: "Perfil", align: "start", sortable: true, value: "job_arreglar"},
-      { text: "Descripción", align: "start", sortable: true, value: "resumen"}, //hay que hacer desde API un "resumen" ademas de la desc completa
+      { text: "Finalizado", align: "start", sortable: true, value: "finalizado"},
+      { text: "Expediente", align: "start", sortable: true, value: "expediente"},
+      { text: "Fecha", align: "start", sortable: true, value: "fecha"},
+      { text: "Observaciones", align: "start", sortable: true, value: "observaciones"},
       { text: "Acciones", value: "actions", sortable: false },
     ],
-    jobs: [],
+    expedientes: [],
     editedIndex: -1,
     editedItem: {
       id_inc: "",
@@ -144,12 +141,6 @@ export default {
       job_arreglar: "",
     },
   }),
-
-  computed: {
-    formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
-    },
-  },
 
   watch: {
     dialog(val) {
@@ -170,16 +161,10 @@ export default {
 
     initialize() {
       axios
-        .get(`${process.env.VUE_APP_API_ROUTE}/jobs`)
-        //se realiza el filtro para los jobs devueltos y la asignación del job_id
+        .get(`${process.env.VUE_APP_API_ROUTE}/expedientes`)
+        //se realiza el filtro para los jobs en triaje y la asignación del job_id
         .then((data) => {
-          this.jobsBruto = data.data.response;
-          for (this.elemento in this.jobsBruto) {
-            //filtramos jobs segun estado
-            if (this.jobsBruto[this.elemento].job_estado == "Devuelto") {
-              this.jobs.push(this.jobsBruto[this.elemento]);
-            }
-          }
+            this.expedientes = data.data.respuesta
         });
     },
 

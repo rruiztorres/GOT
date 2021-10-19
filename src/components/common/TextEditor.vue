@@ -3,13 +3,14 @@
     <div 
     class="bg-white shadow-md border border-gray-300 mb-4"
     v-if="editor">
-      <v-btn icon @click="editor.chain().focus().undo().run()">
+      <v-btn title="deshacer" icon @click="editor.chain().focus().undo().run()">
         <v-icon>mdi-reply</v-icon> 
       </v-btn>
 
-      <v-btn icon @click="editor.chain().focus().redo().run()">
+      <v-btn title="rehacer" icon @click="editor.chain().focus().redo().run()">
         <v-icon>mdi-share</v-icon> 
       </v-btn>
+
 
       <v-btn icon @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
         <v-icon>mdi-format-bold </v-icon>
@@ -28,7 +29,7 @@
       </v-btn>
 
       <v-btn icon @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
-        <v-icon>mdi-iframe</v-icon>
+        <v-icon>mdi-application-braces</v-icon>
       </v-btn>
 
       <v-btn icon @click="editor.chain().focus().setParagraph().run()" :class="{ 'is-active': editor.isActive('paragraph') }">
@@ -78,7 +79,7 @@
     
       <editor-content 
       class="bg-white border border-gray-400 p-6"
-      style="height:28rem;"
+      style="height:27rem;"
       :editor="editor" 
       />
   </div>
@@ -97,7 +98,7 @@ export default {
   props: {
     value: {
       type: String,
-      default: 'Introduzca el texto aqui',
+      default: 'Introduzca el texto aquí',
     },
   },
 

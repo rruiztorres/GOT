@@ -2,17 +2,7 @@
   <div class="home">
     <div class="font-sans text-gray-800 antialiased">
       <nav
-        class="
-          top-0
-          absolute
-          z-50
-          w-full
-          flex flex-wrap
-          items-center
-          justify-between
-          px-2
-          py-3
-        "
+        class="top-0 absolute z-50 w-full flex flex-wrap items-center justify-between px-2 py-3"
       >
         <div
           class="
@@ -94,7 +84,7 @@
                   "
                   type="button"
                 >
-                  <i class="fas fa-arrow-alt-circle-down"></i> Ayuda
+                  <i class="fas fa-arrow-alt-circle-down"></i> GOT API REST
                 </button>
               </li>
             </ul>
@@ -130,7 +120,6 @@
                   <div class="rounded-t mb-0 px-6 py-6">
                     <div class="text-center mb-3">
                       <h1 class="text-gray-500 text-3xl">GOT</h1>
-                      <h3 class="text-gray-500 text-xl">No, no es Game Of Thrones</h3>
                     </div>
                     <div class="btn-wrapper text-center">
                       <!--logo-->
@@ -404,6 +393,7 @@
 
 <script>
 import axios from "axios";
+import md5 from 'md5';
 
 export default {
   name: "Home",
@@ -417,44 +407,47 @@ export default {
       errorAPI: "",
     };
   },
-  created() {
+
+  mounted() {
     this.initialize();
   },
+
   methods: {
     initialize() {
-      const url = "http://10.13.86.114:3000/";
       axios
-        .get(url + "conexion")
+        .get(`${process.env.VUE_APP_API_ROUTE}/conexion`)
         .then((data) => {
-          if (data.data.status == 200) {
+          if (data.status == 200) {
             console.log("API REST Listo");
           }
         })
         .catch((errorAPI) => {
           this.errorAPI = errorAPI;
-        });
+      });
     },
+
     login() {
-      const url = "http://10.13.86.114:3000/";
-      let json = {
+      let usrlogin = {
         usuario: this.usuario,
-        password: this.password,
+        password: md5(this.password),
       };
 
       axios
-        .post(url + "auth/" + this.usuario + "/" + this.password, json)
+        .post(`${process.env.VUE_APP_API_ROUTE}/auth/${usrlogin.usuario}/${usrlogin.password}`, usrlogin)
         .then((data) => {
-          if (data.data.status == 200) {
+          if (data.status == 201) {
             localStorage.token = data.data.token;
             localStorage.usuario = data.data.usuario;
-            localStorage.rol = data.data.rolDefecto;
-            // localStorage.usrname = data.data.usrname; UNDEFINED
+            localStorage.rol = data.data.defaultRole;
+            localStorage.usrRoles = data.data.usrRoles;
             this.$router.push("Dashboard");
-          } else {
-            this.error = data.data.error;
-            this.error_msg = data.data.error_msg;
-          }
-        });
+            }
+          })
+        .catch(error => {
+
+          this.error = error.response.data.error;
+          this.error_msg = error.response.data.error_msg;
+        })
     },
   },
 };

@@ -15,10 +15,9 @@ import Vuetify from 'vuetify/lib';
 Vue.use(Vuetify)
 
 
-//LEAFLET
+//VUELAYERS
 import VueLayers from 'vuelayers'
 import 'vuelayers/lib/style.css' // needs css-loader
-
 Vue.use(VueLayers)
 
 

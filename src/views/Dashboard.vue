@@ -1,5 +1,5 @@
 <template>
-    <v-app class="font-sans">
+    <v-app class="font-sans subpixel-antialiased">
         <div class="h-screen font-sans text-left text-sm">
             <div class="w-full h-screen bg-blue-50" >
                 <Navigation @cambiomenu="cambiarMenu" :mini="newMini" class="float-left"></Navigation>
@@ -53,15 +53,11 @@ import {roles} from '@/assets/mixins/roles.js';
                         this.newMenu = roles[this.rol].default;
                     }
                 }
-                //debug
-                console.log("Login correcto, datos de usuario grabados")
             },
 
             //...   
             cambiarMenu(data){
                 this.newMenu = data;
-                //debug
-                //console.log("DB -> recibido cambio menu")
             },
             //..
              hacerMini(){

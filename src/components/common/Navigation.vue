@@ -114,13 +114,6 @@
                   </v-icon>
                 </v-list-item>
               </v-list>
-
-            <v-divider></v-divider>
-
-            <v-card-actions class="w-80">
-              <v-spacer></v-spacer>
-                <h6 class="text-xs">InciGEOv2 - dev</h6>
-            </v-card-actions>
           </v-card> 
           <!-- FIN MENU DESPLEGABLE USUARIO -->
         </v-menu>
@@ -178,6 +171,7 @@ import {roles} from '@/assets/mixins/roles.js';
         default: false,
       }
     },
+
     
     methods: {
       cambiarMenu(data){

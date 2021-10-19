@@ -1,68 +1,30 @@
 <template>
-    <div>
-      <v-list class="mb-4">
-        <div v-if="hacerMini==false">
-          <v-list-item-title class="ml-4 my-2 text-l font-bold">Gestion de Incidencias</v-list-item-title>
-        </div>
-        <div v-if="hacerMini==true">
-        </div>
-          <v-list-item
-          dense
-            v-for="opcionIncidencia in gestIncidencias"
-            :key="opcionIncidencia.name"
-            @click="activar(opcionIncidencia.active)"
-            class="hover:bg-blue-100"
-          >
-            <v-list-item-icon>
-              <v-icon color="#1E40AF" class="mr-3">{{ opcionIncidencia.icon }}</v-icon>
-              <v-list-item-title class="text-xs text-black">{{ opcionIncidencia.name }}</v-list-item-title>
-            </v-list-item-icon>
-          </v-list-item>
-      </v-list>
+  <div>
+    <v-list 
+      class="mb-4" 
+      v-for="navGroup in navItems"
+      :key="navGroup.name">
 
+      <div v-if="hacerMini==false">
+        <v-list-item-title class="ml-4 my-2 text-l font-bold">{{navGroup.group}}</v-list-item-title>
+      </div>
 
-      <v-list class="mb-4">
-        <div v-if="hacerMini==false">
-          <v-list-item-title class="ml-4 my-2 text-l font-bold">Gestion de Jobs</v-list-item-title>
-        </div>
-        <div v-if="hacerMini==true">
-        </div>
+      <div v-if="hacerMini==true">
+      </div>
 
-          <v-list-item
-            dense
-            v-for="opcionJob in gestJobs"
-            :key="opcionJob.name"
-            @click="activar(opcionJob.active)"
-            class="hover:bg-blue-100"
-          >
-            <v-list-item-icon>
-              <v-icon color="#1E40AF" class="mr-3">{{ opcionJob.icon }}</v-icon>
-              <v-list-item-title class="text-xs text-black">{{ opcionJob.name }}</v-list-item-title>
-            </v-list-item-icon>
-          </v-list-item>
-      </v-list>
-
-
-      <v-list class="mb-4">
-        <div v-if="hacerMini==false">
-          <v-list-item-title class="ml-4 my-2 text-l font-bold">Informes</v-list-item-title>
-        </div>
-        <div v-if="hacerMini==true">
-          
-        </div>
-        <v-list-item
+      <v-list-item
         dense
-          v-for="informe in informes"
-          :key="informe.name"
-          class="hover:bg-blue-100"
-          @click="activar(opcionJob.active)"
-        >
-          <v-list-item-icon>
-            <v-icon color="#1E40AF" class="mr-3">{{ informe.icon }}</v-icon>
-            <v-list-item-title class="text-xs text-black">{{ informe.name }}</v-list-item-title>
-          </v-list-item-icon>
-        </v-list-item>
-      </v-list>
+        v-for="opcionJob in navGroup.items"
+        :key="opcionJob.name"
+        @click="activar(opcionJob.active)"
+        class="hover:bg-blue-100"
+      >
+        <v-list-item-icon>
+          <v-icon color="#1E40AF" class="mr-3">{{ opcionJob.icon }}</v-icon>
+          <v-list-item-title class="text-xs text-black">{{ opcionJob.name }}</v-list-item-title>
+        </v-list-item-icon>
+      </v-list-item>
+    </v-list>
   </div> 
 </template>
 
@@ -84,8 +46,6 @@ export default {
       cambiarRol(rol) {
         this.userRole = rol;
         localStorage.rol = rol;
-        //debug
-        //console.log("el rol pasó a ser " + rol)
       },
     },
 
@@ -95,21 +55,32 @@ export default {
 
     data() {
         return {
-        gestIncidencias: [
-          {name:'Nueva Incidencia', icon:'mdi-map-marker-alert', active: 'NuevaIncidenciaGJ'},
-          {name:'Incidencias en Bandeja', icon:'mdi-inbox-arrow-down', active:'IncBdjGJ'},
-          {name:'Incidencias en Triaje', icon:'mdi-ambulance', active:'IncTriajeGJ'},
-          {name:'Acciones globales', icon:'mdi-table-eye'},
-        ],
-        gestJobs: [ 
-          {name:'Jobs Devueltos', icon:'mdi-briefcase-remove', active:'JobsDevGJ'},
-          {name:'Jobs en Triaje', icon:'mdi-ambulance', active:'JobsTriajeGJ'},
-          {name:'Acciones globales', icon:'mdi-table-eye'},
-        ],
-        informes: [
-          {name:'Vista General', icon:'mdi-finance'},
-          {name:'Mis KPI', icon:'mdi-card-account-details-star'},
-        ],
+          navItems:[
+            { group: 'Gestión de jobs',
+              items: [
+                {name:'Alta de Jobs / Errores', icon:'mdi-briefcase-plus', active:'altaJobsErrores'}, 
+                {name:'Jobs Devueltos', icon:'mdi-briefcase-off', active:'JobsDevGJ'},
+                {name:'Jobs en Triaje', icon:'mdi-briefcase-search', active:'JobsTriajeGJ'},
+                {name:'Recuperar Jobs', icon:'mdi-briefcase-upload'},
+              ]
+            },
+            { group: 'Gestion de Expedientes',
+              items: [
+                {group: 'Gestión de Expedientes', name:'Alta de expediente', icon:'mdi-note-plus', active:'AltaExpediente'}, 
+                {group: 'Gestión de Expedientes',name:'Editar expedientes', icon:'mdi-file-document-edit', active:'EditarExpediente'},
+                {group: 'Gestión de Expedientes',name:'Estado expedientes', icon:'mdi-note-search', active:''},
+              ]
+            },
+            {
+              group: 'Gestión de Informes',
+              items: [
+                {group: 'Informes', name:'Vista General', icon:'mdi-finance'},
+                {group: 'Informes',name:'Mis KPI', icon:'mdi-card-account-details-star'},
+              ]
+            },
+          ],
+
+        // FIN DATA
         }
     },
 
