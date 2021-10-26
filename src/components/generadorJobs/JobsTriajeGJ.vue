@@ -88,9 +88,9 @@
             <v-btn color="primary" @click="initialize">Reset</v-btn>
           </template>
 
-          <template v-slot:[`item.job_estado`]="{ item }">
-            <v-chip :color="getColor(item.job_estado)" dark>
-              {{ item.job_estado }}
+          <template v-slot:[`item.estado`]="{ item }">
+            <v-chip :color="getColor(item.estado)" dark>
+              {{ item.estado }}
             </v-chip>
           </template>
         </v-data-table>
@@ -118,12 +118,12 @@ export default {
     selected: [],
     search: "",
     headers: [
-      { text: "Estado", align: "start", sortable: true, value: "job_estado"},
-      { text: "Job", align: "start", sortable: true, value: "job_id"},
-      { text: "Expediente", align: "start", sortable: true, value: ""},
-      { text: "Gravedad", align: "start", sortable: true, value: "job_gravedad"},
-      { text: "Detectado en", align: "start", sortable: true, value: "job_detectado"},
-      { text: "Perfil", align: "start", sortable: true, value: "job_arreglar"},
+      { text: "Estado", align: "start", sortable: true, value: "estado"},
+      { text: "Job", align: "start", sortable: true, value: "job"},
+      { text: "Expediente", align: "start", sortable: true, value: "expediente"},
+      { text: "Gravedad", align: "start", sortable: true, value: "gravedad_job"},
+      { text: "Detectado en", align: "start", sortable: true, value: "deteccion_job"},
+      { text: "Perfil", align: "start", sortable: true, value: "arreglo_job"},
       { text: "Descripción", align: "start", sortable: true, value: "resumen"}, //hay que hacer desde API un "resumen" ademas de la desc completa
       { text: "Acciones", value: "actions", sortable: false },
     ],
@@ -176,11 +176,14 @@ export default {
           this.jobsBruto = data.data.response;
           for (this.elemento in this.jobsBruto) {
             //filtramos jobs segun estado
-            if (this.jobsBruto[this.elemento].job_estado == "En Triaje") {
+            if (this.jobsBruto[this.elemento].estado == "En triaje") {
               this.jobs.push(this.jobsBruto[this.elemento]);
             }
           }
-        });
+        })
+        .catch((data) => {
+          console.log(data)
+        })
     },
 
     editItem(item) {

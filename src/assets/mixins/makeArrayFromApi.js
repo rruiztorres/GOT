@@ -7,11 +7,11 @@ export const makeArrayFromApi = {
         this.makeArrayFromApi();
     },
     methods: {
-        makeArrayFromApi(objeto, array, propiedad){
-            for (this.index in objeto){
-                array.push(objeto[this.index][propiedad])
+        makeArrayFromApi(objetoAPI, arrayCrear, columnaBD){
+            for (this.index in objetoAPI){
+                arrayCrear.push(objetoAPI[this.index][columnaBD])
             }
-            return array;
+            return arrayCrear;
         },
     },
 }

@@ -4,10 +4,11 @@ export const asignarValoresDefault = {
         this.asignarValoresDefault();
     },
     methods: {
-        asignarValoresDefault(objeto){
-            for (this.index in objeto){
-                if (objeto[this.index].default == true){
-                    return objeto[this.index].id - 1;
+        asignarValoresDefault(objetoAPI, columnaID){
+            for (this.index in objetoAPI){
+                if (objetoAPI[this.index].defecto == true){
+                    
+                    return objetoAPI[this.index][columnaID] - 1;
                 }
             }
         },

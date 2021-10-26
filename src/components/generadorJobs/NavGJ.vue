@@ -72,7 +72,7 @@ export default {
               ]
             },
             {
-              group: 'Gestión de Informes',
+              group: 'Informes',
               items: [
                 {group: 'Informes', name:'Vista General', icon:'mdi-finance'},
                 {group: 'Informes',name:'Mis KPI', icon:'mdi-card-account-details-star'},

@@ -233,6 +233,7 @@
                         <v-spacer class="mt-2"></v-spacer>
 
                         <v-col cols="12">
+
                         <v-row style="margin-bottom: -2.5rem">
                             <v-col cols="4" class="mt-3"> Job Grande: </v-col>
                             <v-col cols="8" style="padding:0rem 0.7rem 1rem; 0rem;">
@@ -241,6 +242,17 @@
                                 inset
                                 v-model="jobGrande"
                                 ></v-switch>
+                            </v-col>
+                        </v-row>
+
+                        <v-row style="margin-bottom: -2.5rem">
+                            <v-col cols="4" class="mt-3"> Expediente </v-col>
+                            <v-col cols="8">
+                            <v-select
+                                dense filled class="text-m"
+                                :items="expediente"
+                                v-model="expedienteJob"
+                            ></v-select>
                             </v-col>
                         </v-row>
 
@@ -472,7 +484,31 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
             dummy(){
                 //
             },
+            
+            //Formatea la geometria de jobs para la insercion en BD
+            stringifyErrorGeometry(geometry){
+                this.coordinates = geometry.coordinates;
+                this.string = 'POINT(';
+                this.coordinate = this.coordinates.toString();
+                this.coordinate = this.coordinate.replace(',',' ');
+                this.string = this.string + this.coordinate;
+                this.string = this.string + ')';
+                return this.string;
+            },
 
+            //Formatea la geometria de jobs para la insercion en BD
+            stringifyJobGeometry(geometry){
+                this.coordinates = geometry.coordinates[0];
+                this.string = "POLYGON((";
+                for (this.index in this.coordinates) {
+                    this.coordinate = this.coordinates[this.index].toString();
+                    this.coordinate = this.coordinate.replace(',',' ');
+                    this.string = this.string + this.coordinate + ','
+                }
+                this.string = this.string + '))';
+                this.string = this.string.replace(",))", "))");
+                return this.string;
+            },
 
             desactivarSelectTool(tipo){
                 if (tipo == 'Jobs'){
@@ -535,14 +571,14 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
             },
 
             obtenerParametrosError(){
-                axios.get(this.apiUrl + 'errorParameters').then((data) => {
+                axios.get(`${process.env.VUE_APP_API_ROUTE}/errorParameters`).then((data) => {
                     this.objeto = data.data;
                     this.makeArrayFromApi(this.objeto.tema,this.temaError, 'tema_error')
                     this.makeArrayFromApi(this.objeto.tipo, this.tipoError, 'tipo_error')
 
                     //Asignar valor por defecto
-                    this.selectTema = this.temaError[this.asignarValoresDefault(this.objeto.tema)];
-                    this.selectTipoError = this.tipoError[this.asignarValoresDefault(this.objeto.tipo)];
+                    this.selectTema = this.temaError[this.asignarValoresDefault(this.objeto.tema, 'id_tema_error')];
+                    this.selectTipoError = this.tipoError[this.asignarValoresDefault(this.objeto.tipo, 'id_tipo_error')];
                     })
             },
 
@@ -551,12 +587,15 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
                 //TODO: parece imposible unificar todo en un mismo array... 
                 let newAttrbError = {
                     id: this.errores[this.errores.length-1].id,
-                    geometria: this.errores[this.errores.length-1].geometry,
-                    asocJob: null,
                     estado: 'Marcado',
-                    descripcion: this.descError,
-                    tema: this.selectTema,
+                    idError: null,
+                    asocJob: null,
                     tipo: this.selectTipoError,
+                    tema: this.selectTema,
+                    descripcion: this.descError,
+                    geometria: this.stringifyErrorGeometry(this.errores[this.errores.length-1].geometry),
+                    geometriaJSON: this.errores[this.errores.length-1].geometry,
+                    viaEnt: 'IDV',
                 }
                 this.erroresAttrb.push(newAttrbError);
                 this.editError = false;
@@ -564,22 +603,24 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
             },
 
             obtenerParametrosJob(){
-                axios.get(this.apiUrl + 'jobParameters').then((data) => {
+                axios.get(`${process.env.VUE_APP_API_ROUTE}/jobParameters`).then((data) => {
                     this.objeto = data.data;
-                    this.makeArrayFromApi(this.objeto.deteccion,this.deteccion, 'detect_job')
-                    this.makeArrayFromApi(this.objeto.perfilJob,this.perfil, 'arreglo_job')
-                    this.makeArrayFromApi(this.objeto.gravedad,this.gravedad, 'gravedad_job')
-                    this.makeArrayFromApi(this.objeto.asignacion,this.asignacion, 'asignacion_job')
-                    this.makeArrayFromApi(this.objeto.tipoBandeja,this.tipoBandeja, 'tipo_bandeja')
+                    //makeArrayFromApi (objetoAPI, arrayCrear, columnaBD)
+                    this.makeArrayFromApi(this.objeto.expediente,this.expediente, 'expediente')
+                    this.makeArrayFromApi(this.objeto.asignacion,this.asignacion, 'asignacion')
+                    this.makeArrayFromApi(this.objeto.deteccion,this.deteccion, 'deteccion')
+                    this.makeArrayFromApi(this.objeto.gravedad,this.gravedad, 'gravedad')
                     this.makeArrayFromApi(this.objeto.operador,this.nombreOperador, 'nombre_operador')
-                    
+                    this.makeArrayFromApi(this.objeto.perfilJob,this.perfil, 'arreglo')                  
+                    this.makeArrayFromApi(this.objeto.tipoBandeja,this.tipoBandeja, 'tipo_bandeja')
 
-                    //Asignar valor por defecto
-                    this.deteccionJob = this.deteccion[this.asignarValoresDefault(this.objeto.deteccion)];
-                    this.asignacionJob = this.asignacion[this.asignarValoresDefault(this.objeto.asignacion)];
-                    this.gravedadJob = this.gravedad[this.asignarValoresDefault(this.objeto.gravedad)];
-                    this.perfilJob = this.perfil[this.asignarValoresDefault(this.objeto.perfilJob)];
-                    this.tipoBandejaJob = this.tipoBandeja[this.asignarValoresDefault(this.objeto.tipoBandeja)];
+                    //Asignar valores por defecto
+                    //asignarValoresDefault(objetoAPI, columnaID)
+                    this.asignacionJob = this.asignacion[this.asignarValoresDefault(this.objeto.asignacion, 'id_asignacion')];
+                    this.deteccionJob = this.deteccion[this.asignarValoresDefault(this.objeto.deteccion, 'id_deteccion')];
+                    this.gravedadJob = this.gravedad[this.asignarValoresDefault(this.objeto.gravedad, 'id_gravedad')];
+                    this.perfilJob = this.perfil[this.asignarValoresDefault(this.objeto.perfilJob, 'id_arreglo')];
+                    this.tipoBandejaJob = this.tipoBandeja[this.asignarValoresDefault(this.objeto.tipoBandeja, 'id_tipo_bandeja')];
                     })
             },
 
@@ -649,8 +690,8 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
                 this.newAttrbJob = {
                     id: this.jobs[this.jobs.length-1].id,
                     idJob: null,
-                    expediente: '2019/2000011810',
-                    estado: 'Marcado',
+                    expediente: this.expedienteJob,
+                    estado: 'En triaje',
                     jobGran: this.jobGrande,
                     detectado: this.deteccionJob,
                     descripcion: this.descJob,
@@ -659,7 +700,9 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
                     asignar: this.asignacionJob,
                     tipoBandeja: this.tipoBandejaJob,
                     operador: this.nombreOperadorJob,
-                    geometria: this.jobs[this.jobs.length-1].geometry,
+                    geometria: this.stringifyJobGeometry(this.jobs[this.jobs.length-1].geometry),
+                    geometriaJSON: this.jobs[this.jobs.length-1].geometry,
+                    epsg: 3857,
                 }
                 this.jobsAttrb.push(this.newAttrbJob);
                 this.editJob = false;
@@ -826,6 +869,8 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
             editJob: false,             //Visibilidad ventana editar atributos
             descJob: '',                //TextArea Descripcion Job
             jobGrande: false,           //Valor
+            expediente:[],
+            expedienteJob:[],
             deteccion: [],              //Array desde BD llenar en initialize
             deteccionJob:[],            //Toma por defecto primer valor
             perfil: [],                 //Array desde BD llenar en initialize    

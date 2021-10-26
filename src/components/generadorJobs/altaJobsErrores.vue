@@ -161,27 +161,31 @@
             selectViaEntrada(){
                 this.viaEntrada = this.selectViaEntrada
             },
+
             selectProcedencia(){
                 this.procedencia = this.selectProcedencia
             },
+
             selectPrioridad(){
                 this.prioridad = this.selectPrioridad
             },
+
             jobs(){
                 if (this.jobs.length != 0){
                     this.jobLoading=false;
                 }
             },
+
             errores(){
                 if (this.errores.length != 0){
                     this.errorLoading=false;
                 }
-            }
+            },
         },
 
         methods: {
             compruebaDatos(){
-                if (this.jobs.length != 0 || this.errores.length != 0){
+                if (this.jobs.length != 0 && this.datosGuardados == false || this.errores.length != 0 && this.datosGuardados == false ){
                     this.openAlert();
                 } else {
                     this.closeDialog();
@@ -203,7 +207,6 @@
                 this.$emit('closed', 'JobsTriajeGJ');
             },
 
-
             showInfo(message, type){
                 this.showMessage = true;
                 this.message = message;
@@ -213,14 +216,14 @@
                 this.showMessage = false;
             },
 
-            recDataError(){
+            /*recDataError(){
                 //Comprueba si hay errores registrados en mapa
                 if (this.errores.length > 0){
                     //Si hay Jobs registrados asigna errores a jobs espacialmente
                     this.asignErrorToJob();
                     for (this.index in this.errores) {
                         axios
-                        .post( this.url + 'postErrores', this.errores[this.index])
+                        .post( `${process.env.VUE_APP_API_ROUTE}/postErrores`, this.errores[this.index])
                         .then( data => {
                             if (data.data.status == 200){
                                 this.showInfo("Datos guardados correctamente", "green");
@@ -236,37 +239,36 @@
             },
 
             recDataJob(){
-                if(this.jobs.length > 0){
-                    for (this.index in this.jobs) {
-                        axios
-                        .post( this.url + 'postJobs', this.jobs[this.index])
-                        .then( data => {
-                            if (data.data.status == 200) {
-                            //TODO: debería confirmar que jobs y errores se guardan bien
+                axios
+                .post(`${process.env.VUE_APP_API_ROUTE}/postJobs`, this.jobs)
+                .then( data => {
+                    if (data.status == 201){
+                        //Asigna los IdJob con la respuesta obtenida desde la BD 
+                        for (this.index in this.jobs){
+                            this.jobs[this.index].idJob = data.data.creados[this.index]
+                        }
+                        // comprueba que no existen jobs sin guardar para lanzar aviso en caso de cierre ventana
+                        for (this.index in this.jobs){
+                            if (this.jobs[this.index].idJob != null) {
+                                this.datosGuardados = true;
+                            } else {
+                                this.datosGuardados = false;
                             }
-                        })
-                        .catch(error => {console.warn("Algo fue mal al grabar el job ",error)})                                              
+                        }
+                        //Mensaje info
+                        this.showInfo("Datos guardados correctamente", "green");
+                        setTimeout(this.closeInfo,2000);
+                    } else {
+                        this.showInfo("Error al guardar!", "red");
+                        setTimeout(this.closeInfo,2000);
                     }
-                }
-            },
-
-            updateDataError(){
-                axios
-                .put(this.url + 'updateErrores' + this.errores)
-                .then(data => { console.log ("Errores actualizados correctamente ", data)})
-            },
-
-            updateDataJobs(){
-                axios
-                .put(this.url + 'updateJobs' + this.jobs)
-                .then(data => { console.log ("Jobs actualizados correctamente ", data)})
-            },
-
+                });                
+            },*/
 
             compruebaErrorBD(){
                 for (this.index in this.errores){
                     axios
-                    .get(this.url + 'errores/' + this.errores[this.index].idError)
+                    .get(`${process.env.VUE_APP_API_ROUTE}/errores/` + this.errores[this.index].idError)
                     .then(data => {
                         if (data.data.mensaje.length > 0){
                             this.existe = true;
@@ -281,7 +283,7 @@
             compruebaJobBD(){
                 for (this.index in this.jobs){
                     axios
-                    .get(this.url + 'jobs/' + this.jobs[this.index].id_job)
+                    .get(`${process.env.VUE_APP_API_ROUTE}/jobs/` + this.jobs[this.index].id_job)
                     .then(data => {
                         if (data.data.mensaje.length > 0){
                             this.existe = true;
@@ -293,78 +295,112 @@
                 return this.existe;
             },
 
-            guardarDatos(){
-                       
-            },
-
             storeJobs(jobs){
                 this.jobs = jobs;
             },
 
             storeErrors(errores){
-                console.log("hello", errores)
                 this.errores = errores;
+            },
+
+            updateDataError(){
+                axios
+                .put(`${process.env.VUE_APP_API_ROUTE}/updateErrores` + this.errores)
+                .then(data => { console.log ("Errores actualizados correctamente ", data)})
+            },
+
+            updateDataJobs(){
+                axios
+                .put(`${process.env.VUE_APP_API_ROUTE}/updateJobs` + this.jobs)
+                .then(data => { console.log ("Jobs actualizados correctamente ", data)})
             },
 
             asignErrorToJob() {
                 for (this.indexError in this.errores) {
                     //reinicia el valor, necesario para detectar ediciones
-                    this.errores[this.indexError].job = '';
+                    this.errores[this.indexError].asocJob = '';
                     this.point = [
-                        this.errores[this.indexError].geometry.coordinates[0],
-                        this.errores[this.indexError].geometry.coordinates[1],
+                        this.errores[this.indexError].geometriaJSON.coordinates[0],
+                        this.errores[this.indexError].geometriaJSON.coordinates[1],
                     ];
 
                     for (this.indexJob in this.jobs) {
-                        this.polygon = [this.jobs[this.indexJob].geometry.coordinates[0]];
+                        this.polygon = [this.jobs[this.indexJob].geometriaJSON.coordinates[0]];
                         this.inside = pointInPolygon(this.point, this.polygon[0]);
                         if (this.inside == true) {
-                            //Esta dentro del Job
-                            this.errores[this.indexError].job = this.jobs[this.indexJob].idJob;
+                            //Esta dentro del Job ¿Esperar a que terminen los jobs para grabar?
+                            console.log(this.jobs[this.indexJob].idJob)
+                            this.errores[this.indexError].asocJob = this.jobs[this.indexJob].idJob;
+                        } else {
+                            console.log("esta fuera")
                         }
                     }
                 }
             },
+            
+            // GUARDAR DATOS MAESTRO -definir algoritmo guardado-
+            // La gestion la debe hacer la API desde aqui solo entregamos arrays de objetos
+            guardarDatos(){
+                this.jobsErrores = {
+                    jobs: this.jobs,
+                    errores: this.errores
+                };
+                
+                axios
+                .post(`${process.env.VUE_APP_API_ROUTE}/postJobsErrores`, this.jobsErrores)
+                .then( data => {
+                    if (data.status == 201) {
+                        //Asignamos los id dados por la base de datos en la petición
+                        for (this.index in this.jobs){
+                            this.jobs[this.index].idJob = data.data.jobs[this.index]
+                        }
+                        for (this.index in this.errores){
+                            this.errores[this.index].asocJob = data.data.errores[this.index].idJob;
+                            this.errores[this.index].idError = data.data.errores[this.index].idError;
+                        }
+                        this.datosGuardados = true;
+                    } else {
+                        console.log(data.data.mensaje);
+                    }
+                })   
+            }
         },
 
         data () {
             return {
-                url: 'http://10.13.86.114:3000/',    //url:puerto del servicio API
                 dialog: true,
-                emailRules: [
-                    v => /.+@.+/.test(v) || 'Debe introducir un email válido, por ejemplo: "usuario@incigeo.com"',
-                ],
                 errores:[],                         //Almacen de errores
                 jobs:[],                            //Almacen de jobs
-
                 jobLoading: true,                   //En Resumen de la incidencia muestra la barra de carga mientras no se hayan registrado jobs        
                 errorLoading: true,                 //En Resumen de la incidencia muestra la barra de carga mientras no se hayan registrado errores  
-
                 showMessage: false,                 //Muestra mensajes de información en la parte inferior de la pantalla
-                showAlert: false,                   //Muestra ventana de alerta
                 message: '',                        //Determina el texto mostrado en el mensaje de información
                 messageType: '',                    //green para success, red para error, blue para info.
 
                 jobHeaders : [
                     { text: 'Estado', value:'estado'},                
-                    { text: 'Id', value:'idJob'},
+                    { text: 'ID Job', value:'idJob'},
                     { text: 'Expediente', value: 'expediente'},
-                    { text: 'Descripción', value: 'descripcion'},
                     { text: 'Perfil', value:'perfil' },
                     { text: 'Detectado en', value: 'detectado' },
                     { text: 'Gravedad', value: 'gravedad' },
                     { text: 'Asignado a', value: 'tipoBandeja' },
                     { text: 'Operador', value: 'operador' },
+                    { text: 'Descripción', value: 'descripcion'},
                 ],
 
                 errorHeaders : [
-                    { text: 'Estado', value: 'estado' },                
+                    { text: 'Estado', value: 'estado' },
                     { text: 'Id Error', value:'idError'},
                     { text: 'Asignado a Job', value: 'asocJob' },
-                    { text: 'Error de', value: 'tipoError' },
+                    { text: 'Tipo Error', value: 'tipo' },              
                     { text: 'Tema Error', value: 'tema' },
-                    { text: 'Descripcion', value: 'descripcion' },
+                    { text: 'Descripcion', value: 'descripcion' },                  
                 ],
+
+                showAlert: false,                   //Muestra ventana de alerta
+                datosGuardados: false,              //Indica si los datos han sido guardados en base de datos.
+
             }
         },
     }
