@@ -25,7 +25,15 @@
         </v-list-item-icon>
       </v-list-item>
     </v-list>
-  </div> 
+
+
+    <v-btn color="green" dark class="w-56 ml-4">
+      <v-icon class="mr-6">mdi-email-outline</v-icon>
+      ENVIAR AVISO
+    </v-btn>
+  </div>
+
+  
 </template>
 
 <script>

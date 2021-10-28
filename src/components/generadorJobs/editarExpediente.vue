@@ -24,17 +24,18 @@
             </div>
           </div>
         </v-card>
-
+        
         <v-data-table
           v-model="selected"
           :headers="headers"
           :items="expedientes"
+          item-key="expediente"
           :search="search"
           class="font-sans"
           show-select
         >
           <template v-slot:top>
-            <!-- VENTANA EDICION INCIDENCIA -->
+            <!-- VENTANA EDICION EXPEDIENTE 
             <v-dialog
               v-model="dialog"
               fullscreen
@@ -49,7 +50,7 @@
                 :center="editedItem.geometria_error"
               ></VerIncidencia>
             </v-dialog>
-            <!-- FIN VENTANA EDICION INCIDENCIA -->
+            FIN VENTANA EDICION INCIDENCIA -->
 
             <v-dialog v-model="dialogDelete" max-width="500px">
               <v-card>
@@ -59,14 +60,14 @@
                 </h3>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn class="w-24 bg-red-500" dark text @click="closeDelete"
+                  <v-btn class="w-24 bg-red-500" dark text @click="dummy"
                     >Cancel</v-btn
                   >
                   <v-btn
                     class="w-24 bg-green-500"
                     dark
                     text
-                    @click="deleteItemConfirm"
+                    @click="dummy"
                     >OK</v-btn
                   >
                   <v-spacer></v-spacer>
@@ -102,56 +103,43 @@
 <script>
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
-import VerIncidencia from "@/components/common/VerIncidencia";
 
 
 export default {
   name: "EditarExpediente",
   mixins: [getColor],
-  components: {
-    VerIncidencia,
-  },
 
   data: () => ({
     dialog: false,
     dialogDelete: false,
+    singleSelect: false,
     selected: [],
     search: "",
     headers: [
       { text: "Finalizado", align: "start", sortable: true, value: "finalizado"},
       { text: "Expediente", align: "start", sortable: true, value: "expediente"},
       { text: "Fecha", align: "start", sortable: true, value: "fecha"},
-      { text: "Observaciones", align: "start", sortable: true, value: "observaciones"},
+      { text: "Observaciones", align: "start", sortable: true, value: "textoPlano"},
       { text: "Acciones", value: "actions", sortable: false },
     ],
     expedientes: [],
     editedIndex: -1,
     editedItem: {
-      id_inc: "",
-      job_estado: "",
-      job_prioridad: "",
-      job_detectado: "",
-      job_arreglar: "",
-    },
-    defaultItem: {
-      id_inc: "",
-      job_estado: "",
-      job_prioridad: "",
-      job_detectado: "",
-      job_arreglar: "",
+      finalizado: "",
+      expediente: "",
+      fecha: "",
+      textoPlano: "",
     },
   }),
 
-  watch: {
-    dialog(val) {
-      val || this.close();
-    },
-    dialogDelete(val) {
-      val || this.closeDelete();
-    },
-  },
   created() {
     this.initialize();
+  },
+
+  watch: {
+    selected(){
+      console.log(this.selected)
+    }
   },
 
   methods: {
@@ -165,53 +153,18 @@ export default {
         //se realiza el filtro para los jobs en triaje y la asignación del job_id
         .then((data) => {
             this.expedientes = data.data.respuesta
+            for (this.index in this.expedientes) {
+              //Devuelve texto plano desde html para la tabla
+              this.texto = this.expedientes[this.index].observaciones;
+              this.texto = this.texto.replace(/<[^>]*>/g, '');
+              this.expedientes[this.index].textoPlano = this.texto;
+
+              //Devuelve fecha en formato YYYY-MM-DD
+              this.fecha = this.expedientes[this.index].fecha;
+              this.fechaCortada = this.fecha.slice(0,10)
+              this.expedientes[this.index].fecha = this.fechaCortada;
+            }
         });
-    },
-
-    editItem(item) {
-      this.editedIndex = this.jobs.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true;
-    },
-
-    deleteItem(item) {
-      this.editedIndex = this.jobs.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
-    },
-
-    deleteItemConfirm() {
-      this.jobs.splice(this.editedIndex, 1);
-      this.closeDelete();
-    },
-
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    dialogClose() {
-      this.dialog = false;
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.jobs[this.editedIndex], this.editedItem);
-      } else {
-        this.jobs.push(this.editedItem);
-      }
-      this.close();
     },
   },
 };

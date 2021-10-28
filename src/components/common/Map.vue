@@ -147,7 +147,7 @@
                             icon tile
                             :title="item.title"
                             @click="item.click()"
-                            :disabled="item.aplicarPerfil"
+                            :disabled="aplicarModo(item.modo)"
                             >
                                 <v-icon color="#1E40AF">{{ item.icon }}</v-icon>
                             </v-btn>
@@ -167,7 +167,7 @@
                             icon tile
                             :title="item.title"
                             @click="item.click()"
-                            :disabled="item.aplicarPerfil"
+                            :disabled="aplicarModo(item.modo)"
                             >
                             <v-icon color="#1E40AF">{{ item.icon }}</v-icon>
                         </v-btn>
@@ -451,11 +451,30 @@
 import axios from "axios";
 import {makeArrayFromApi} from '@/assets/mixins/makeArrayFromApi.js';
 import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
+import {getMapExtent} from '@/assets/mixins/getMapExtent';
 
     export default {
+        props: ["modoMapa", "jobsRecibidos", "erroresRecibidos", "reset"],
+
+        computed: {
+            returnModoMapa(){
+            return this.modoMapa;
+            },
+            returnJobsRecibidos(){
+            return this.jobsRecibidos;
+            },
+            returnErroresRecibidos(){
+            return this.erroresRecibidos;
+            },
+            returnReset(){
+            return this.reset;
+            },
+        },
+
         mixins:[
             makeArrayFromApi, 
-            asignarValoresDefault
+            asignarValoresDefault,
+            getMapExtent,
         ],
 
         created(){
@@ -463,10 +482,13 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
             this.activeMap = this.wmtsServices[0];
             this.obtenerParametrosJob();
             this.obtenerParametrosError();
+            this.retrieveJobFromBD();
+            this.retrieveErroresFromBD();
         },
 
         watch:{
-            jobs(){
+
+        jobs(){
                 if(this.jobs.length != 0 && this.toolActive == 'drawJobs'){
                     this.editJob = true
                 }
@@ -483,6 +505,49 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
         methods:{
             dummy(){
                 //
+            },
+
+            //Solo modo visualizar
+            retrieveJobFromBD(){
+                if (this.modoMapa == 'visualizar') {
+                    this.newJob = {
+                        geometry: this.jobsRecibidos.geometria_json,
+                        type: "Feature"
+                    }
+                    this.jobs.push(this.newJob);
+                    //getExtent
+                    this.datosExtent = this.getMapExtent(this.jobsRecibidos.geometria_json)
+                    this.center = this.datosExtent.centro;
+                    this.zoom = this.datosExtent.nuevoZoom;
+                }
+            },
+
+            //Solo modo visualizar
+            retrieveErroresFromBD(){
+                if (this.modoMapa == 'visualizar'){
+                    for (this.index in this.erroresRecibidos){
+                        this.newError = {
+                            geometry: this.erroresRecibidos[this.index].geometria_json,
+                            type: "Feature"
+                        }
+                        this.errores.push(this.newError);
+                    }
+                }
+
+            },
+
+            //Aplica el modo de mapa (edicion - visualización)
+            aplicarModo(modo){
+                if (this.modoMapa == 'visualizar') {
+                    if (modo == 'editar'){
+                        return true
+                    } 
+                }
+                
+                else if (this.modoMapa == 'editar') {
+                    return false
+                }
+
             },
             
             //Formatea la geometria de jobs para la insercion en BD
@@ -754,7 +819,7 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
             //VIEW
             zoom: 5.5,
             minZoom: 5.5,
-            center: [ 48058.02769095573, 4896391.572951017 ],
+            center: [ -386025.74417069746, 4683331.210786856 ],
 
             //SOURCE WMTS -> añadimos servicio añadiendo objeto al array
             wmtsServices: [
@@ -814,27 +879,32 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
                 {   title: "Dibujar Job", 
                     active: "drawJobs", 
                     click: this.activeDrawJobs, 
-                    icon: "mdi-vector-square", 
+                    icon: "mdi-vector-square",
+                    modo: "editar" 
                 },
                 {   title: "Seleccionar Job", 
                     active: "selectJob", 
                     click: this.activeSelectJobs, 
-                    icon: "mdi-cursor-default", 
+                    icon: "mdi-cursor-default",
+                    modo: "visualizar" 
                 },
                 {   title: "Información del Job", 
                     active: "getJobInfo", 
                     click: this.dummy, 
-                    icon: "mdi-information", 
+                    icon: "mdi-information",
+                    modo: "visualizar" 
                 },
                 {   title: "Editar geometría de Job", 
                     active: "modifyJob", 
                     click: this.activeModifyJobs, 
-                    icon: "mdi-vector-polygon", 
+                    icon: "mdi-vector-polygon",
+                    modo: "editar"  
                 },
                 {   title: "Eliminar Job", 
                     active: "deleteJobs", 
                     click: this.deleteJobs, 
                     icon: "mdi-delete",
+                    modo: "editar" 
                 },
             ],
             errorPanel: [             //Array de objetos que definen las opciones disponibles en el panel de control
@@ -842,26 +912,32 @@ import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
                     active: "drawErrors",
                     click: this.activeDrawErrors,
                     icon: "mdi-map-marker-plus",
+                    modo: "editar" 
                 },
                 {   title: "Seleccionar Error",
                     active: "selectError", 
                     click: this.activeSelectErrores, 
                     icon: "mdi-cursor-default",
+                    modo: "visualizar" 
                 },
                 {   title: "Información del Error",
                     active: "getErrorInfo", 
                     click: this.dummy, 
                     icon: "mdi-information",
+                    modo: "visualizar"
                 },
                 {   title: "Editar posición del Error",
                     active: "modifyError", 
                     click: this.activeModifyErrores, 
                     icon: "mdi-arrow-all",
+                    modo: "editar"
                 },
                 {   title: "Eliminar Error", 
                     active: "deleteErrores", 
                     click: this.deleteErrores, 
                     icon: "mdi-delete",
+                    modo: "editar"
+
                 },
             ],
 

@@ -31,6 +31,7 @@
           :items="jobs"
           :search="search"
           class="font-sans"
+          item-key="job"
           show-select
         >
           <template v-slot:top>
@@ -42,12 +43,10 @@
               transition="dialog-bottom-transition"
               class="h-full"
             >
-              <VerIncidencia
+              <VerJob
                 @dialog="dialogClose"
-                :incidencia="editedItem"
-                :error="editedItem.geometria_error"
-                :center="editedItem.geometria_error"
-              ></VerIncidencia>
+                :job="editedItem"
+              ></VerJob>
             </v-dialog>
             <!-- FIN VENTANA EDICION INCIDENCIA -->
 
@@ -80,7 +79,7 @@
               ><v-icon small @click="dummy(item)"> mdi-pencil </v-icon></v-btn
             >
             <v-btn title="consultar" icon dark class="bg-green-500"
-              ><v-icon small @click="dummy(item)"> mdi-eye </v-icon></v-btn
+              ><v-icon small @click="editItem(item)"> mdi-eye </v-icon></v-btn
             >
           </template>
 
@@ -102,14 +101,14 @@
 <script>
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
-import VerIncidencia from "@/components/common/VerIncidencia";
+import VerJob from "@/components/common/VerJob";
 
 
 export default {
   name: "JobsTriajeGJ",
   mixins: [getColor],
   components: {
-    VerIncidencia,
+    VerJob,
   },
 
   data: () => ({
@@ -130,18 +129,22 @@ export default {
     jobs: [],
     editedIndex: -1,
     editedItem: {
-      id_inc: "",
-      job_estado: "",
-      job_prioridad: "",
-      job_detectado: "",
-      job_arreglar: "",
+      estado: "",
+      job: "",
+      expediente: "",
+      gravedad_job: "",
+      deteccion_job: "",
+      arreglo_job: "",
+      resumen:"",
     },
     defaultItem: {
-      id_inc: "",
-      job_estado: "",
-      job_prioridad: "",
-      job_detectado: "",
-      job_arreglar: "",
+      estado: "",
+      job: "",
+      expediente: "",
+      gravedad_job: "",
+      deteccion_job: "",
+      arreglo_job: "",
+      resumen:"",
     },
   }),
 
@@ -152,6 +155,10 @@ export default {
   },
 
   watch: {
+    selected(){
+      console.log(this.selected)
+    },
+
     dialog(val) {
       val || this.close();
     },

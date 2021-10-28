@@ -136,10 +136,6 @@
 <!-- FIN MENU OPCIONES SEGUN ROL -->
     <div v-if="mini==false">
       <v-spacer class="mt-4"></v-spacer>
-      <v-btn color="green" dark class="w-56 ml-4">
-        <v-icon class="mr-6">mdi-email-outline</v-icon>
-        Enviar Mensaje
-        </v-btn>
     </div>
   </v-navigation-drawer>
 </v-app>

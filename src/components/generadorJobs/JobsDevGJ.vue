@@ -31,6 +31,7 @@
           :items="jobs"
           :search="search"
           class="font-sans"
+          item-key="job"
           show-select
         >
           <template v-slot:top>
@@ -155,9 +156,14 @@ export default {
     dialog(val) {
       val || this.close();
     },
+
     dialogDelete(val) {
       val || this.closeDelete();
     },
+
+    editItem(){
+      console.log("edit", this.editedItem)
+    }
   },
   created() {
     this.initialize();

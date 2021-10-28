@@ -46,7 +46,7 @@
                         class="p-8"
                         style="height:50rem;"
                         >
-                            <Map @jobs="storeJobs" @errores="storeErrors" perfil="editar"></Map>
+                            <Map @jobs="storeJobs" @errores="storeErrors" modoMapa="editar"></Map>
                          </v-card>
                     </v-tab-item> <!-- FIN LOCALIZACION EN EL MAPA -->
 
@@ -61,7 +61,7 @@
                             <h1 class="text-2xl font-black mb-2">Jobs</h1>
                                 <v-data-table
                                     :loading="jobLoading"
-                                    loading-text="Esperando jobs. Si registró jobs en mapa haga clic en Guardar datos para ver los cambios."
+                                    loading-text="Esperando jobs..."
                                     :headers="jobHeaders"
                                     :items="jobs"
                                     class="elevation-1"
@@ -79,7 +79,7 @@
                             <h1 class="text-2xl font-black mb-2">Errores</h1>
                                 <v-data-table
                                     :loading="errorLoading"
-                                    loading-text="Esperando errores. Si registró errores haga clic en Guardar datos para ver los cambios."
+                                    loading-text="Esperando errores..."
                                     :headers="errorHeaders"
                                     :items="errores"
                                     class="elevation-1"
@@ -133,6 +133,23 @@
                   </v-card>
                 </v-overlay>
 
+                <!--LOADING-->
+                <v-overlay :value="showLoading">
+                    <div class="grid justify-items-center">
+                        <div class="mb-4">
+                            <h3>Espere mientras se cargan los datos</h3>
+                        </div>
+                        <div> 
+                            <v-progress-circular
+                            :size="80"
+                            :width="10"
+                            color="primary"
+                            indeterminate
+                            ></v-progress-circular>
+                        </div>
+                    </div>
+                </v-overlay>
+
             </v-card>
         </template>
     </div>
@@ -144,13 +161,14 @@
     import Map from '@/components/common/Map';
     import axios from 'axios';
     import {getColor} from '@/assets/mixins/getColor.js';
-    import pointInPolygon from 'point-in-polygon';
+    //import Dashboard from '../../views/Dashboard.vue';
 
     export default {
         name: "altaJobsErrores",
 
         components: {
             Map,
+            //Dashboard,
         },
 
         mixins: [
@@ -216,85 +234,6 @@
                 this.showMessage = false;
             },
 
-            /*recDataError(){
-                //Comprueba si hay errores registrados en mapa
-                if (this.errores.length > 0){
-                    //Si hay Jobs registrados asigna errores a jobs espacialmente
-                    this.asignErrorToJob();
-                    for (this.index in this.errores) {
-                        axios
-                        .post( `${process.env.VUE_APP_API_ROUTE}/postErrores`, this.errores[this.index])
-                        .then( data => {
-                            if (data.data.status == 200){
-                                this.showInfo("Datos guardados correctamente", "green");
-                                setTimeout(this.closeInfo,2000);
-                            } else {
-                                this.showInfo("Error al guardar!", "red");
-                                setTimeout(this.closeInfo,2000);
-                            }
-                        })
-                        .catch(error => {console.warn("algo fue mal al grabar el error ", error)})
-                    }
-                }
-            },
-
-            recDataJob(){
-                axios
-                .post(`${process.env.VUE_APP_API_ROUTE}/postJobs`, this.jobs)
-                .then( data => {
-                    if (data.status == 201){
-                        //Asigna los IdJob con la respuesta obtenida desde la BD 
-                        for (this.index in this.jobs){
-                            this.jobs[this.index].idJob = data.data.creados[this.index]
-                        }
-                        // comprueba que no existen jobs sin guardar para lanzar aviso en caso de cierre ventana
-                        for (this.index in this.jobs){
-                            if (this.jobs[this.index].idJob != null) {
-                                this.datosGuardados = true;
-                            } else {
-                                this.datosGuardados = false;
-                            }
-                        }
-                        //Mensaje info
-                        this.showInfo("Datos guardados correctamente", "green");
-                        setTimeout(this.closeInfo,2000);
-                    } else {
-                        this.showInfo("Error al guardar!", "red");
-                        setTimeout(this.closeInfo,2000);
-                    }
-                });                
-            },*/
-
-            compruebaErrorBD(){
-                for (this.index in this.errores){
-                    axios
-                    .get(`${process.env.VUE_APP_API_ROUTE}/errores/` + this.errores[this.index].idError)
-                    .then(data => {
-                        if (data.data.mensaje.length > 0){
-                            this.existe = true;
-                        } else {
-                            this.existe = false;
-                        }
-                    })
-                }
-                return this.existe;
-            },
-
-            compruebaJobBD(){
-                for (this.index in this.jobs){
-                    axios
-                    .get(`${process.env.VUE_APP_API_ROUTE}/jobs/` + this.jobs[this.index].id_job)
-                    .then(data => {
-                        if (data.data.mensaje.length > 0){
-                            this.existe = true;
-                        } else {
-                            this.existe = false;
-                        }
-                    })
-                }
-                return this.existe;
-            },
-
             storeJobs(jobs){
                 this.jobs = jobs;
             },
@@ -315,32 +254,11 @@
                 .then(data => { console.log ("Jobs actualizados correctamente ", data)})
             },
 
-            asignErrorToJob() {
-                for (this.indexError in this.errores) {
-                    //reinicia el valor, necesario para detectar ediciones
-                    this.errores[this.indexError].asocJob = '';
-                    this.point = [
-                        this.errores[this.indexError].geometriaJSON.coordinates[0],
-                        this.errores[this.indexError].geometriaJSON.coordinates[1],
-                    ];
-
-                    for (this.indexJob in this.jobs) {
-                        this.polygon = [this.jobs[this.indexJob].geometriaJSON.coordinates[0]];
-                        this.inside = pointInPolygon(this.point, this.polygon[0]);
-                        if (this.inside == true) {
-                            //Esta dentro del Job ¿Esperar a que terminen los jobs para grabar?
-                            console.log(this.jobs[this.indexJob].idJob)
-                            this.errores[this.indexError].asocJob = this.jobs[this.indexJob].idJob;
-                        } else {
-                            console.log("esta fuera")
-                        }
-                    }
-                }
-            },
-            
+           
             // GUARDAR DATOS MAESTRO -definir algoritmo guardado-
-            // La gestion la debe hacer la API desde aqui solo entregamos arrays de objetos
             guardarDatos(){
+                this.showLoading = true;
+
                 this.jobsErrores = {
                     jobs: this.jobs,
                     errores: this.errores
@@ -359,6 +277,9 @@
                             this.errores[this.index].idError = data.data.errores[this.index].idError;
                         }
                         this.datosGuardados = true;
+                        this.showLoading = false;
+                        this.showInfo("Datos guardados correctamente", "green");
+                        setTimeout(this.closeInfo,2000);
                     } else {
                         console.log(data.data.mensaje);
                     }
@@ -400,6 +321,8 @@
 
                 showAlert: false,                   //Muestra ventana de alerta
                 datosGuardados: false,              //Indica si los datos han sido guardados en base de datos.
+
+                showLoading: false,                 //Muestra la pantalla de carga mientras los datos son almacenados
 
             }
         },
