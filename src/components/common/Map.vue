@@ -452,6 +452,7 @@ import axios from "axios";
 import {makeArrayFromApi} from '@/assets/mixins/makeArrayFromApi.js';
 import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
 import {getMapExtent} from '@/assets/mixins/getMapExtent';
+import md5 from 'md5';
 
     export default {
         props: ["modoMapa", "jobsRecibidos", "erroresRecibidos", "reset"],
@@ -487,10 +488,13 @@ import {getMapExtent} from '@/assets/mixins/getMapExtent';
         },
 
         watch:{
-
-        jobs(){
+            jobs(){
                 if(this.jobs.length != 0 && this.toolActive == 'drawJobs'){
                     this.editJob = true
+                }
+
+                if(this.jobs.length != 0 && this.toolActive == 'modifyJob'){
+                    this.$emit('jobs', this.jobsAttrb)
                 }
             },
             
@@ -507,33 +511,60 @@ import {getMapExtent} from '@/assets/mixins/getMapExtent';
                 //
             },
 
-            //Solo modo visualizar
+            
             retrieveJobFromBD(){
-                if (this.modoMapa == 'visualizar') {
-                    this.newJob = {
-                        geometry: this.jobsRecibidos.geometria_json,
-                        type: "Feature"
+                if (this.modoMapa == 'visualizar' || this.modoMapa == 'editar') {
+                    //Solo ejecutamos si recibimos errores desde el componente padre
+                    if (this.jobsRecibidos) {
+                        //Geometrias
+                        this.newJob = {
+                            id: md5(this.jobsRecibidos.job),
+                            geometry: this.jobsRecibidos.geometria_json,
+                            type: "Feature"
+                        }
+                        this.jobs.push(this.newJob);
+
+                        //Atributos
+                        this.newAttrbJobBd = {
+                            id: md5(this.jobsRecibidos.job),
+                            idJob: this.jobsRecibidos.idJOB,
+                            expediente: this.jobsRecibidos.expediente,
+                            estado: this.jobsRecibidos.estado,
+                            jobGran: this.jobsRecibidos.jobGran,
+                            detectado: this.jobsRecibidos.detectado,
+                            descripcion: this.jobsRecibidos.descripcion,
+                            perfil: this.jobsRecibidos.perfil,
+                            gravedad: this.jobsRecibidos.gravedad,
+                            asignar: this.jobsRecibidos.asignar,
+                            tipoBandeja: this.jobsRecibidos.tipoBandeja,
+                            operador: this.jobsRecibidos.operador,
+                            geometria: this.jobsRecibidos.geometria,
+                            geometriaJSON: this.jobsRecibidos.geometria_json,
+                            epsg: this.jobsRecibidos.epsg,
+                        }
+
+                        //getExtent
+                        this.datosExtent = this.getMapExtent(this.jobsRecibidos.geometria_json)
+                        this.center = this.datosExtent.centro;
+                        this.zoom = this.datosExtent.nuevoZoom;
                     }
-                    this.jobs.push(this.newJob);
-                    //getExtent
-                    this.datosExtent = this.getMapExtent(this.jobsRecibidos.geometria_json)
-                    this.center = this.datosExtent.centro;
-                    this.zoom = this.datosExtent.nuevoZoom;
                 }
             },
 
             //Solo modo visualizar
             retrieveErroresFromBD(){
-                if (this.modoMapa == 'visualizar'){
-                    for (this.index in this.erroresRecibidos){
-                        this.newError = {
-                            geometry: this.erroresRecibidos[this.index].geometria_json,
-                            type: "Feature"
+                if (this.modoMapa == 'visualizar' || this.modoMapa == 'editar'){
+                    //Solo ejecutamos si recibimos errores desde el componente padre
+                    if (this.erroresRecibidos){
+                        for (this.index in this.erroresRecibidos){
+                            this.newError = {
+                                geometry: this.erroresRecibidos[this.index].geometria_json,
+                                type: "Feature"
+                            }
+                            this.errores.push(this.newError);
                         }
-                        this.errores.push(this.newError);
                     }
                 }
-
             },
 
             //Aplica el modo de mapa (edicion - visualización)

@@ -2,19 +2,21 @@
   <div class="bg-gray-200 h-full pb-6">
     <!--TOOLBAR SUPERIOR -->
     <v-toolbar dark color="primary">
-      <v-btn icon dark @click="closeDialog">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
+      <v-btn icon dark @click="closeDialog"><v-icon>mdi-close</v-icon></v-btn>
       <v-toolbar-title
-        >MOSTRANDO JOB - <b>{{ job.job }}</b></v-toolbar-title
+        >EDITANDO JOB - <b>{{ job.job }}</b></v-toolbar-title
       >
+
       <v-spacer></v-spacer>
-      <v-btn class="w-24 bg-red-500 mr-5" dark text @click="closeDialog">
-        CANCELAR
-      </v-btn>
-      <v-btn class="w-24 bg-green-500" dark text @click="storePolygonGeom">
-        GUARDAR
-      </v-btn>
+      <v-btn class="w-24 bg-red-500 mr-5" dark text @click="closeDialog"
+        >CANCELAR</v-btn
+      >
+      <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="actualizaDatosBD"
+        >GUARDAR DATOS</v-btn
+      >
+      <v-btn class="w-24 bg-green-500 mr-5" dark text @click="generarJob"
+        >GENERAR</v-btn
+      >
     </v-toolbar>
 
     <!--MAIN-->
@@ -22,82 +24,87 @@
       <v-card>
         <v-tabs v-model="activeTab" fixed-tabs background-color="#0341a6" dark>
           <v-tab :key="1" @click="activateMap(false)">Datos del Job</v-tab>
-          <v-tab :key="2" @click="activateMap(true)">Localización en el Mapa</v-tab>
+          <v-tab :key="2" @click="activateMap(true)"
+            >Localización en el Mapa</v-tab
+          >
           <v-tab :key="3" @click="activateMap(false)">Datos adjuntos</v-tab>
 
           <v-tabs-slider color="#76aff5"></v-tabs-slider>
 
           <!--DATOS DEL JOB-->
           <v-tab-item>
+            <!--Container tab -->
             <v-card flat class="p-8">
               <div class="min-w-1/4">
                 <v-row class="h-full mb-6">
                   <v-col cols="8">
-                    <table class="mr-6 text-justify shadow-md w-full">
-                      <tbody>
-                        <tr class="bg-gray-100 w-1/6">
-                          <td class="p-3"><b>Estado:</b></td>
-                          <td class="w-5/6">
-                            <v-chip :color="getColor(job.estado)" dark>
-                              {{ job.estado }}</v-chip
-                            >
-                          </td>
-                        </tr>
-                        <tr class="p-3 bg-white">
-                          <td class="p-3"><b>Expediente:</b></td>
-                          <td>{{ job.expediente }}</td>
-                        </tr>
-                        <tr class="p-3 bg-gray-100">
-                          <td class="p-3"><b>Gravedad:</b></td>
-                          <td>{{ job.gravedad_job }}</td>
-                        </tr>
-                        <tr class="p-3 bg-white">
-                          <td class="p-3"><b>Detectado en:</b></td>
-                          <td>{{ job.deteccion_job }}</td>
-                        </tr>
-                        <tr class="p-3 bg-gray-100">
-                          <td class="p-3"><b>Perfil job:</b></td>
-                          <td>{{ job.arreglo_job }}</td>
-                        </tr>
-                        <tr class="p-3 bg-white">
-                          <td class="p-3"><b>Descripción:</b></td>
-                          <td>{{ job.descripcion }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <br />
+                    <v-card class="mb-6">
+                      <v-card-title class="bg-blue-200"
+                        >DATOS DEL JOB</v-card-title
+                      >
 
-                    <div>
-                      <h1 class="text-xl pb-3">
-                        ERRORES ASOCIADOS AL JOB - <b>{{ job.job }}</b>
-                      </h1>
-                      <div>
-                        <template>
-                          <v-data-table
-                            loading-text="Aun no existen jobs asociados a esta incidencia"
-                            :headers="errorHeaders"
-                            :items="errores"
-                            item-key="error"
+                      <v-data-table
+                        :headers="jobHeaders"
+                        :items="datosJob"
+                        class="font-sans"
+                        hide-default-footer
+                      >
+                        <template v-slot:[`item.actions`]="{ item }">
+                          <v-btn
+                            title="Editar Job"
+                            icon
+                            dark
+                            class="bg-blue-500 mr-1"
                           >
-                            <template v-slot:[`item.estado`]="{ item }">
-                              <v-chip :color="getColor(item.estado)" dark>
-                                {{ item.estado }}
-                              </v-chip>
-                            </template>
-                          </v-data-table>
+                            <v-icon small @click="editItem(item)">
+                              mdi-pencil
+                            </v-icon>
+                          </v-btn>
                         </template>
+
+                        <template v-slot:[`item.estado`]="{ item }">
+                          <v-chip :color="getColor(item.estado)" dark>
+                            {{ item.estado }}
+                          </v-chip>
+                        </template>
+                      </v-data-table>
+                    </v-card>
+
+                    <v-card>
+                      <v-card-title class="bg-blue-200"
+                        >ERRORES ASOCIADOS</v-card-title
+                      >
+                      <div>
+                        <v-data-table
+                          calculate-widths
+                          :headers="errorHeaders"
+                          :items="errores"
+                          item-key="error"
+                          hide-default-footer
+                        >
+                          <template v-slot:[`item.estado`]="{ item }">
+                            <v-chip :color="getColor(item.estado)" dark>
+                              {{ item.estado }}
+                            </v-chip>
+                          </template>
+                        </v-data-table>
                       </div>
-                    </div>
+                    </v-card>
                   </v-col>
 
                   <!-- LOG DEL JOB -->
                   <v-col cols="4">
-                    <v-card class="p-2">
-                      <h1 class="text-xl pb-3">LOG DEL JOB</h1>
+                    <v-card>
+                      <v-card-title class="bg-blue-200">LOG</v-card-title>
                       <template>
                         <v-container style="max-width: 600px;">
                           <v-timeline dense>
-                            <v-timeline-item class="mb-4" fill-dot color="green" small>
+                            <v-timeline-item
+                              class="mb-4"
+                              fill-dot
+                              color="green"
+                              small
+                            >
                               <v-card class="p-4">
                                 <v-row justify="space-between">
                                   <v-col cols="12">
@@ -106,10 +113,12 @@
                                       color="green"
                                       label
                                     >
-                                      Inserciones automáticas - 09:25 PM (10/02/2021)
+                                      Inserciones automáticas - 09:25 PM
+                                      (10/02/2021)
                                     </v-chip>
                                     <p class="my-3">
-                                      Incidencia insertada por proceso automático
+                                      Incidencia insertada por proceso
+                                      automático
                                     </p>
                                   </v-col>
                                 </v-row>
@@ -141,7 +150,12 @@
                               </v-card>
                             </v-timeline-item>
 
-                            <v-timeline-item class="mb-4" fill-dot color="green" small>
+                            <v-timeline-item
+                              class="mb-4"
+                              fill-dot
+                              color="green"
+                              small
+                            >
                               <v-card class="p-4">
                                 <v-row justify="space-between">
                                   <v-col cols="12">
@@ -153,15 +167,21 @@
                                       Job Generado - 11:45 PM (10/02/2021)
                                     </v-chip>
                                     <p class="my-3">
-                                      Job generado por el generador de jobs Raúl Ruiz
-                                      Torres y asignado a bandeja operadores
+                                      Job generado por el generador de jobs Raúl
+                                      Ruiz Torres y asignado a bandeja
+                                      operadores
                                     </p>
                                   </v-col>
                                 </v-row>
                               </v-card>
                             </v-timeline-item>
 
-                            <v-timeline-item class="mb-4" fill-dot color="red" small>
+                            <v-timeline-item
+                              class="mb-4"
+                              fill-dot
+                              color="red"
+                              small
+                            >
                               <v-card class="p-4">
                                 <v-row justify="space-between">
                                   <v-col cols="12">
@@ -170,12 +190,15 @@
                                       color="red"
                                       label
                                     >
-                                      Error de versionado - 11:55 PM (10/02/2021)
+                                      Error de versionado - 11:55 PM
+                                      (10/02/2021)
                                     </v-chip>
                                     <p class="my-3">
                                       No se ha podido crear la versión del Job
                                     </p>
-                                    <v-btn color="primary" small>Solucionar</v-btn>
+                                    <v-btn color="primary" small
+                                      >Solucionar</v-btn
+                                    >
                                   </v-col>
                                 </v-row>
                               </v-card>
@@ -197,42 +220,22 @@
             <v-card flat class="p-8" style="height:50rem;">
               <Map
                 v-if="mapIsActive == true"
-                modoMapa="visualizar"
+                modoMapa="editar"
                 :jobsRecibidos="job"
                 :erroresRecibidos="errores"
                 :reset="mapReset"
+                @jobs="storeJobs"
+                @errores="storeErrors"
               >
               </Map>
             </v-card>
           </v-tab-item>
           <!-- FIN LOCALIZACION EN EL MAPA -->
 
-          <!--LOG DE LA INCIDENCIA-->
-          <v-tab-item @click="activateMap(false)">
-            <v-card flat class="p-8">
-              <!-- desde aqui -->
-
-              
-
-              <!-- hasta aqui -->
-
-              <v-card-text>
-                <p>
-                  <!-- COMODIN -->
-                </p>
-              </v-card-text>
-            </v-card>
-          </v-tab-item>
-          <!--FIN LOG DE LA INCIDENCIA-->
-
           <!--DATOS ADJUNTOS-->
           <v-tab-item>
-            <v-card flat>
-              <v-card-text>
-                <p>
-                  <!-- COMODIN -->
-                </p>
-              </v-card-text>
+            <v-card flat class="p-8">
+              <v-spacer class="m-4"></v-spacer>
             </v-card>
           </v-tab-item>
           <!--FIN DATOS ADJUNTOS-->
@@ -245,13 +248,18 @@
 <script>
 import { getColor } from "@/assets/mixins/getColor.js";
 import axios from "axios";
-
 import Map from "@/components/common/Map";
 
 export default {
   props: ["job", "error", "center"],
 
-  name: "VerJob",
+  computed: {
+    returnJob() {
+      return this.job;
+    },
+  },
+
+  name: "EditarJob",
 
   components: {
     Map,
@@ -265,8 +273,8 @@ export default {
 
   watch: {
     job() {
-      //lanza de nuevo initialize cuando detecta que hemos cambiado de incidencia en el menu
-      //de lo contrario se genera un bug al cambiar de incidencia
+      /*lanza de nuevo initialize cuando detecta que hemos cambiado de incidencia en el menu
+      de lo contrario se genera un bug al cambiar de job*/
       if (this.job.job) {
         this.initialize();
       }
@@ -274,6 +282,39 @@ export default {
   },
 
   methods: {
+    dummy(item) {
+      console.log(item);
+    },
+
+    generarJob() {
+      //Lanzar aviso de generar job
+      axios
+        .put(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, {
+          nuevoEstado: "En bandeja",
+          idJob: this.job.job,
+        })
+        .then(() => {
+          //Cerramos ventana edicion
+          this.closeDialog();
+        })
+        .catch((data) => {
+          console.log(data);
+        });
+    },
+
+    datosJobToDataTable() {
+      this.datosJob = [this.job];
+    },
+
+    storeJobs(jobs) {
+      this.job = jobs;
+      console.log("recibido cambio job");
+    },
+
+    storeErrors(errores) {
+      this.errores = errores;
+    },
+
     activateMap(active) {
       this.mapIsActive = active;
     },
@@ -284,6 +325,7 @@ export default {
       this.mapReset = false;
       this.activeTab = 0;
       this.getErroresFromJob();
+      this.datosJobToDataTable();
     },
 
     getErroresFromJob() {
@@ -313,23 +355,10 @@ export default {
       this.mapReset = true;
     },
 
-    storePolygonGeom() {
-      //de momento solo puede almacenar 1 poligono
-      this.geometries = this.features[0].geometry.coordinates;
-      this.jobGeometry = [];
-      //formateo de geometrias desde openlayers a postgis
-      for (this.geometry in this.geometries) {
-        for (this.index in this.geometries[this.geometry]) {
-          this.coordinate = this.geometries[this.geometry][this.index];
-          this.coordinate = JSON.stringify(this.coordinate);
-          //borrar caracteres no deseados
-          this.coordinate = this.coordinate.replace("[", "");
-          this.coordinate = this.coordinate.replace("]", "");
-          this.coordinate = this.coordinate.replace(",", " ");
-          this.jobGeometry.push(this.coordinate);
-        }
-      }
-      this.jobGeometry = '"POLYGON((' + this.jobGeometry + '))"';
+    actualizaDatosBD() {
+      //1 .- Actualizar datos de job en BD
+      //2 .- Comprobar que no se ha insertado ningún error nuevo
+      //3 .- Actualizar datos de errores en BD
     },
   },
 
@@ -344,6 +373,18 @@ export default {
         { text: "Tipo", value: "tipo_error" },
         { text: "Descripcion", value: "descripcion" },
         { text: "Procedencia", value: "via_ent" },
+      ],
+
+      jobHeaders: [
+        { text: "Estado", value: "estado" },
+        { text: "Expediente", value: "expediente" },
+        { text: "Perfil", value: "arreglo_job" },
+        { text: "Detectado en", value: "deteccion_job" },
+        { text: "Gravedad", value: "gravedad_job" },
+        { text: "Asignado a", value: "asignacion_job" },
+        { text: "Operador", value: "nombre_operador" },
+        { text: "Descripción", value: "resumen" },
+        { text: "Acciones", value: "actions" },
       ],
 
       mapReset: false,

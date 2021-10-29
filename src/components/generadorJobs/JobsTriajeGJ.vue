@@ -32,8 +32,7 @@
           :search="search"
           class="font-sans"
           item-key="job"
-          show-select
-        >
+          show-select>
           <template v-slot:top>
             <!-- VENTANA EDICION INCIDENCIA -->
             <v-dialog
@@ -43,10 +42,10 @@
               transition="dialog-bottom-transition"
               class="h-full"
             >
-              <VerJob
+              <EditarJob
                 @dialog="dialogClose"
                 :job="editedItem"
-              ></VerJob>
+              ></EditarJob>
             </v-dialog>
             <!-- FIN VENTANA EDICION INCIDENCIA -->
 
@@ -75,12 +74,9 @@
           </template>
 
           <template v-slot:[`item.actions`]="{ item }">
-            <v-btn title="editar" icon dark class="bg-blue-500 mr-1"
-              ><v-icon small @click="dummy(item)"> mdi-pencil </v-icon></v-btn
-            >
-            <v-btn title="consultar" icon dark class="bg-green-500"
-              ><v-icon small @click="editItem(item)"> mdi-eye </v-icon></v-btn
-            >
+            <v-btn title="Editar Job" icon dark class="bg-blue-500 mr-1">
+              <v-icon small @click="editItem(item)"> mdi-pencil </v-icon>
+            </v-btn>
           </template>
 
           <template v-slot:no-data>
@@ -101,14 +97,14 @@
 <script>
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
-import VerJob from "@/components/common/VerJob";
+import EditarJob from '@/components/common/EditarJob.vue';
 
 
 export default {
   name: "JobsTriajeGJ",
   mixins: [getColor],
   components: {
-    VerJob,
+    EditarJob,
   },
 
   data: () => ({
@@ -176,6 +172,8 @@ export default {
     },
 
     initialize() {
+      //Reinicia los datos de los jobs
+      this.jobs = [];
       axios
         .get(`${process.env.VUE_APP_API_ROUTE}/jobs`)
         //se realiza el filtro para los jobs en triaje y la asignación del job_id
@@ -228,6 +226,7 @@ export default {
 
     dialogClose() {
       this.dialog = false;
+      this.initialize();
     },
 
     save() {
