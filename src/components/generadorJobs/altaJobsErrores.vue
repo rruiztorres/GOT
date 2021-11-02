@@ -23,7 +23,7 @@
                 <v-spacer></v-spacer>
                 <v-btn class="w-24 bg-red-500 mr-5" dark text @click="compruebaDatos">CANCELAR</v-btn>
                 <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="guardarDatos">GUARDAR DATOS</v-btn>
-                <v-btn class="w-24 bg-green-500 mr-5" dark text >GENERAR</v-btn>
+                <v-btn class="w-24 bg-green-500 mr-5" dark text @click="generacionJobsErrores()">GENERAR</v-btn>
         </v-toolbar>
 
             <template>
@@ -149,7 +149,6 @@
                         </div>
                     </div>
                 </v-overlay>
-
             </v-card>
         </template>
     </div>
@@ -161,18 +160,17 @@
     import Map from '@/components/common/Map';
     import axios from 'axios';
     import {getColor} from '@/assets/mixins/getColor.js';
-    //import Dashboard from '../../views/Dashboard.vue';
+    import {generarJob} from '@/assets/mixins/generarJob.js';
 
     export default {
         name: "altaJobsErrores",
 
         components: {
             Map,
-            //Dashboard,
         },
 
         mixins: [
-            getColor
+            getColor, generarJob
         ],
 
         watch:{
@@ -202,6 +200,18 @@
         },
 
         methods: {
+            generacionJobsErrores(){
+                this.resultado = this.generarJob(this.jobs);
+                if (this.resultado.procesadoOK == false) {
+                    this.showInfo(this.resultado.mensaje, "red");
+                    setTimeout(this.closeInfo,2000);
+                }
+                else if (this.resultado.procesadoOK == true){
+                    this.showInfo(this.resultado.mensaje, "green");
+                    setTimeout(this.closeInfo,2000);
+                }
+            },
+
             compruebaDatos(){
                 if (this.jobs.length != 0 && this.datosGuardados == false || this.errores.length != 0 && this.datosGuardados == false ){
                     this.openAlert();
@@ -254,7 +264,6 @@
                 .then(data => { console.log ("Jobs actualizados correctamente ", data)})
             },
 
-           
             // GUARDAR DATOS MAESTRO -definir algoritmo guardado-
             guardarDatos(){
                 this.showLoading = true;
@@ -270,10 +279,10 @@
                     if (data.status == 201) {
                         //Asignamos los id dados por la base de datos en la petición
                         for (this.index in this.jobs){
-                            this.jobs[this.index].idJob = data.data.jobs[this.index]
+                            this.jobs[this.index].job = data.data.jobs[this.index]
                         }
                         for (this.index in this.errores){
-                            this.errores[this.index].asocJob = data.data.errores[this.index].idJob;
+                            this.errores[this.index].asocJob = data.data.errores[this.index].job;
                             this.errores[this.index].idError = data.data.errores[this.index].idError;
                         }
                         this.datosGuardados = true;
@@ -300,7 +309,7 @@
 
                 jobHeaders : [
                     { text: 'Estado', value:'estado'},                
-                    { text: 'ID Job', value:'idJob'},
+                    { text: 'ID Job', value:'job'},
                     { text: 'Expediente', value: 'expediente'},
                     { text: 'Perfil', value:'perfil' },
                     { text: 'Detectado en', value: 'detectado' },

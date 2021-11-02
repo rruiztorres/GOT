@@ -7,6 +7,10 @@
         <div v-if="activarMenu == 'JobsTriajeGJ'"><JobsTriajeGJ></JobsTriajeGJ></div>
         <div v-if="activarMenu == 'AltaExpediente'"><AltaExpediente @closed="menuDefault"></AltaExpediente></div>
         <div v-if="activarMenu == 'EditarExpediente'"><EditarExpediente></EditarExpediente></div>
+
+        <!--Operador especializado-->
+        <div v-if="activarMenu == 'BandejaOpEsp'"><BandejaOpEsp></BandejaOpEsp></div>
+
     </div>
 </div>
 </template>
@@ -17,6 +21,7 @@ import JobsTriajeGJ from '@/components/generadorJobs/JobsTriajeGJ';
 import AltaJobsErrores from '@/components/generadorJobs/altaJobsErrores';
 import AltaExpediente from '@/components/generadorJobs/altaExpediente';
 import EditarExpediente from '@/components/generadorJobs/editarExpediente';
+import BandejaOpEsp from '@/components/operadorEsp/BandejaOpEsp';
 
 
 
@@ -28,6 +33,7 @@ export default {
         AltaJobsErrores,
         AltaExpediente,
         EditarExpediente,
+        BandejaOpEsp,
     },
 
     props: ['activarMenu'],

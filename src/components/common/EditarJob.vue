@@ -14,7 +14,7 @@
       <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="actualizaDatosBD"
         >GUARDAR DATOS</v-btn
       >
-      <v-btn class="w-24 bg-green-500 mr-5" dark text @click="generarJob"
+      <v-btn class="w-24 bg-green-500 mr-5" dark text @click="generarJobErrores()"
         >GENERAR</v-btn
       >
     </v-toolbar>
@@ -212,6 +212,21 @@
                 <br />
               </div>
             </v-card>
+
+            <!--MENSAJES DE INFORMACION-->
+            <v-overlay :value="showMessage">
+                <v-alert
+                class="mx-7"
+                :color="messageType"
+                dark
+                border="top"
+                icon="mdi-alert-circle-outline"
+                transition="scale-transition"
+                >
+                {{message}}
+                </v-alert>
+            </v-overlay>
+
           </v-tab-item>
           <!--FIN DATOS DEL JOB -->
 
@@ -247,10 +262,13 @@
 
 <script>
 import { getColor } from "@/assets/mixins/getColor.js";
+import { generarJob } from "@/assets/mixins/generarJob.js";
 import axios from "axios";
 import Map from "@/components/common/Map";
 
 export default {
+  mixins: [getColor, generarJob],
+
   props: ["job", "error", "center"],
 
   computed: {
@@ -265,7 +283,7 @@ export default {
     Map,
   },
 
-  mixins: [getColor],
+
 
   created() {
     this.initialize();
@@ -286,20 +304,25 @@ export default {
       console.log(item);
     },
 
-    generarJob() {
-      //Lanzar aviso de generar job
-      axios
-        .put(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, {
-          nuevoEstado: "En bandeja",
-          idJob: this.job.job,
-        })
-        .then(() => {
-          //Cerramos ventana edicion
-          this.closeDialog();
-        })
-        .catch((data) => {
-          console.log(data);
-        });
+    generarJobErrores(){
+      this.resultado = this.generarJob([this.job]);
+        if (this.resultado.procesadoOK == false) {
+            this.showInfo(this.resultado.mensaje, "red");
+            setTimeout(this.closeInfo,2000);
+        }
+        else if (this.resultado.procesadoOK == true){
+            this.showInfo(this.resultado.mensaje, "green");
+            setTimeout(this.closeInfo,2000);
+        }
+    },
+
+    showInfo(message, type){
+        this.showMessage = true;
+        this.message = message;
+        this.messageType = type;
+    },
+    closeInfo(){
+        this.showMessage = false;
     },
 
     datosJobToDataTable() {
@@ -390,6 +413,10 @@ export default {
       mapReset: false,
       mapIsActive: false,
       activeTab: 0,
+
+      showMessage: false,
+      messageType: '',                    //green para success, red para error, blue para info.
+      message: '',
     };
   },
 };

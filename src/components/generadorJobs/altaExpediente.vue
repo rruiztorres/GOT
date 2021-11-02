@@ -47,7 +47,7 @@
       </v-card>
     </template>
 
-    <!--MENSAJES ALERTA FLOTANTES --> 
+    <!--MENSAJES ALERTA FLOTANTES -->
     <template>
         <v-dialog v-model="mensajeFlotante.visibilidad" max-width="49rem">
             <v-alert
@@ -146,7 +146,7 @@ export default {
           })
         }
     },
-
+    
     lanzarMensaje(color, tipo, mensaje, aceptar){
         this.mensajeFlotante.visibilidad = true;
         this.mensajeFlotante.color = color;                 //colores: red, green, orange, yellow, purple
@@ -154,6 +154,7 @@ export default {
         this.mensajeFlotante.mensaje = mensaje;
         this.mensajeFlotante.aceptar = aceptar;             //Muestra el boton de "entendido"
     },
+
 
     cerrarMensajeInformacion(){
         this.mensajeFlotante.visibilidad = false;

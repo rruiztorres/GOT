@@ -527,7 +527,7 @@ import md5 from 'md5';
                         //Atributos
                         this.newAttrbJobBd = {
                             id: md5(this.jobsRecibidos.job),
-                            idJob: this.jobsRecibidos.idJOB,
+                            job: this.jobsRecibidos.idJOB,
                             expediente: this.jobsRecibidos.expediente,
                             estado: this.jobsRecibidos.estado,
                             jobGran: this.jobsRecibidos.jobGran,
