@@ -49,7 +49,7 @@
 
             <!-- ERRORES -->
             <vl-layer-vector 
-                :z-index="2">
+                :z-index="3">
                 <vl-source-vector :features.sync="errores" ident="errores"></vl-source-vector>
                 <vl-style-box>
                     <vl-style-circle :radius="7">
@@ -82,7 +82,7 @@
             :active="toolActive == 'modifyError'">
             </vl-interaction-modify>
 
-    <!-- ======================================================================== -->    
+    <!-- ================================ CAPAS WMTS ================================= -->    
 
             <vl-layer-tile 
             id="wmts" 
@@ -96,6 +96,40 @@
                 :style-name="activeMap.styleName">
                 </vl-source-wmts>
             </vl-layer-tile>
+
+
+    <!-- ========================== INFO JOBS ============================== -->
+
+            <vl-overlay v-if ="ventanaInfoJob == true" id="overlay" :position="[center[0]-2000, center[1]+2000]">
+                <template>
+                    <div class="overlay-content bg-white p-4 shadow shadow-l">
+                        <table class="bg-gray-100">
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>JOB:</b></td>
+                                <td class="p-2">{{jobMostrarInfo.job}}</td>
+                            </tr>
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>DESCRIPCIÓN:</b></td>
+                                <td class="p-2">{{jobMostrarInfo.descripcion}}</td>
+                            </tr>
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>DETECTADO:</b></td>
+                                <td class="p-2">{{jobMostrarInfo.detectado}}</td>
+                            </tr>
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>GRAVEDAD:</b></td>
+                                <td class="p-2">{{jobMostrarInfo.gravedad}}</td>
+                            </tr>
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>PERFIL:</b></td>
+                                <td class="p-2">{{jobMostrarInfo.perfil}}</td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <v-btn color="error" elevation="3" @click="ventanaInfoJob = !ventanaInfoJob">CERRAR</v-btn>
+                    </div>
+                </template>
+            </vl-overlay>
 
         </vl-map>
 
@@ -407,7 +441,7 @@
             </v-dialog>
         </template>
 
-        <!--MENSAJES ALERTA FLOTANTES --> 
+        <!--MENSAJES ALERTA FLOTANTES -->
         <template>
             <v-dialog v-model="mensajeFlotante.visibilidad" max-width="49rem">
                 <v-alert
@@ -425,7 +459,6 @@
                     </v-col>
                 </v-row>
                 </v-alert>
-                
             </v-dialog>
         </template>
 
@@ -444,6 +477,7 @@
             </v-alert>
         </template>
 
+
     </div>
 </template>
 
@@ -453,6 +487,7 @@ import {makeArrayFromApi} from '@/assets/mixins/makeArrayFromApi.js';
 import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
 import {getMapExtent} from '@/assets/mixins/getMapExtent';
 import md5 from 'md5';
+
 
     export default {
         props: ["modoMapa", "jobsRecibidos", "erroresRecibidos", "reset"],
@@ -511,6 +546,28 @@ import md5 from 'md5';
                 //
             },
 
+            mostrarInfoError(){
+                console.log(this.selectedErrores)
+            },
+
+            mostrarInfoJob(){
+                for (this.index in this.selectedJobs) {
+                    for (this.indexattrb in this.jobsAttrb){
+                        if (this.jobsAttrb[this.indexattrb].id == this.selectedJobs[this.index].id){
+                            this.jobSeleccionado = this.jobsAttrb[this.indexattrb];
+
+                            this.jobMostrarInfo = {
+                                job: this.jobSeleccionado.job,
+                                descripcion: this.jobSeleccionado.descripcion,
+                                detectado: this.jobSeleccionado.detectado,
+                                gravedad: this.jobSeleccionado.gravedad,
+                                perfil: this.jobSeleccionado.perfil,
+                            }
+                        }
+                    }
+                }
+                this.ventanaInfoJob = true;
+            },
             
             retrieveJobFromBD(){
                 if (this.modoMapa == 'visualizar' || this.modoMapa == 'editar') {
@@ -527,21 +584,21 @@ import md5 from 'md5';
                         //Atributos
                         this.newAttrbJobBd = {
                             id: md5(this.jobsRecibidos.job),
-                            job: this.jobsRecibidos.idJOB,
+                            job: this.jobsRecibidos.job,
                             expediente: this.jobsRecibidos.expediente,
                             estado: this.jobsRecibidos.estado,
-                            jobGran: this.jobsRecibidos.jobGran,
-                            detectado: this.jobsRecibidos.detectado,
+                            jobGran: this.jobsRecibidos.job_grande,
+                            detectado: this.jobsRecibidos.deteccion_job,
                             descripcion: this.jobsRecibidos.descripcion,
-                            perfil: this.jobsRecibidos.perfil,
-                            gravedad: this.jobsRecibidos.gravedad,
-                            asignar: this.jobsRecibidos.asignar,
-                            tipoBandeja: this.jobsRecibidos.tipoBandeja,
-                            operador: this.jobsRecibidos.operador,
+                            perfil: this.jobsRecibidos.arreglo_job,
+                            gravedad: this.jobsRecibidos.gravedad_job,
+                            asignar: this.jobsRecibidos.asignacion_job,
+                            tipoBandeja: this.jobsRecibidos.tipo_bandeja,
+                            operador: this.jobsRecibidos.nombre_operador,
                             geometria: this.jobsRecibidos.geometria,
                             geometriaJSON: this.jobsRecibidos.geometria_json,
-                            epsg: this.jobsRecibidos.epsg,
-                        }
+                        };
+                        this.jobsAttrb.push(this.newAttrbJobBd);
 
                         //getExtent
                         this.datosExtent = this.getMapExtent(this.jobsRecibidos.geometria_json)
@@ -627,6 +684,15 @@ import md5 from 'md5';
                 this.toolActive = this.errorPanel[1].active;
                 this.drawType = null;
                 this.mostrarAyudaHerramienta('Haga clic sobre un error para seleccionarlo. El color azul indica que el error ha sido seleccionado')
+                setTimeout(this.cerrarAyudaHerramienta, 3000);
+            },
+
+            activeInfoError(){
+                this.desactivarSelectTool('Jobs');
+                this.toolActive = this.errorPanel[2].active;
+                this.drawType = null;
+                this.mostrarInfoError();
+                this.mostrarAyudaHerramienta('Muestra información de un error seleccionado')
                 setTimeout(this.cerrarAyudaHerramienta, 3000);
             },
 
@@ -821,6 +887,15 @@ import md5 from 'md5';
                 setTimeout(this.cerrarAyudaHerramienta, 3000);
             },
 
+            activeInfoJob(){
+                this.desactivarSelectTool('Errores');
+                this.toolActive = this.jobsPanel[2].active;
+                this.drawType = null;
+                this.mostrarInfoJob();
+                this.mostrarAyudaHerramienta('Muestra información del job seleccionado')
+                setTimeout(this.cerrarAyudaHerramienta, 3000);
+            },
+
             activeModifyJobs(){
                 this.desactivarSelectTool('Errores');
                 this.toolActive =this.jobsPanel[3].active;
@@ -921,7 +996,7 @@ import md5 from 'md5';
                 },
                 {   title: "Información del Job", 
                     active: "getJobInfo", 
-                    click: this.dummy, 
+                    click: this.activeInfoJob, 
                     icon: "mdi-information",
                     modo: "visualizar" 
                 },
@@ -953,7 +1028,7 @@ import md5 from 'md5';
                 },
                 {   title: "Información del Error",
                     active: "getErrorInfo", 
-                    click: this.dummy, 
+                    click: this.activeInfoError, 
                     icon: "mdi-information",
                     modo: "visualizar"
                 },
@@ -1014,6 +1089,9 @@ import md5 from 'md5';
             ayudaHerramienta: {
                 mensaje: 'introduzca texto'
             },
+
+            //VENTANA INFORMACION JOB
+            ventanaInfoJob: false,
 
             };
         }

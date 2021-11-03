@@ -30,6 +30,7 @@
           :headers="headers"
           :items="jobs"
           :search="search"
+          group-by="expediente"
           class="font-sans"
           item-key="job"
           show-select>

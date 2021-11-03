@@ -262,12 +262,12 @@
 
 <script>
 import { getColor } from "@/assets/mixins/getColor.js";
-import { generarJob } from "@/assets/mixins/generarJob.js";
+import { generarJobError } from "@/assets/mixins/generarJobError.js";
 import axios from "axios";
 import Map from "@/components/common/Map";
 
 export default {
-  mixins: [getColor, generarJob],
+  mixins: [getColor, generarJobError],
 
   props: ["job", "error", "center"],
 

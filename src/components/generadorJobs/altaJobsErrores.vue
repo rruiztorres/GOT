@@ -160,7 +160,7 @@
     import Map from '@/components/common/Map';
     import axios from 'axios';
     import {getColor} from '@/assets/mixins/getColor.js';
-    import {generarJob} from '@/assets/mixins/generarJob.js';
+    import {generarJobError} from '@/assets/mixins/generarJobError.js';
 
     export default {
         name: "altaJobsErrores",
@@ -170,7 +170,7 @@
         },
 
         mixins: [
-            getColor, generarJob
+            getColor, generarJobError
         ],
 
         watch:{
@@ -201,7 +201,7 @@
 
         methods: {
             generacionJobsErrores(){
-                this.resultado = this.generarJob(this.jobs);
+                this.resultado = this.generarJobError(this.jobs, this.errores);
                 if (this.resultado.procesadoOK == false) {
                     this.showInfo(this.resultado.mensaje, "red");
                     setTimeout(this.closeInfo,2000);
