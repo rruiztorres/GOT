@@ -10,6 +10,10 @@
 
         <!--Operador especializado-->
         <div v-if="activarMenu == 'BandejaOpEsp'"><BandejaOpEsp></BandejaOpEsp></div>
+        <!--Comun a ambos -->
+        <div v-if="activarMenu == 'BandejaMisJobs'"><BandejaMisJobs></BandejaMisJobs></div>
+        <!--Operador-->
+        <div v-if="activarMenu == 'BandejaOp'"><BandejaOp></BandejaOp></div>
 
     </div>
 </div>
@@ -22,6 +26,8 @@ import AltaJobsErrores from '@/components/generadorJobs/altaJobsErrores';
 import AltaExpediente from '@/components/generadorJobs/altaExpediente';
 import EditarExpediente from '@/components/generadorJobs/editarExpediente';
 import BandejaOpEsp from '@/components/operadorEsp/BandejaOpEsp';
+import BandejaOp from '@/components/common/BandejaOp';
+import BandejaMisJobs from '@/components/common/BandejaMisJobs';
 
 
 
@@ -34,6 +40,8 @@ export default {
         AltaExpediente,
         EditarExpediente,
         BandejaOpEsp,
+        BandejaOp,
+        BandejaMisJobs,
     },
 
     props: ['activarMenu'],
@@ -41,7 +49,7 @@ export default {
     methods:{
         menuDefault(data){
             this.$emit('cambiomenu', data);
-        }
+        },
     },
 }
 </script>

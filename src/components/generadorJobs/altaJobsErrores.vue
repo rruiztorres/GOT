@@ -209,6 +209,8 @@
                 else if (this.resultado.procesadoOK == true){
                     this.showInfo(this.resultado.mensaje, "green");
                     setTimeout(this.closeInfo,2000);
+                    //Cierre automático tras generar jobs y errores
+                    setTimeout(this.closeDialog, 2200);
                 }
             },
 

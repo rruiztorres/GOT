@@ -165,6 +165,10 @@ import {roles} from '@/assets/mixins/roles.js';
       mini: {
         type: Boolean,
         default: false,
+      },
+
+      jobsBdjaOpEsp: {
+        default: 0,
       }
     },
 

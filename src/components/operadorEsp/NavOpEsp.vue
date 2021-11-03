@@ -16,16 +16,7 @@
       >
         <v-list-item-icon>
           <v-icon color="#1E40AF" class="mr-3">{{ opcionJob.icon }}</v-icon>
-          <!-- Muestra badge con numero en caso de que jobs sean >0 -->
-          <div v-if="opcionJob.number > 0">
-            <v-badge inline color="red" :content="opcionJob.number">
-              <v-list-item-title class="text-xs text-black">{{
-                opcionJob.name
-              }}</v-list-item-title>
-            </v-badge>
-          </div>
           <v-list-item-title
-            v-if="opcionJob.number < 0"
             class="text-xs text-black"
             >{{ opcionJob.name }}</v-list-item-title
           >
@@ -91,6 +82,9 @@ export default {
       type: Boolean,
       default: false,
     },
+    numJobsBdjaOpEsp: {
+      default: 0,
+    }
   },
   methods: {
     activar(datos) {
@@ -110,14 +104,9 @@ export default {
   data() {
     return {
       gestJobs: [
-        { name: "Mis Jobs", icon: "mdi-briefcase-account", number: -1 },
-        {
-          name: "Bandeja Operador Esp.",
-          icon: "mdi-inbox-multiple",
-          active: "BandejaOpEsp",
-          number: 2,
-        },
-        { name: "Bandeja Operador", icon: "mdi-inbox", number: 780 },
+        { name: "Mis Jobs", icon: "mdi-briefcase-account", active: "BandejaMisJobs"},
+        { name: "Bandeja Operador Esp.", icon: "mdi-inbox-multiple", active: "BandejaOpEsp"},
+        { name: "Bandeja Operador", icon: "mdi-inbox", number: 780, active: "BandejaOp" },
       ],
       idvs: [
         { name: "Generar IDV", icon: "mdi-briefcase-account" },

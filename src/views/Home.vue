@@ -120,6 +120,7 @@
                   <div class="rounded-t mb-0 px-6 py-6">
                     <div class="text-center mb-3">
                       <h1 class="text-gray-500 text-3xl">GOT</h1>
+                      <h2 class="text-gray-500 text-sm">Gestor de órdenes de trabajo entorno BDIG</h2>
                     </div>
                     <div class="btn-wrapper text-center">
                       <!--logo-->

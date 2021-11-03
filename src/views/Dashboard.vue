@@ -2,7 +2,11 @@
     <v-app class="font-sans subpixel-antialiased">
         <div class="h-screen font-sans text-left text-sm">
             <div class="w-full h-screen bg-blue-50" >
-                <Navigation @cambiomenu="cambiarMenu" :mini="newMini" class="float-left"></Navigation>
+                <Navigation 
+                    @cambiomenu="cambiarMenu" 
+                    :mini="newMini"
+                    class="float-left">
+                </Navigation>
                
                 <div>
                     <div class="h-20 bg-blue-800 text-white shadow-xl p-5">
@@ -16,7 +20,12 @@
                     </div>
                 </div>
                 
-                <v-main><Loader class="" @cambiomenu="cambiarMenu" :activarMenu="newMenu" :userRole="userRole"></Loader></v-main>
+                <v-main>
+                    <Loader
+                        @cambiomenu="cambiarMenu" 
+                        :activarMenu="newMenu" 
+                        :userRole="userRole">
+                    </Loader></v-main>
             </div>
         </div>
     </v-app>
@@ -45,6 +54,7 @@ import {roles} from '@/assets/mixins/roles.js';
         },
 
         methods: {
+
             //asigna el panel que debe activarse de acuerdo al array "roles" recibido como mixin property.
             initialize(){
                 this.rolDefault = localStorage.rol;
@@ -73,8 +83,10 @@ import {roles} from '@/assets/mixins/roles.js';
                 userRole,
                 newMenu,
                 newMini,
+                numJobOpEsp: 0,
             }
         },
+        
        
         
     }

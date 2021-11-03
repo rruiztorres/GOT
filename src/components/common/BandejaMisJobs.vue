@@ -2,7 +2,7 @@
   <div>
     <v-app class="font-sans shadow-md rounded px-8 mr-8">
       <h1 class="text-xl font-bold py-4 mt-2">
-        Bandeja de Jobs (Operadores Especializados)
+        Mis Jobs
       </h1>
 
       <div class="overflow-y-auto">
@@ -182,9 +182,8 @@ export default {
           this.jobsBruto = data.data.response;
           for (this.elemento in this.jobsBruto) {
             //filtramos jobs, en bandeja, operadores especializados sin operador asignado
-            if (  this.jobsBruto[this.elemento].estado == "En bandeja" 
-                  && this.jobsBruto[this.elemento].tipo_bandeja == 'Operadores Especializados'
-                  && this.jobsBruto[this.elemento].nombre_operador == null) {
+            if (  this.jobsBruto[this.elemento].estado == "En bandeja_op" 
+                  && this.jobsBruto[this.elemento].nombre_operador == localStorage.usuario) {
               this.jobs.push(this.jobsBruto[this.elemento]);
             } 
           }

@@ -24,14 +24,23 @@ export const generarJob = {
                         };
                         return enviarDatos;
                     } else {
-                        //Actualizar estado en BD
-                        let actualizar = {
-                            nuevoEstado: 'En bandeja',
-                            operador: jobs[index].operador,
-                            job: jobs[index].job
-                        };
+                        if (jobs[index].operador.length == 0){
+                            //No tiene operador asignado
+                            this.actualizar = {
+                                nuevoEstado: 'En bandeja',
+                                operador: null, 
+                                job: jobs[index].job
+                            };
+                        } else {
+                            //Si tiene operador asignado = asignacion directa a su bandeja
+                            this.actualizar = {
+                                nuevoEstado: 'En bandeja_op',
+                                operador: jobs[index].operador,
+                                job: jobs[index].job
+                            };
+                        }
                         axios
-                        .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, actualizar)
+                        .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, this.actualizar)
                         .then(() => {
                             //No existen errores, no lanzar alerta
                         })

@@ -313,6 +313,7 @@ export default {
         else if (this.resultado.procesadoOK == true){
             this.showInfo(this.resultado.mensaje, "green");
             setTimeout(this.closeInfo,2000);
+            setTimeout(this.closeDialog, 2200);
         }
     },
 
