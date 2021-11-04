@@ -130,6 +130,47 @@
                     </div>
                 </template>
             </vl-overlay>
+    
+    <!-- ========================== INFO ERRORES ============================== -->
+
+            <vl-overlay v-if ="ventanaInfoError == true" id="overlay" :position="[center[0]-2000, center[1]+2000]">
+                <template>
+                    <div class="overlay-content bg-white p-4 shadow shadow-l">
+                        <table class="bg-gray-100">
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>id Error</b></td>
+                                <td class="p-2">{{errorMostrarInfo.idError}}</td>
+                            </tr>
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>Descripción</b></td>
+                                <td class="p-2">{{errorMostrarInfo.descripcion}}</td>
+                            </tr>
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>Tema</b></td>
+                                <td class="p-2">{{errorMostrarInfo.tema}}</td>
+                            </tr>
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>Tipo</b></td>
+                                <td class="p-2">{{errorMostrarInfo.tipo}}</td>
+                            </tr>
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>Via de Entrada</b></td>
+                                <td class="p-2">{{errorMostrarInfo.viaEnt}}</td>
+                            </tr>
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>Estado</b></td>
+                                <td class="p-2">{{errorMostrarInfo.estado}}</td>
+                            </tr>
+                            <tr class="border border-gray">
+                                <td class="p-2"><b>Asoc. a Job</b></td>
+                                <td class="p-2">{{errorMostrarInfo.asocJob}}</td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <v-btn color="error" elevation="3" @click="ventanaInfoError = !ventanaInfoError">CERRAR</v-btn>
+                    </div>
+                </template>
+            </vl-overlay>
 
         </vl-map>
 
@@ -547,26 +588,60 @@ import md5 from 'md5';
             },
 
             mostrarInfoError(){
-                console.log(this.selectedErrores)
+                if (this.selectedErrores.length == 0){
+                    this.lanzarMensaje("orange", "info", "Debe seleccionar un error", true)
+                } else {
+                    if (this.selectedErrores.length == 1) {
+                        for (this.index in this.selectedErrores) {
+                            for (this.indexattrb in this.erroresAttrb){
+                                if (this.erroresAttrb[this.indexattrb].id == this.selectedErrores[this.index].id){
+                                    this.errorSeleccionado = this.erroresAttrb[this.indexattrb];
+                                    this.errorMostrarInfo = {
+                                        idError: this.errorSeleccionado.idError,
+                                        descripcion: this.errorSeleccionado.descripcion,
+                                        tema: this.errorSeleccionado.tema,
+                                        tipo: this.errorSeleccionado.tipo,
+                                        viaEnt: this.errorSeleccionado.viaEnt,
+                                        estado: this.errorSeleccionado.estado,
+                                        asocJob: this.errorSeleccionado.asocJob,
+                                    }
+                                }
+                            }
+                        }
+                        this.selectedErrores = [];
+                        this.ventanaInfoError = true;
+                    } else {
+                        this.lanzarMensaje("orange", "info", "Solo es posible mostrar la información de un error cada vez", true)
+                    }
+                }
             },
 
             mostrarInfoJob(){
-                for (this.index in this.selectedJobs) {
-                    for (this.indexattrb in this.jobsAttrb){
-                        if (this.jobsAttrb[this.indexattrb].id == this.selectedJobs[this.index].id){
-                            this.jobSeleccionado = this.jobsAttrb[this.indexattrb];
+                if (this.selectedJobs.length == 0){
+                    this.lanzarMensaje("orange", "info", "Debe seleccionar un job", true)
+                } else {
+                    if (this.selectedJobs.length == 1) {
+                        for (this.index in this.selectedJobs) {
+                            for (this.indexattrb in this.jobsAttrb){
+                                if (this.jobsAttrb[this.indexattrb].id == this.selectedJobs[this.index].id){
+                                    this.jobSeleccionado = this.jobsAttrb[this.indexattrb];
 
-                            this.jobMostrarInfo = {
-                                job: this.jobSeleccionado.job,
-                                descripcion: this.jobSeleccionado.descripcion,
-                                detectado: this.jobSeleccionado.detectado,
-                                gravedad: this.jobSeleccionado.gravedad,
-                                perfil: this.jobSeleccionado.perfil,
+                                    this.jobMostrarInfo = {
+                                        job: this.jobSeleccionado.job,
+                                        descripcion: this.jobSeleccionado.descripcion,
+                                        detectado: this.jobSeleccionado.detectado,
+                                        gravedad: this.jobSeleccionado.gravedad,
+                                        perfil: this.jobSeleccionado.perfil,
+                                    }
+                                }
                             }
                         }
+                        this.selectedJobs = [];
+                        this.ventanaInfoJob = true;
+                    } else {
+                        this.lanzarMensaje("orange", "info", "Solo es posible mostrar la información de un job cada vez", true)
                     }
                 }
-                this.ventanaInfoJob = true;
             },
             
             retrieveJobFromBD(){
@@ -610,15 +685,30 @@ import md5 from 'md5';
 
             //Solo modo visualizar
             retrieveErroresFromBD(){
+                console.log(this.erroresRecibidos)
                 if (this.modoMapa == 'visualizar' || this.modoMapa == 'editar'){
                     //Solo ejecutamos si recibimos errores desde el componente padre
                     if (this.erroresRecibidos){
                         for (this.index in this.erroresRecibidos){
                             this.newError = {
+                                id: md5(this.erroresRecibidos[this.index].id_error),
                                 geometry: this.erroresRecibidos[this.index].geometria_json,
                                 type: "Feature"
                             }
                             this.errores.push(this.newError);
+
+                            //Atributos
+                            this.newAttrbErrorBd = {
+                                id: md5(this.erroresRecibidos[this.index].id_error),
+                                idError: this.erroresRecibidos[this.index].error,
+                                descripcion: this.erroresRecibidos[this.index].descripcion,
+                                asocJob: this.erroresRecibidos[this.index].job,
+                                tema: this.erroresRecibidos[this.index].tema_error,
+                                tipo: this.erroresRecibidos[this.index].tipo_error,
+                                viaEnt: this.erroresRecibidos[this.index].via_ent,
+                                estado: this.erroresRecibidos[this.index].estado,
+                            };
+                            this.erroresAttrb.push(this.newAttrbErrorBd);
                         }
                     }
                 }
@@ -1090,8 +1180,9 @@ import md5 from 'md5';
                 mensaje: 'introduzca texto'
             },
 
-            //VENTANA INFORMACION JOB
+            //VENTANA INFORMACION 
             ventanaInfoJob: false,
+            ventanaInfoError: false,
 
             };
         }

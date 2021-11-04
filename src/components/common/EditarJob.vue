@@ -14,7 +14,11 @@
       <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="actualizaDatosBD"
         >GUARDAR DATOS</v-btn
       >
-      <v-btn class="w-24 bg-green-500 mr-5" dark text @click="generarJobErrores()"
+      <v-btn
+        class="w-24 bg-green-500 mr-5"
+        dark
+        text
+        @click="generarJobErrores()"
         >GENERAR</v-btn
       >
     </v-toolbar>
@@ -215,20 +219,29 @@
 
             <!--MENSAJES DE INFORMACION-->
             <v-overlay :value="showMessage">
-                <v-alert
+              <v-alert
                 class="mx-7"
                 :color="messageType"
                 dark
                 border="top"
                 icon="mdi-alert-circle-outline"
                 transition="scale-transition"
-                >
-                {{message}}
-                </v-alert>
+              >
+                {{ message }}
+              </v-alert>
             </v-overlay>
 
+            <!--VENTANA EDICIÓN ATRIBUTOS JOB-->
+            <v-overlay :value="showEditJob">
+              <FormularioDatosJob
+                :job="jobEditar"
+                @closeEditJob="closeEditJob"
+                @editedJob="actualizarJobEditado"
+              >
+              </FormularioDatosJob>
+            </v-overlay>
           </v-tab-item>
-          <!--FIN DATOS DEL JOB -->
+
 
           <!--LOCALIZACIÓN EN EL MAPA-->
           <v-tab-item>
@@ -265,6 +278,7 @@ import { getColor } from "@/assets/mixins/getColor.js";
 import { generarJobError } from "@/assets/mixins/generarJobError.js";
 import axios from "axios";
 import Map from "@/components/common/Map";
+import FormularioDatosJob from "@/components/common/FormularioDatosJob";
 
 export default {
   mixins: [getColor, generarJobError],
@@ -281,9 +295,8 @@ export default {
 
   components: {
     Map,
+    FormularioDatosJob,
   },
-
-
 
   created() {
     this.initialize();
@@ -304,26 +317,50 @@ export default {
       console.log(item);
     },
 
-    generarJobErrores(){
-      this.resultado = this.generarJob([this.job]);
-        if (this.resultado.procesadoOK == false) {
-            this.showInfo(this.resultado.mensaje, "red");
-            setTimeout(this.closeInfo,2000);
-        }
-        else if (this.resultado.procesadoOK == true){
-            this.showInfo(this.resultado.mensaje, "green");
-            setTimeout(this.closeInfo,2000);
-            setTimeout(this.closeDialog, 2200);
-        }
+    editItem(item) {
+      this.showEditJob = true;
+      this.jobEditar = item;
     },
 
-    showInfo(message, type){
-        this.showMessage = true;
-        this.message = message;
-        this.messageType = type;
+    closeEditJob(data){
+      this.showEditJob = data;
     },
-    closeInfo(){
-        this.showMessage = false;
+
+    actualizarJobEditado(data){
+      this.job.expediente = data.expediente;
+      this.job.arreglo_job = data.arreglo_job;
+      this.job.perfil = data.perfil;
+      this.job.deteccion_job = data.deteccion_job;
+      this.job.gravedad_job = data.gravedad_job;
+      this.job.asignacion_job = data.asignacion_job;
+      this.job.nombre_operador = data.nombre_operador;
+      this.job.descripcion = data.descripcion;
+      this.job.resumen = data.descripcion.substr(0,30) + "...";
+
+      this.showInfo("Los datos del Job se han actualizado correctamente", "green");
+      setTimeout(this.closeInfo,2000);
+    },
+
+    generarJobErrores() {
+      this.resultado = this.generarJob([this.job]);
+      if (this.resultado.procesadoOK == false) {
+        this.showInfo(this.resultado.mensaje, "red");
+        setTimeout(this.closeInfo, 2000);
+      } else if (this.resultado.procesadoOK == true) {
+        this.showInfo(this.resultado.mensaje, "green");
+        setTimeout(this.closeInfo, 2000);
+        setTimeout(this.closeDialog, 2200);
+      }
+    },
+
+    showInfo(message, type) {
+      this.showMessage = true;
+      this.message = message;
+      this.messageType = type;
+    },
+
+    closeInfo() {
+      this.showMessage = false;
     },
 
     datosJobToDataTable() {
@@ -416,8 +453,11 @@ export default {
       activeTab: 0,
 
       showMessage: false,
-      messageType: '',                    //green para success, red para error, blue para info.
-      message: '',
+      messageType: "", //green para success, red para error, blue para info.
+      message: "",
+
+      showEditJob: false,
+      jobEditar: null,
     };
   },
 };
