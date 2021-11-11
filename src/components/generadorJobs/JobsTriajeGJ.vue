@@ -44,6 +44,7 @@
               class="h-full"
             >
               <EditarJob
+                @datosActualizados="actualizarDatos"
                 @dialog="dialogClose"
                 :job="editedItem"
               ></EditarJob>
@@ -98,7 +99,7 @@
 <script>
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
-import EditarJob from '@/components/common/EditarJob.vue';
+import EditarJob from '@/components/generadorJobs/EditarJob.vue';
 
 
 export default {
@@ -170,6 +171,12 @@ export default {
   methods: {
     dummy() {
       //
+    },
+
+    actualizarDatos(data){
+      if (data == true) {
+        this.initialize();
+      }
     },
 
     initialize() {

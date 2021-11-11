@@ -269,7 +269,6 @@
             // GUARDAR DATOS MAESTRO -definir algoritmo guardado-
             guardarDatos(){
                 this.showLoading = true;
-
                 this.jobsErrores = {
                     jobs: this.jobs,
                     errores: this.errores

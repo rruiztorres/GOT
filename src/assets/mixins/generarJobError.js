@@ -8,6 +8,7 @@ import axios from "axios";
 export const generarJobError = {
     methods: {
         generarJobError(jobs, errores) {
+            console.log(jobs.length)
             if (jobs.length == 0) {
                 //No existen jobs, lanzar alerta
                 const enviarDatos = {

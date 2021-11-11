@@ -266,13 +266,15 @@
 </template>
 
 <script>
-import { getColor } from "@/assets/mixins/getColor.js";
-import { generarJobError } from "@/assets/mixins/generarJobError.js";
+import { getColor } from '@/assets/mixins/getColor';
+import { generarJobError } from '@/assets/mixins/generarJobError';
+import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry';
+
 import axios from "axios";
 import Map from "@/components/common/Map";
 
 export default {
-  mixins: [getColor, generarJobError],
+  mixins: [getColor, generarJobError, stringifyJobGeometry],
 
   props: ["job", "error", "center"],
 
@@ -342,13 +344,15 @@ export default {
       this.editandoJob.nombre_operador = job.operador;
       this.editandoJob.descripcion = job.descripcion;
       this.editandoJob.geometria_json = job.geometriaJSON;
+      this.editandoJob.geometria = this.stringifyJobGeometry(job.geometriaJSON);
       this.editandoJob.resumen = job.descripcion.substr(0,30) + "...";
 
       this.edicionSinGuardar = true;
     },
 
     generarJobErrores() {
-      this.resultado = this.generarJob([this.job]);
+      console.log(this.editandoJob)
+      this.resultado = this.generarJobError([this.editandoJob],[]);
       if (this.resultado.procesadoOK == false) {
         this.showInfo(this.resultado.mensaje, "red");
         setTimeout(this.closeInfo, 2000);
@@ -425,6 +429,22 @@ export default {
 
     actualizaDatosBD() {
       //1 .- Actualizar datos de job en BD
+      
+      if (this.edicionSinGuardar == true) {
+        axios
+        .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, this.editandoJob)
+          .then((data) => {
+              this.edicionSinGuardar = false;
+              this.$emit("datosActualizados", true);
+
+              this.showInfo(data.data.mensaje, "green");
+              setTimeout(this.closeInfo, 2000);
+          })
+          .catch((data) => {
+            console.log(data);
+          });
+        
+      }
       //2 .- Comprobar que no se ha insertado ningún error nuevo
       //3 .- Actualizar datos de errores en BD
     },
