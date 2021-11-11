@@ -169,18 +169,17 @@ export default {
     },
 
     guardarDatosJob(){
-      this.editedJob = {
-        descripcion: this.descJob,
-        job_grande: this.jobGrande,
-        expediente: this.expedienteJob,
-        deteccion_job: this.deteccionJob,
-        arreglo_job: this.perfilJob,
-        gravedad_job: this.job.gravedad_job,
-        asignacion_job: this.job.asignacion_job,
-        tipo_bandeja: this.tipoBandejaJob,
-        nombre_operador: this.nombreOperadorJob,
-      };
+      this.job.asignar = this.asignacionJob;
+      this.job.descripcion = this.descJob;
+      this.job.detectado = this.deteccionJob;
+      this.job.expediente = this.expedienteJob;
+      this.job.gravedad = this.gravedadJob;
+      this.job.jobGran = this.jobGrande;
+      this.job.operador = this.nombreOperadorJob;
+      this.job.perfil = this.perfilJob;
+      this.job.tipoBandeja = this.tipoBandejaJob;
 
+      //Emitir cambios y cerrar
       this.$emit("editedJob", this.editedJob);
       this.closeEditJob();
     },
@@ -199,14 +198,14 @@ export default {
 
             //Valores preasignados del job a editar
             this.descJob = this.job.descripcion;
-            this.jobGrande = this.job.job_grande;
+            this.jobGrande = this.job.jobGran;
             this.expedienteJob = this.job.expediente;
-            this.deteccionJob = this.job.deteccion_job;
-            this.perfilJob = this.job.arreglo_job;
-            this.gravedadJob = this.job.gravedad_job;
-            this.asignacionJob = this.job.asignacion_job;
-            this.tipoBandejaJob = this.job.tipo_bandeja;
-            this.nombreOperadorJob = this.job.nombre_operador;
+            this.deteccionJob = this.job.detectado;
+            this.perfilJob = this.job.perfil;
+            this.gravedadJob = this.job.gravedad;
+            this.asignacionJob = this.job.asignar;
+            this.tipoBandejaJob = this.job.tipoBandeja;
+            this.nombreOperadorJob = this.job.operador;
             })
     },
   },

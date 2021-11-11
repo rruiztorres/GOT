@@ -96,82 +96,6 @@
                 :style-name="activeMap.styleName">
                 </vl-source-wmts>
             </vl-layer-tile>
-
-
-    <!-- ========================== INFO JOBS ============================== -->
-
-            <vl-overlay v-if ="ventanaInfoJob == true" id="overlay" :position="[center[0]-2000, center[1]+2000]">
-                <template>
-                    <div class="overlay-content bg-white p-4 shadow shadow-l">
-                        <table class="bg-gray-100">
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>JOB:</b></td>
-                                <td class="p-2">{{jobMostrarInfo.job}}</td>
-                            </tr>
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>DESCRIPCIÓN:</b></td>
-                                <td class="p-2">{{jobMostrarInfo.descripcion}}</td>
-                            </tr>
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>DETECTADO:</b></td>
-                                <td class="p-2">{{jobMostrarInfo.detectado}}</td>
-                            </tr>
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>GRAVEDAD:</b></td>
-                                <td class="p-2">{{jobMostrarInfo.gravedad}}</td>
-                            </tr>
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>PERFIL:</b></td>
-                                <td class="p-2">{{jobMostrarInfo.perfil}}</td>
-                            </tr>
-                        </table>
-                        <br/>
-                        <v-btn color="error" elevation="3" @click="ventanaInfoJob = !ventanaInfoJob">CERRAR</v-btn>
-                    </div>
-                </template>
-            </vl-overlay>
-    
-    <!-- ========================== INFO ERRORES ============================== -->
-
-            <vl-overlay v-if ="ventanaInfoError == true" id="overlay" :position="[center[0]-2000, center[1]+2000]">
-                <template>
-                    <div class="overlay-content bg-white p-4 shadow shadow-l">
-                        <table class="bg-gray-100">
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>id Error</b></td>
-                                <td class="p-2">{{errorMostrarInfo.idError}}</td>
-                            </tr>
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>Descripción</b></td>
-                                <td class="p-2">{{errorMostrarInfo.descripcion}}</td>
-                            </tr>
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>Tema</b></td>
-                                <td class="p-2">{{errorMostrarInfo.tema}}</td>
-                            </tr>
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>Tipo</b></td>
-                                <td class="p-2">{{errorMostrarInfo.tipo}}</td>
-                            </tr>
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>Via de Entrada</b></td>
-                                <td class="p-2">{{errorMostrarInfo.viaEnt}}</td>
-                            </tr>
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>Estado</b></td>
-                                <td class="p-2">{{errorMostrarInfo.estado}}</td>
-                            </tr>
-                            <tr class="border border-gray">
-                                <td class="p-2"><b>Asoc. a Job</b></td>
-                                <td class="p-2">{{errorMostrarInfo.asocJob}}</td>
-                            </tr>
-                        </table>
-                        <br/>
-                        <v-btn color="error" elevation="3" @click="ventanaInfoError = !ventanaInfoError">CERRAR</v-btn>
-                    </div>
-                </template>
-            </vl-overlay>
-
         </vl-map>
 
         <!--PANEL DE CONTROL -->
@@ -519,19 +443,88 @@
         </template>
 
 
+        <!-- ========================== INFO JOBS ============================== -->
+
+        <v-dialog v-model="ventanaInfoJob" width="500">
+            <v-card class="p-4 shadow shadow-l">
+                <v-card-title>PROPIEDADES DEL JOB {{jobMostrarInfo.job}}</v-card-title>
+                <table class="w-full">
+                    <tr>
+                        <td class="w-1/3 border border-gray p-2"><b>JOB:</b></td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.job}}</td>
+                    </tr>
+                    <tr class="bg-gray-100">
+                        <td class="w-1/3 border border-gray p-2"><b>DESCRIPCIÓN:</b></td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.descripcion}}</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray p-2"><b>EXPEDIENTE:</b></td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.expediente}}</td>
+                    </tr>
+                    <tr class="bg-gray-100">
+                        <td class="border border-gray p-2"><b>DETECTADO EN:</b></td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.detectado}}</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray p-2"><b>PERFIL:</b></td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.perfil}}</td>
+                    </tr>
+                    <tr class="bg-gray-100">
+                        <td class="border border-gray p-2"><b>GRAVEDAD:</b></td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.gravedad}}</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray p-2"><b>ASIGNADO A:</b></td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.asignar}}</td>
+                    </tr>
+                    <tr class="bg-gray-100">
+                        <td class="border border-gray p-2"><b>ENVIAR A:</b></td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.tipoBandeja}}</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray p-2"><b>OPERADOR: </b></td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.operador}}</td>
+                    </tr>
+                </table>
+                <v-spacer class="mb-4"></v-spacer>
+                <v-card-actions class="justify-end" style="padding:0rem;">
+                    <v-btn class="w-28" color="error" elevation="3" @click="cerrarVentanaInfoJob()">CANCELAR</v-btn>
+                    <v-btn class="w-28" color="primary" elevation="3" @click="abrirFormularioEdicionJob()">EDITAR</v-btn>
+                    <v-btn class="w-28" color="success" elevation="3" @click="actualizarJobEditado()">ACEPTAR</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="formularioEdicionJob" width="500">
+            <FormularioDatosJob
+            :job="jobMostrarInfo"
+            @closeEditJob="formularioEdicionJob=false"
+            >
+            </FormularioDatosJob>
+        </v-dialog>
+        
     </div>
 </template>
 
 <script>
 import axios from "axios";
-import {makeArrayFromApi} from '@/assets/mixins/makeArrayFromApi.js';
-import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault.js';
-import {getMapExtent} from '@/assets/mixins/getMapExtent';
 import md5 from 'md5';
+
+import {makeArrayFromApi} from '@/assets/mixins/makeArrayFromApi';
+import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault';
+import {getMapExtent} from '@/assets/mixins/getMapExtent';
+import {stringifyJobGeometry} from '@/assets/mixins/stringifyJobGeometry';
+
+import FormularioDatosJob from '@/components/common/FormularioDatosJob';
+
 
 
     export default {
         props: ["modoMapa", "jobsRecibidos", "erroresRecibidos", "reset"],
+
+        components:{
+            FormularioDatosJob,
+        },
 
         computed: {
             returnModoMapa(){
@@ -552,6 +545,7 @@ import md5 from 'md5';
             makeArrayFromApi, 
             asignarValoresDefault,
             getMapExtent,
+            stringifyJobGeometry,
         ],
 
         created(){
@@ -585,6 +579,19 @@ import md5 from 'md5';
         methods:{
             dummy(){
                 //
+            },
+
+            actualizarJobEditado(){
+                this.$emit("job", this.jobMostrarInfo)
+                this.ventanaInfoJob = false;
+            },
+
+            cerrarVentanaInfoJob(){
+                this.ventanaInfoJob = false;
+            },
+            
+            abrirFormularioEdicionJob(){
+                this.formularioEdicionJob = true;
             },
 
             mostrarInfoError(){
@@ -624,15 +631,9 @@ import md5 from 'md5';
                         for (this.index in this.selectedJobs) {
                             for (this.indexattrb in this.jobsAttrb){
                                 if (this.jobsAttrb[this.indexattrb].id == this.selectedJobs[this.index].id){
-                                    this.jobSeleccionado = this.jobsAttrb[this.indexattrb];
-
-                                    this.jobMostrarInfo = {
-                                        job: this.jobSeleccionado.job,
-                                        descripcion: this.jobSeleccionado.descripcion,
-                                        detectado: this.jobSeleccionado.detectado,
-                                        gravedad: this.jobSeleccionado.gravedad,
-                                        perfil: this.jobSeleccionado.perfil,
-                                    }
+                                    this.jobMostrarInfo = this.jobsAttrb[this.indexattrb];
+                                    //Reiniciamos la geometría por si fuera necesario hacer ediciones
+                                    this.jobMostrarInfo.geometria = this.stringifyJobGeometry(this.jobsAttrb[this.indexattrb].geometriaJSON)
                                 }
                             }
                         }
@@ -685,7 +686,6 @@ import md5 from 'md5';
 
             //Solo modo visualizar
             retrieveErroresFromBD(){
-                console.log(this.erroresRecibidos)
                 if (this.modoMapa == 'visualizar' || this.modoMapa == 'editar'){
                     //Solo ejecutamos si recibimos errores desde el componente padre
                     if (this.erroresRecibidos){
@@ -740,7 +740,7 @@ import md5 from 'md5';
             },
 
             //Formatea la geometria de jobs para la insercion en BD
-            stringifyJobGeometry(geometry){
+            /*stringifyJobGeometry(geometry){
                 this.coordinates = geometry.coordinates[0];
                 this.string = "POLYGON((";
                 for (this.index in this.coordinates) {
@@ -751,7 +751,7 @@ import md5 from 'md5';
                 this.string = this.string + '))';
                 this.string = this.string.replace(",))", "))");
                 return this.string;
-            },
+            },*/
 
             desactivarSelectTool(tipo){
                 if (tipo == 'Jobs'){
@@ -1084,10 +1084,10 @@ import md5 from 'md5';
                     icon: "mdi-cursor-default",
                     modo: "visualizar" 
                 },
-                {   title: "Información del Job", 
+                {   title: "Editar Propiedades del Job", 
                     active: "getJobInfo", 
                     click: this.activeInfoJob, 
-                    icon: "mdi-information",
+                    icon: "mdi-square-edit-outline",
                     modo: "visualizar" 
                 },
                 {   title: "Editar geometría de Job", 
@@ -1183,9 +1183,9 @@ import md5 from 'md5';
             //VENTANA INFORMACION 
             ventanaInfoJob: false,
             ventanaInfoError: false,
-
-            };
+            jobMostrarInfo: {},
+            formularioEdicionJob: false,
         }
     }
-
+}
 </script>

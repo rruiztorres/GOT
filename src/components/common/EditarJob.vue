@@ -2,7 +2,7 @@
   <div class="bg-gray-200 h-full pb-6">
     <!--TOOLBAR SUPERIOR -->
     <v-toolbar dark color="primary">
-      <v-btn icon dark @click="closeDialog"><v-icon>mdi-close</v-icon></v-btn>
+      <v-btn icon dark @click="compruebaDatos"><v-icon>mdi-close</v-icon></v-btn>
       <v-toolbar-title
         >EDITANDO JOB - <b>{{ job.job }}</b></v-toolbar-title
       >
@@ -53,19 +53,6 @@
                         class="font-sans"
                         hide-default-footer
                       >
-                        <template v-slot:[`item.actions`]="{ item }">
-                          <v-btn
-                            title="Editar Job"
-                            icon
-                            dark
-                            class="bg-blue-500 mr-1"
-                          >
-                            <v-icon small @click="editItem(item)">
-                              mdi-pencil
-                            </v-icon>
-                          </v-btn>
-                        </template>
-
                         <template v-slot:[`item.estado`]="{ item }">
                           <v-chip :color="getColor(item.estado)" dark>
                             {{ item.estado }}
@@ -230,16 +217,6 @@
                 {{ message }}
               </v-alert>
             </v-overlay>
-
-            <!--VENTANA EDICIÓN ATRIBUTOS JOB-->
-            <v-overlay :value="showEditJob">
-              <FormularioDatosJob
-                :job="jobEditar"
-                @closeEditJob="closeEditJob"
-                @editedJob="actualizarJobEditado"
-              >
-              </FormularioDatosJob>
-            </v-overlay>
           </v-tab-item>
 
 
@@ -249,10 +226,10 @@
               <Map
                 v-if="mapIsActive == true"
                 modoMapa="editar"
-                :jobsRecibidos="job"
+                :jobsRecibidos="editandoJob"
                 :erroresRecibidos="errores"
                 :reset="mapReset"
-                @jobs="storeJobs"
+                @job="storeJobs"
                 @errores="storeErrors"
               >
               </Map>
@@ -268,6 +245,21 @@
           </v-tab-item>
           <!--FIN DATOS ADJUNTOS-->
         </v-tabs>
+
+        <!-- AVISO DATOS SIN GUARDAR (lo utilizamos también en mapa ¿sacar a componente? ) -->
+        <v-overlay :value="showAlert">
+          <v-card class="p-3 w-80">
+            <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
+            <h3 class="text-center text-l">Existen datos sin guardar ¿desea cerrar sin guardar los cambios?</h3>
+              <v-card-actions>
+                <div class="mt-6 flex">
+                    <v-btn class="w-24 bg-red-500" dark text @click="showAlert = false">CANCELAR</v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn class="w-24 bg-green-500" dark text @click="cerrarSinGuardar()">OK</v-btn>
+                </div>
+              </v-card-actions>
+          </v-card>
+        </v-overlay>
       </v-card>
     </template>
   </div>
@@ -278,7 +270,6 @@ import { getColor } from "@/assets/mixins/getColor.js";
 import { generarJobError } from "@/assets/mixins/generarJobError.js";
 import axios from "axios";
 import Map from "@/components/common/Map";
-import FormularioDatosJob from "@/components/common/FormularioDatosJob";
 
 export default {
   mixins: [getColor, generarJobError],
@@ -295,7 +286,6 @@ export default {
 
   components: {
     Map,
-    FormularioDatosJob,
   },
 
   created() {
@@ -304,10 +294,11 @@ export default {
 
   watch: {
     job() {
-      /*lanza de nuevo initialize cuando detecta que hemos cambiado de incidencia en el menu
-      de lo contrario se genera un bug al cambiar de job*/
+      //vuelve a lanzar el initialize cuando detecta un cambio de job
       if (this.job.job) {
         this.initialize();
+        //es necesario para poder mutar la propiedad recibida "job"
+        this.editandoJob = this.job;
       }
     },
   },
@@ -315,6 +306,14 @@ export default {
   methods: {
     dummy(item) {
       console.log(item);
+    },
+
+    cerrarSinGuardar(){
+      this.showAlert = false;
+      //Borramos ediciones sin guardar
+      this.editandoJob = this.job;
+      this.edicionSinGuardar = false;
+      this.closeDialog();
     },
 
     editItem(item) {
@@ -326,19 +325,26 @@ export default {
       this.showEditJob = data;
     },
 
-    actualizarJobEditado(data){
-      this.job.expediente = data.expediente;
-      this.job.arreglo_job = data.arreglo_job;
-      this.job.perfil = data.perfil;
-      this.job.deteccion_job = data.deteccion_job;
-      this.job.gravedad_job = data.gravedad_job;
-      this.job.asignacion_job = data.asignacion_job;
-      this.job.nombre_operador = data.nombre_operador;
-      this.job.descripcion = data.descripcion;
-      this.job.resumen = data.descripcion.substr(0,30) + "...";
+    compruebaDatos(){
+      if (this.edicionSinGuardar == true){
+        this.showAlert = true;
+      } else {
+        this.closeDialog();
+      }
+    },
 
-      this.showInfo("Los datos del Job se han actualizado correctamente", "green");
-      setTimeout(this.closeInfo,2000);
+    actualizarJobEditado(job){
+      this.editandoJob.expediente = job.expediente;
+      this.editandoJob.arreglo_job = job.perfil;
+      this.editandoJob.deteccion_job = job.detectado;
+      this.editandoJob.gravedad_job = job.gravedad;
+      this.editandoJob.asignacion_job = job.asignar;
+      this.editandoJob.nombre_operador = job.operador;
+      this.editandoJob.descripcion = job.descripcion;
+      this.editandoJob.geometria_json = job.geometriaJSON;
+      this.editandoJob.resumen = job.descripcion.substr(0,30) + "...";
+
+      this.edicionSinGuardar = true;
     },
 
     generarJobErrores() {
@@ -364,12 +370,13 @@ export default {
     },
 
     datosJobToDataTable() {
-      this.datosJob = [this.job];
+      this.datosJob = [this.editandoJob];
     },
 
-    storeJobs(jobs) {
-      this.job = jobs;
-      console.log("recibido cambio job");
+    storeJobs(job) {
+      this.editandoJob = job;
+      this.actualizarJobEditado(this.editandoJob);
+      this.datosJobToDataTable();
     },
 
     storeErrors(errores) {
@@ -380,7 +387,7 @@ export default {
       this.mapIsActive = active;
     },
 
-    //inicializa la tabla de jobs asociados a la incidencia
+    //inicializa la tabla de jobs
     initialize() {
       //Enviamos señal sin cambio a map
       this.mapReset = false;
@@ -445,7 +452,6 @@ export default {
         { text: "Asignado a", value: "asignacion_job" },
         { text: "Operador", value: "nombre_operador" },
         { text: "Descripción", value: "resumen" },
-        { text: "Acciones", value: "actions" },
       ],
 
       mapReset: false,
@@ -458,6 +464,12 @@ export default {
 
       showEditJob: false,
       jobEditar: null,
+
+      //CAPACIDAD EDICION JOBS
+      editandoJob: this.job,
+
+      //ALERTA DATOS SIN GUARDAD
+      showAlert: false,
     };
   },
 };
