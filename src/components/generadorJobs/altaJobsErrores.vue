@@ -15,15 +15,15 @@
                 <v-btn
                     icon
                     dark
-                    @click="compruebaDatos"
+                    @click="checkData"
                 >
                 <v-icon>mdi-close</v-icon>
             </v-btn>
             <v-toolbar-title>Alta de nuevos Jobs / Errores</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn class="w-24 bg-red-500 mr-5" dark text @click="compruebaDatos">CANCELAR</v-btn>
-                <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="guardarDatos">GUARDAR DATOS</v-btn>
-                <v-btn class="w-24 bg-green-500 mr-5" dark text @click="generacionJobsErrores()">GENERAR</v-btn>
+                <v-btn class="w-24 bg-red-500 mr-5" dark text @click="checkData">CANCELAR</v-btn>
+                <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="saveData">GUARDAR DATOS</v-btn>
+                <v-btn class="w-24 bg-green-500 mr-5" dark text @click="generateJobsErrors()">GENERAR</v-btn>
         </v-toolbar>
 
             <template>
@@ -157,184 +157,183 @@
 </template>
 
 <script>
-    import Map from '@/components/common/Map';
-    import axios from 'axios';
-    import {getColor} from '@/assets/mixins/getColor.js';
-    import {generarJobError} from '@/assets/mixins/generarJobError.js';
+import Map from '@/components/common/Map';
+import axios from 'axios';
+import {getColor} from '@/assets/mixins/getColor.js';
+import {generarJobError} from '@/assets/mixins/generarJobError.js';
 
-    export default {
-        name: "altaJobsErrores",
+export default {
+    name: "altaJobsErrores",
 
-        components: {
-            Map,
+    components: {
+        Map,
+    },
+
+    mixins: [
+        getColor, generarJobError
+    ],
+
+    watch:{
+        selectViaEntrada(){
+            this.viaEntrada = this.selectViaEntrada
         },
 
-        mixins: [
-            getColor, generarJobError
+        selectProcedencia(){
+            this.procedencia = this.selectProcedencia
+        },
+
+        selectPrioridad(){
+            this.prioridad = this.selectPrioridad
+        },
+
+        jobs(){
+            if (this.jobs.length != 0){
+                this.jobLoading=false;
+            }
+        },
+
+        errores(){
+            if (this.errores.length != 0){
+                this.errorLoading=false;
+            }
+        },
+    },
+
+    methods: {
+        generateJobsErrors(){
+            this.resultado = this.generarJobError(this.jobs, this.errores);
+            if (this.resultado.procesadoOK == false) {
+                this.showInfo(this.resultado.mensaje, "red");
+                setTimeout(this.closeInfo,2000);
+            }
+            else if (this.resultado.procesadoOK == true){
+                this.showInfo(this.resultado.mensaje, "green");
+                setTimeout(this.closeInfo,2000);
+                //Cierre automático tras generar jobs y errores
+                setTimeout(this.closeDialog, 2200);
+            }
+        },
+
+        checkData(){
+            if (this.jobs.length != 0 && this.datosGuardados == false || this.errores.length != 0 && this.datosGuardados == false ){
+                this.openAlert();
+            } else {
+                this.closeDialog();
+            }
+        },
+
+        openAlert(){
+            this.showAlert = true;
+        },
+
+        closeAlert(){
+            this.showAlert = false;
+        },
+
+        closeDialog() {
+            this.dialog = false;
+            //Al cerrar el dialogo devuelve el valor por defecto para GJ a loader
+            //TODO: habría que definir el valor por defecto en una función global
+            this.$emit('closed', 'JobsTriajeGJ');
+        },
+
+        showInfo(message, type){
+            this.showMessage = true;
+            this.message = message;
+            this.messageType = type;
+        },
+        closeInfo(){
+            this.showMessage = false;
+        },
+
+        storeJobs(jobs){
+            this.jobs = jobs;
+        },
+
+        storeErrors(errores){
+            this.errores = errores;
+        },
+
+        updateDataError(){
+            axios
+            .put(`${process.env.VUE_APP_API_ROUTE}/updateErrores` + this.errores)
+            .then(data => { console.log ("Errores actualizados correctamente ", data)})
+        },
+
+        updateDataJobs(){
+            axios
+            .put(`${process.env.VUE_APP_API_ROUTE}/updateJobs` + this.jobs)
+            .then(data => { console.log ("Jobs actualizados correctamente ", data)})
+        },
+
+        // GUARDAR DATOS MAESTRO -definir algoritmo guardado-
+        saveData(){
+            this.showLoading = true;
+            this.jobsErrores = {
+                jobs: this.jobs,
+                errores: this.errores
+            };
+            
+            axios
+            .post(`${process.env.VUE_APP_API_ROUTE}/postJobsErrores`, this.jobsErrores)
+            .then( data => {
+                if (data.status == 201) {
+                    //Asignamos los id dados por la base de datos en la petición
+                    for (this.index in this.jobs){
+                        this.jobs[this.index].job = data.data.jobs[this.index]
+                    }
+                    for (this.index in this.errores){
+                        this.errores[this.index].asocJob = data.data.errores[this.index].job;
+                        this.errores[this.index].idError = data.data.errores[this.index].idError;
+                    }
+                    this.datosGuardados = true;
+                    this.showLoading = false;
+                    this.showInfo("Datos guardados correctamente", "green");
+                    setTimeout(this.closeInfo,2000);
+                } else {
+                    console.log(data.data.mensaje);
+                }
+            })   
+        }
+    },
+
+    data () {
+        return {
+        dialog: true,
+        errores:[],                         //Almacen de errores
+        jobs:[],                            //Almacen de jobs
+        jobLoading: true,                   //En Resumen de la incidencia muestra la barra de carga mientras no se hayan registrado jobs        
+        errorLoading: true,                 //En Resumen de la incidencia muestra la barra de carga mientras no se hayan registrado errores  
+        showMessage: false,                 //Muestra mensajes de información en la parte inferior de la pantalla
+        message: '',                        //Determina el texto mostrado en el mensaje de información
+        messageType: '',                    //green para success, red para error, blue para info.
+
+        jobHeaders : [
+            { text: 'Estado', value:'estado'},                
+            { text: 'ID Job', value:'job'},
+            { text: 'Expediente', value: 'expediente'},
+            { text: 'Perfil', value:'arreglo_job' },
+            { text: 'Detectado en', value: 'deteccion_job' },
+            { text: 'Gravedad', value: 'gravedad_job' },
+            { text: 'Asignado a', value: 'tipo_bandeja' },
+            { text: 'Operador', value: 'nombre_operador' },
+            { text: 'Descripción', value: 'descripcion'},
         ],
 
-        watch:{
-            selectViaEntrada(){
-                this.viaEntrada = this.selectViaEntrada
-            },
+        errorHeaders : [
+            { text: 'Estado', value: 'estado' },
+            { text: 'Id Error', value:'idError'},
+            { text: 'Asignado a Job', value: 'asocJob' },
+            { text: 'Tipo Error', value: 'tipo' },              
+            { text: 'Tema Error', value: 'tema' },
+            { text: 'Descripcion', value: 'descripcion' },                  
+        ],
 
-            selectProcedencia(){
-                this.procedencia = this.selectProcedencia
-            },
+        showAlert: false,                   //Muestra ventana de alerta
+        datosGuardados: false,              //Indica si los datos han sido guardados en base de datos.
 
-            selectPrioridad(){
-                this.prioridad = this.selectPrioridad
-            },
-
-            jobs(){
-                if (this.jobs.length != 0){
-                    this.jobLoading=false;
-                }
-            },
-
-            errores(){
-                if (this.errores.length != 0){
-                    this.errorLoading=false;
-                }
-            },
-        },
-
-        methods: {
-            generacionJobsErrores(){
-                this.resultado = this.generarJobError(this.jobs, this.errores);
-                if (this.resultado.procesadoOK == false) {
-                    this.showInfo(this.resultado.mensaje, "red");
-                    setTimeout(this.closeInfo,2000);
-                }
-                else if (this.resultado.procesadoOK == true){
-                    this.showInfo(this.resultado.mensaje, "green");
-                    setTimeout(this.closeInfo,2000);
-                    //Cierre automático tras generar jobs y errores
-                    setTimeout(this.closeDialog, 2200);
-                }
-            },
-
-            compruebaDatos(){
-                if (this.jobs.length != 0 && this.datosGuardados == false || this.errores.length != 0 && this.datosGuardados == false ){
-                    this.openAlert();
-                } else {
-                    this.closeDialog();
-                }
-            },
-
-            openAlert(){
-                this.showAlert = true;
-            },
-
-            closeAlert(){
-                this.showAlert = false;
-            },
-
-            closeDialog() {
-                this.dialog = false;
-                //Al cerrar el dialogo devuelve el valor por defecto para GJ a loader
-                //TODO: habría que definir el valor por defecto en una función global
-                this.$emit('closed', 'JobsTriajeGJ');
-            },
-
-            showInfo(message, type){
-                this.showMessage = true;
-                this.message = message;
-                this.messageType = type;
-            },
-            closeInfo(){
-                this.showMessage = false;
-            },
-
-            storeJobs(jobs){
-                this.jobs = jobs;
-            },
-
-            storeErrors(errores){
-                this.errores = errores;
-            },
-
-            updateDataError(){
-                axios
-                .put(`${process.env.VUE_APP_API_ROUTE}/updateErrores` + this.errores)
-                .then(data => { console.log ("Errores actualizados correctamente ", data)})
-            },
-
-            updateDataJobs(){
-                axios
-                .put(`${process.env.VUE_APP_API_ROUTE}/updateJobs` + this.jobs)
-                .then(data => { console.log ("Jobs actualizados correctamente ", data)})
-            },
-
-            // GUARDAR DATOS MAESTRO -definir algoritmo guardado-
-            guardarDatos(){
-                this.showLoading = true;
-                this.jobsErrores = {
-                    jobs: this.jobs,
-                    errores: this.errores
-                };
-                
-                axios
-                .post(`${process.env.VUE_APP_API_ROUTE}/postJobsErrores`, this.jobsErrores)
-                .then( data => {
-                    if (data.status == 201) {
-                        //Asignamos los id dados por la base de datos en la petición
-                        for (this.index in this.jobs){
-                            this.jobs[this.index].job = data.data.jobs[this.index]
-                        }
-                        for (this.index in this.errores){
-                            this.errores[this.index].asocJob = data.data.errores[this.index].job;
-                            this.errores[this.index].idError = data.data.errores[this.index].idError;
-                        }
-                        this.datosGuardados = true;
-                        this.showLoading = false;
-                        this.showInfo("Datos guardados correctamente", "green");
-                        setTimeout(this.closeInfo,2000);
-                    } else {
-                        console.log(data.data.mensaje);
-                    }
-                })   
-            }
-        },
-
-        data () {
-            return {
-                dialog: true,
-                errores:[],                         //Almacen de errores
-                jobs:[],                            //Almacen de jobs
-                jobLoading: true,                   //En Resumen de la incidencia muestra la barra de carga mientras no se hayan registrado jobs        
-                errorLoading: true,                 //En Resumen de la incidencia muestra la barra de carga mientras no se hayan registrado errores  
-                showMessage: false,                 //Muestra mensajes de información en la parte inferior de la pantalla
-                message: '',                        //Determina el texto mostrado en el mensaje de información
-                messageType: '',                    //green para success, red para error, blue para info.
-
-                jobHeaders : [
-                    { text: 'Estado', value:'estado'},                
-                    { text: 'ID Job', value:'job'},
-                    { text: 'Expediente', value: 'expediente'},
-                    { text: 'Perfil', value:'perfil' },
-                    { text: 'Detectado en', value: 'detectado' },
-                    { text: 'Gravedad', value: 'gravedad' },
-                    { text: 'Asignado a', value: 'tipoBandeja' },
-                    { text: 'Operador', value: 'operador' },
-                    { text: 'Descripción', value: 'descripcion'},
-                ],
-
-                errorHeaders : [
-                    { text: 'Estado', value: 'estado' },
-                    { text: 'Id Error', value:'idError'},
-                    { text: 'Asignado a Job', value: 'asocJob' },
-                    { text: 'Tipo Error', value: 'tipo' },              
-                    { text: 'Tema Error', value: 'tema' },
-                    { text: 'Descripcion', value: 'descripcion' },                  
-                ],
-
-                showAlert: false,                   //Muestra ventana de alerta
-                datosGuardados: false,              //Indica si los datos han sido guardados en base de datos.
-
-                showLoading: false,                 //Muestra la pantalla de carga mientras los datos son almacenados
-
-            }
-        },
-    }
+        showLoading: false,                 //Muestra la pantalla de carga mientras los datos son almacenados
+        }
+    },
+}
 </script>

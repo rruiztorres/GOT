@@ -35,14 +35,14 @@
               class="ml-4 p-3 border border-gray-200 shadow bg-gray-100"
               style="height:32rem;"
             >
-              <TextEditor @editor="storeObsExp"></TextEditor>
+              <TextEditor @editor="storeObservationsExp"></TextEditor>
             </div>
           </v-col>
         </v-row>
           <v-card-actions class="mt-8">
             <v-spacer></v-spacer>
-            <v-btn color="error" dark @click="cerrarExpediente">CANCELAR</v-btn>
-            <v-btn color="success" dark @click="guardarExpediente">ACEPTAR</v-btn>
+            <v-btn color="error" dark @click="closeExpediente">CANCELAR</v-btn>
+            <v-btn color="success" dark @click="saveExpediente">ACEPTAR</v-btn>
           </v-card-actions>
       </v-card>
     </template>
@@ -61,7 +61,7 @@
                     {{mensajeFlotante.mensaje}}
                 </v-col>
                 <v-col cols="3">
-                    <v-btn v-if="mensajeFlotante.aceptar == true" @click="cerrarMensajeInformacion()">ENTENDIDO</v-btn>
+                    <v-btn v-if="mensajeFlotante.aceptar == true" @click="closeInfoMessage()">ENTENDIDO</v-btn>
                 </v-col>
             </v-row>
             </v-alert>
@@ -83,25 +83,25 @@ export default {
 
   mounted(){
     this.initializeParameters();
-    this.recuperarExpedientes();
+    this.retrieveExpFromBD();
   },
 
   methods:{
     initializeParameters(){
       this.date1 = '';
       this.nExp = '';
-      this.storeObsExp('');
+      this.storeObservationsExp('');
     },
 
-    cerrarExpediente(){
+    closeExpediente(){
       this.$emit('closed', 'JobsTriajeGJ');
     },
 
-    storeObsExp(data){
+    storeObservationsExp(data){
       this.observaciones = data;
     },
 
-    recuperarExpedientes(){
+    retrieveExpFromBD(){
       axios
       .get(`${process.env.VUE_APP_API_ROUTE}/expedientes`)
       .then((data) => {
@@ -109,15 +109,15 @@ export default {
       })
     },
 
-    compruebaDatos(datos){
+    checkData(datos){
       if (datos.date1 == '' || datos.numExp == '' || datos.observaciones == ''){
-        this.lanzarMensaje('red','error','No pueden existir campos vacios, revise los datos', true)
+        this.throwMessage('red','error','No pueden existir campos vacios, revise los datos', true)
       } else {
         // comprobamos que expediente no existe ya en BD
         this.compruebaExp = 'ok';
         for (this.index in this.expedientesBD){
           if (this.expedientesBD[this.index].expediente == datos.numExp){
-            this.lanzarMensaje('red','error','El número de expediente ya existe', true)
+            this.throwMessage('red','error','El número de expediente ya existe', true)
             this.compruebaExp = 'error'
           }
         }
@@ -125,29 +125,29 @@ export default {
       return this.compruebaExp;
     },
 
-    guardarExpediente(){
+    saveExpediente(){
       let newExp = {
         numExp: this.nExp,
         fecha: this.date1,
         observaciones: this.observaciones,
         finalizado: false
       }
-      const datosCorrectos = this.compruebaDatos(newExp);
+      const datosCorrectos = this.checkData(newExp);
       if (datosCorrectos == 'ok'){
         
         axios
           .post(`${process.env.VUE_APP_API_ROUTE}/expediente`, newExp)
           .then((data) => {
               if (data.status == 201){
-                this.lanzarMensaje('green', 'success', `Expediente ${this.nExp} creado correctamente`, false)
-                setTimeout(this.cerrarMensajeInformacion,1500);
+                this.throwMessage('green', 'success', `Expediente ${this.nExp} creado correctamente`, false)
+                setTimeout(this.closeInfoMessage,1500);
                 this.initializeParameters();
               }
           })
         }
     },
     
-    lanzarMensaje(color, tipo, mensaje, aceptar){
+    throwMessage(color, tipo, mensaje, aceptar){
         this.mensajeFlotante.visibilidad = true;
         this.mensajeFlotante.color = color;                 //colores: red, green, orange, yellow, purple
         this.mensajeFlotante.type = tipo;                   //type: success, info, warning, error
@@ -156,7 +156,7 @@ export default {
     },
 
 
-    cerrarMensajeInformacion(){
+    closeInfoMessage(){
         this.mensajeFlotante.visibilidad = false;
     },
   },

@@ -146,7 +146,7 @@
                             icon tile
                             :title="item.title"
                             @click="item.click()"
-                            :disabled="aplicarModo(item.modo)"
+                            :disabled="applyMode(item.modo)"
                             >
                                 <v-icon color="#1E40AF">{{ item.icon }}</v-icon>
                             </v-btn>
@@ -166,7 +166,7 @@
                             icon tile
                             :title="item.title"
                             @click="item.click()"
-                            :disabled="aplicarModo(item.modo)"
+                            :disabled="applyMode(item.modo)"
                             >
                             <v-icon color="#1E40AF">{{ item.icon }}</v-icon>
                         </v-btn>
@@ -332,7 +332,7 @@
 
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="error" dark @click="cancelarInsercion('jobs')"
+                            <v-btn color="error" dark @click="abortInsertion('jobs')"
                             >CANCELAR</v-btn>
                             <v-btn color="success" dark @click="storeAttrbJobs"
                             >ACEPTAR</v-btn>
@@ -395,7 +395,7 @@
 
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="error" dark @click="cancelarInsercion('errores')"
+                        <v-btn color="error" dark @click="abortInsertion('errores')"
                         >CANCELAR</v-btn>
                         <v-btn color="success" dark @click="storeAttrbErrors"
                         >ACEPTAR</v-btn>
@@ -420,7 +420,7 @@
                         {{mensajeFlotante.mensaje}}
                     </v-col>
                     <v-col cols="3">
-                        <v-btn v-if="mensajeFlotante.aceptar == true" @click="cerrarMensajeInformacion()">ENTENDIDO</v-btn>
+                        <v-btn v-if="mensajeFlotante.aceptar == true" @click="closeInfoMessage()">ENTENDIDO</v-btn>
                     </v-col>
                 </v-row>
                 </v-alert>
@@ -463,34 +463,34 @@
                     </tr>
                     <tr class="bg-gray-100">
                         <td class="border border-gray p-2"><b>DETECTADO EN:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.detectado}}</td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.deteccion_job}}</td>
                     </tr>
                     <tr>
                         <td class="border border-gray p-2"><b>PERFIL:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.perfil}}</td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.arreglo_job}}</td>
                     </tr>
                     <tr class="bg-gray-100">
                         <td class="border border-gray p-2"><b>GRAVEDAD:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.gravedad}}</td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.gravedad_job}}</td>
                     </tr>
                     <tr>
                         <td class="border border-gray p-2"><b>ASIGNADO A:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.asignar}}</td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.asignacion_job}}</td>
                     </tr>
                     <tr class="bg-gray-100">
                         <td class="border border-gray p-2"><b>ENVIAR A:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.tipoBandeja}}</td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.tipo_bandeja}}</td>
                     </tr>
                     <tr>
                         <td class="border border-gray p-2"><b>OPERADOR: </b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.operador}}</td>
+                        <td class="border border-gray p-2">{{jobMostrarInfo.nombre_operador}}</td>
                     </tr>
                 </table>
                 <v-spacer class="mb-4"></v-spacer>
                 <v-card-actions class="justify-end" style="padding:0rem;">
-                    <v-btn class="w-28" color="error" elevation="3" @click="cerrarVentanaInfoJob()">CANCELAR</v-btn>
-                    <v-btn class="w-28" :disabled="modoMapa == 'visualizar'" color="primary" elevation="3" @click="abrirFormularioEdicionJob()">EDITAR</v-btn>
-                    <v-btn class="w-28" color="success" elevation="3" @click="actualizarJobEditado()">ACEPTAR</v-btn>
+                    <v-btn class="w-28" color="error" elevation="3" @click="closeWindowInfoJob()">CANCELAR</v-btn>
+                    <v-btn class="w-28" :disabled="modoMapa == 'visualizar'" color="primary" elevation="3" @click="openFormEditJob()">EDITAR</v-btn>
+                    <v-btn class="w-28" color="success" elevation="3" @click="updateEditedJob()">ACEPTAR</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -510,14 +510,13 @@
 import axios from "axios";
 import md5 from 'md5';
 
-import {makeArrayFromApi} from '@/assets/mixins/makeArrayFromApi';
-import {asignarValoresDefault} from '@/assets/mixins/asignarValoresDefault';
-import {getMapExtent} from '@/assets/mixins/getMapExtent';
-import {stringifyJobGeometry} from '@/assets/mixins/stringifyJobGeometry';
+import { makeArrayFromApi } from '@/assets/mixins/makeArrayFromApi';
+import { asignarValoresDefault } from '@/assets/mixins/asignarValoresDefault';
+import { getMapExtent } from '@/assets/mixins/getMapExtent';
+import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry';
+import { stringifyErrorGeometry } from '@/assets/mixins/stringifyErrorGeometry';
 
 import FormularioDatosJob from '@/components/common/FormularioDatosJob';
-
-
 
     export default {
         props: ["modoMapa", "jobsRecibidos", "erroresRecibidos", "reset"],
@@ -546,15 +545,16 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
             asignarValoresDefault,
             getMapExtent,
             stringifyJobGeometry,
+            stringifyErrorGeometry,
         ],
 
         created(){
             //Selecciona como mapa activo por defecto el primer objeto del array de servicios
             this.activeMap = this.wmtsServices[0];
-            this.obtenerParametrosJob();
-            this.obtenerParametrosError();
+            this.getJobParameters();
+            this.getErrorParameters();
             this.retrieveJobFromBD();
-            this.retrieveErroresFromBD();
+            this.retrieveErrorsFromBD();
         },
 
         watch:{
@@ -581,22 +581,22 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 //
             },
 
-            actualizarJobEditado(){
+            updateEditedJob(){
                 this.$emit("job", this.jobMostrarInfo)
                 this.ventanaInfoJob = false;
             },
 
-            cerrarVentanaInfoJob(){
+            closeWindowInfoJob(){
                 this.ventanaInfoJob = false;
             },
             
-            abrirFormularioEdicionJob(){
+            openFormEditJob(){
                 this.formularioEdicionJob = true;
             },
 
-            mostrarInfoError(){
+            showInfoError(){
                 if (this.selectedErrores.length == 0){
-                    this.lanzarMensaje("orange", "info", "Debe seleccionar un error", true)
+                    this.throwMessage("orange", "info", "Debe seleccionar un error", true)
                 } else {
                     if (this.selectedErrores.length == 1) {
                         for (this.index in this.selectedErrores) {
@@ -618,14 +618,14 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                         this.selectedErrores = [];
                         this.ventanaInfoError = true;
                     } else {
-                        this.lanzarMensaje("orange", "info", "Solo es posible mostrar la información de un error cada vez", true)
+                        this.throwMessage("orange", "info", "Solo es posible mostrar la información de un error cada vez", true)
                     }
                 }
             },
 
-            mostrarInfoJob(){
+            showInfoJob(){
                 if (this.selectedJobs.length == 0){
-                    this.lanzarMensaje("orange", "info", "Debe seleccionar un job", true)
+                    this.throwMessage("orange", "info", "Debe seleccionar un job", true)
                 } else {
                     if (this.selectedJobs.length == 1) {
                         for (this.index in this.selectedJobs) {
@@ -633,14 +633,14 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                                 if (this.jobsAttrb[this.indexattrb].id == this.selectedJobs[this.index].id){
                                     this.jobMostrarInfo = this.jobsAttrb[this.indexattrb];
                                     //Reiniciamos la geometría por si fuera necesario hacer ediciones
-                                    this.jobMostrarInfo.geometria = this.stringifyJobGeometry(this.jobsAttrb[this.indexattrb].geometriaJSON)
+                                    this.jobMostrarInfo.geometria = this.stringifyJobGeometry(this.jobsAttrb[this.indexattrb].geometria_json)
                                 }
                             }
                         }
                         this.selectedJobs = [];
                         this.ventanaInfoJob = true;
                     } else {
-                        this.lanzarMensaje("orange", "info", "Solo es posible mostrar la información de un job cada vez", true)
+                        this.throwMessage("orange", "info", "Solo es posible mostrar la información de un job cada vez", true)
                     }
                 }
             },
@@ -660,19 +660,19 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                         //Atributos
                         this.newAttrbJobBd = {
                             id: md5(this.jobsRecibidos.job),
-                            job: this.jobsRecibidos.job,
                             expediente: this.jobsRecibidos.expediente,
-                            estado: this.jobsRecibidos.estado,
-                            jobGran: this.jobsRecibidos.job_grande,
-                            detectado: this.jobsRecibidos.deteccion_job,
+                            job: this.jobsRecibidos.job,
                             descripcion: this.jobsRecibidos.descripcion,
-                            perfil: this.jobsRecibidos.arreglo_job,
-                            gravedad: this.jobsRecibidos.gravedad_job,
-                            asignar: this.jobsRecibidos.asignacion_job,
-                            tipoBandeja: this.jobsRecibidos.tipo_bandeja,
-                            operador: this.jobsRecibidos.nombre_operador,
+                            gravedad_job: this.jobsRecibidos.gravedad_job,
+                            deteccion_job: this.jobsRecibidos.deteccion_job,
+                            arreglo_job: this.jobsRecibidos.arreglo_job,
+                            estado: this.jobsRecibidos.estado,
+                            tipo_bandeja: this.jobsRecibidos.tipo_bandeja,
+                            asignacion_job: this.jobsRecibidos.asignacion_job,
+                            nombre_operador: this.jobsRecibidos.nombre_operador,
                             geometria: this.jobsRecibidos.geometria,
-                            geometriaJSON: this.jobsRecibidos.geometria_json,
+                            geometria_json: this.jobsRecibidos.geometria_json,
+                            job_grande: this.jobsRecibidos.job_grande,
                         };
                         this.jobsAttrb.push(this.newAttrbJobBd);
 
@@ -684,8 +684,9 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 }
             },
 
-            //Solo modo visualizar
-            retrieveErroresFromBD(){
+            
+            retrieveErrorsFromBD(){
+            //Solo se ejecuta si modoMapa es visualizar o editar
                 if (this.modoMapa == 'visualizar' || this.modoMapa == 'editar'){
                     //Solo ejecutamos si recibimos errores desde el componente padre
                     if (this.erroresRecibidos){
@@ -714,46 +715,20 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 }
             },
 
+            
+            applyMode(modo){
             //Aplica el modo de mapa (edicion - visualización)
-            aplicarModo(modo){
                 if (this.modoMapa == 'visualizar') {
                     if (modo == 'editar'){
                         return true
                     } 
                 }
-                
                 else if (this.modoMapa == 'editar') {
                     return false
                 }
-
             },
             
-            //Formatea la geometria de jobs para la insercion en BD
-            stringifyErrorGeometry(geometry){
-                this.coordinates = geometry.coordinates;
-                this.string = 'POINT(';
-                this.coordinate = this.coordinates.toString();
-                this.coordinate = this.coordinate.replace(',',' ');
-                this.string = this.string + this.coordinate;
-                this.string = this.string + ')';
-                return this.string;
-            },
-
-            //Formatea la geometria de jobs para la insercion en BD
-            /*stringifyJobGeometry(geometry){
-                this.coordinates = geometry.coordinates[0];
-                this.string = "POLYGON((";
-                for (this.index in this.coordinates) {
-                    this.coordinate = this.coordinates[this.index].toString();
-                    this.coordinate = this.coordinate.replace(',',' ');
-                    this.string = this.string + this.coordinate + ','
-                }
-                this.string = this.string + '))';
-                this.string = this.string.replace(",))", "))");
-                return this.string;
-            },*/
-
-            desactivarSelectTool(tipo){
+            deactivateSelectTool(tipo){
                 if (tipo == 'Jobs'){
                     this.toggleBtnJob = null
                 } else {
@@ -762,48 +737,48 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
             },
 
             activeDrawErrors(){
-                this.desactivarSelectTool('Jobs');
+                this.deactivateSelectTool('Jobs');
                 this.toolActive = this.errorPanel[0].active;
                 this.drawType = 'Point';
-                this.mostrarAyudaHerramienta('Haga clic en el mapa para situar el error.')
-                setTimeout(this.cerrarAyudaHerramienta, 3000);
+                this.showToolHelp('Haga clic en el mapa para situar el error.')
+                setTimeout(this.closeToolHelp, 3000);
             },
 
-            activeSelectErrores(){
-                this.desactivarSelectTool('Jobs');
+            activeSelectErrors(){
+                this.deactivateSelectTool('Jobs');
                 this.toolActive = this.errorPanel[1].active;
                 this.drawType = null;
-                this.mostrarAyudaHerramienta('Haga clic sobre un error para seleccionarlo. El color azul indica que el error ha sido seleccionado')
-                setTimeout(this.cerrarAyudaHerramienta, 3000);
+                this.showToolHelp('Haga clic sobre un error para seleccionarlo. El color azul indica que el error ha sido seleccionado')
+                setTimeout(this.closeToolHelp, 3000);
             },
 
             activeInfoError(){
-                this.desactivarSelectTool('Jobs');
+                this.deactivateSelectTool('Jobs');
                 this.toolActive = this.errorPanel[2].active;
                 this.drawType = null;
-                this.mostrarInfoError();
-                this.mostrarAyudaHerramienta('Muestra información de un error seleccionado')
-                setTimeout(this.cerrarAyudaHerramienta, 3000);
+                this.showInfoError();
+                this.showToolHelp('Muestra información de un error seleccionado')
+                setTimeout(this.closeToolHelp, 3000);
             },
 
-            activeModifyErrores(){
-                this.desactivarSelectTool('Jobs');
+            activeModifyErrors(){
+                this.deactivateSelectTool('Jobs');
                 this.toolActive =this.errorPanel[3].active;
                 this.drawType = 'Point';
-                this.mostrarAyudaHerramienta('')
-                setTimeout(this.cerrarAyudaHerramienta, 6000);
+                this.showToolHelp('')
+                setTimeout(this.closeToolHelp, 6000);
             },
 
-            activeDeleteErrores(){
-                this.desactivarSelectTool('Jobs');
+            activeDeleteErrors(){
+                this.deactivateSelectTool('Jobs');
                 this.toolActive =this.errorPanel[4].active;
                 this.drawType = null;
             },
 
-            deleteErrores(){
+            deleteErrors(){
                 //Comprobamos primero que existe una seleccion, si no existe lanza mensaje
                 if (this.selectedErrores.length == 0){
-                    this.lanzarMensaje("orange", "info", "Debe seleccionar al menos un error", true)
+                    this.throwMessage("orange", "info", "Debe seleccionar al menos un error", true)
                 }
 
                 for (this.index in this.selectedErrores){
@@ -813,8 +788,8 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                             this.errores.splice(this.errorIndex, 1);
                             this.erroresAttrb.splice(this.errorIndex, 1);
 
-                            this.lanzarMensaje ("green", "success", "Error eliminado correctamente", false)
-                            setTimeout(this.cerrarMensajeInformacion,1500);
+                            this.throwMessage ("green", "success", "Error eliminado correctamente", false)
+                            setTimeout(this.closeInfoMessage,1500);
                         }
                     }
                 }
@@ -822,7 +797,7 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 this.selectedErrores = [];
             },
 
-            obtenerParametrosError(){
+            getErrorParameters(){
                 axios.get(`${process.env.VUE_APP_API_ROUTE}/errorParameters`).then((data) => {
                     this.objeto = data.data;
                     this.makeArrayFromApi(this.objeto.tema,this.temaError, 'tema_error')
@@ -854,7 +829,7 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 this.$emit('errores', this.erroresAttrb)
             },
 
-            obtenerParametrosJob(){
+            getJobParameters(){
                 axios.get(`${process.env.VUE_APP_API_ROUTE}/jobParameters`).then((data) => {
                     this.objeto = data.data;
                     //makeArrayFromApi (objetoAPI, arrayCrear, columnaBD)
@@ -876,7 +851,7 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                     })
             },
 
-            lanzarMensaje(color, tipo, mensaje, aceptar){
+            throwMessage(color, tipo, mensaje, aceptar){
                 this.mensajeFlotante.visibilidad = true;
                 this.mensajeFlotante.color = color;                 //colores: red, green, orange, yellow, purple
                 this.mensajeFlotante.type = tipo;                   //type: success, info, warning, error
@@ -884,23 +859,23 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 this.mensajeFlotante.aceptar = aceptar;             //Muestra el boton de "entendido"
             },
 
-            cerrarMensajeInformacion(){
+            closeInfoMessage(){
                 this.mensajeFlotante.visibilidad = false;
             },
 
-            mostrarAyudaHerramienta(mensaje){
+            showToolHelp(mensaje){
                 this.ayudaHerramientaVentana = true;
                 this.ayudaHerramienta.mensaje = mensaje;
             },
 
-            cerrarAyudaHerramienta(){
+            closeToolHelp(){
                 this.ayudaHerramientaVentana = false;
             },
 
             deleteJobs(){
                 //Comprobamos primero que existe una seleccion, si no existe lanza mensaje
                 if (this.selectedJobs.length == 0){
-                    this.lanzarMensaje("orange", "info", "Debe seleccionar al menos un job", true)
+                    this.throwMessage("orange", "info", "Debe seleccionar al menos un job", true)
                 }
 
                 for (this.index in this.selectedJobs){
@@ -910,8 +885,8 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                             this.jobs.splice(this.jobIndex, 1);
                             this.jobsAttrb.splice(this.jobIndex, 1);
 
-                            this.lanzarMensaje ("green", "success", "Job eliminado correctamente", false)
-                            setTimeout(this.cerrarMensajeInformacion,1500);
+                            this.throwMessage ("green", "success", "Job eliminado correctamente", false)
+                            setTimeout(this.closeInfoMessage,1500);
                         }
                     }
                 }
@@ -919,7 +894,7 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 this.selectedJobs = [];
             },
 
-            cancelarInsercion(tipoDato){
+            abortInsertion(tipoDato){
                 //Si un usuario cancela la inserción de atributos, cancela también la geometría
                 if (tipoDato == 'jobs') {
                     this.jobs.splice(this.jobs.length-1,1);
@@ -931,7 +906,7 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                     this.errores.splice(this.errores.length-1,1);
                     this.editError = false;
                     //Evita que se active la ventana de atributos de jobs
-                    this.activeSelectErrores(); this.toggleBtnError = 1;
+                    this.activeSelectErrors(); this.toggleBtnError = 1;
                 }
                 
             },
@@ -941,20 +916,19 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 //TODO: parece imposible unificar todo en un mismo array... 
                 this.newAttrbJob = {
                     id: this.jobs[this.jobs.length-1].id,
-                    idJob: null,
                     expediente: this.expedienteJob,
-                    estado: 'En triaje',
-                    jobGran: this.jobGrande,
-                    detectado: this.deteccionJob,
+                    job: null,
                     descripcion: this.descJob,
-                    perfil: this.perfilJob,
-                    gravedad: this.gravedadJob,
-                    asignar: this.asignacionJob,
-                    tipoBandeja: this.tipoBandejaJob,
-                    operador: this.nombreOperadorJob,
+                    gravedad_job: this.gravedadJob,
+                    deteccion_job: this.deteccionJob,
+                    arreglo_job: this.perfilJob,
+                    estado: 'En triaje',
+                    tipo_bandeja: this.tipoBandejaJob,
+                    asignacion_job: this.asignacionJob,
+                    nombre_operador: this.nombreOperadorJob,
                     geometria: this.stringifyJobGeometry(this.jobs[this.jobs.length-1].geometry),
-                    geometriaJSON: this.jobs[this.jobs.length-1].geometry,
-                    epsg: 3857,
+                    geometria_json: this.jobs[this.jobs.length-1].geometry,
+                    job_grande: this.jobGrande,
                 }
                 this.jobsAttrb.push(this.newAttrbJob);
                 this.editJob = false;
@@ -962,40 +936,40 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
             },
 
             activeDrawJobs(){
-                this.desactivarSelectTool('Errores');
+                this.deactivateSelectTool('Errores');
                 this.toolActive = this.jobsPanel[0].active;
                 this.drawType = 'Polygon';
-                this.mostrarAyudaHerramienta('Haga clic en el mapa para dibujar los vértices del polígono. Doble clic para finalizar.')
-                setTimeout(this.cerrarAyudaHerramienta, 3000);
+                this.showToolHelp('Haga clic en el mapa para dibujar los vértices del polígono. Doble clic para finalizar.')
+                setTimeout(this.closeToolHelp, 3000);
             },
 
             activeSelectJobs(){
-                this.desactivarSelectTool('Errores');
+                this.deactivateSelectTool('Errores');
                 this.toolActive = this.jobsPanel[1].active;
                 this.drawType = null;
-                this.mostrarAyudaHerramienta('Haga clic sobre un job para seleccionarlo. El color azul indica que el job ha sido seleccionado')
-                setTimeout(this.cerrarAyudaHerramienta, 3000);
+                this.showToolHelp('Haga clic sobre un job para seleccionarlo. El color azul indica que el job ha sido seleccionado')
+                setTimeout(this.closeToolHelp, 3000);
             },
 
             activeInfoJob(){
-                this.desactivarSelectTool('Errores');
+                this.deactivateSelectTool('Errores');
                 this.toolActive = this.jobsPanel[2].active;
                 this.drawType = null;
-                this.mostrarInfoJob();
-                this.mostrarAyudaHerramienta('Muestra información del job seleccionado')
-                setTimeout(this.cerrarAyudaHerramienta, 3000);
+                this.showInfoJob();
+                this.showToolHelp('Muestra información del job seleccionado')
+                setTimeout(this.closeToolHelp, 3000);
             },
 
             activeModifyJobs(){
-                this.desactivarSelectTool('Errores');
+                this.deactivateSelectTool('Errores');
                 this.toolActive =this.jobsPanel[3].active;
                 this.drawType = 'Polygon';
-                this.mostrarAyudaHerramienta('Acérquese al job y un punto azul indicará el vértice que se desplazara. Para crear un nuevo vértice arrastre la línea de polígono en el lugar deseado')
-                setTimeout(this.cerrarAyudaHerramienta, 6000);
+                this.showToolHelp('Acérquese al job y un punto azul indicará el vértice que se desplazara. Para crear un nuevo vértice arrastre la línea de polígono en el lugar deseado')
+                setTimeout(this.closeToolHelp, 6000);
             },
 
             activeDeleteJobs(){
-                this.desactivarSelectTool('Errores');
+                this.deactivateSelectTool('Errores');
                 this.toolActive =this.jobsPanel[4].active;
                 this.drawType = null;
             },
@@ -1112,7 +1086,7 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 },
                 {   title: "Seleccionar Error",
                     active: "selectError", 
-                    click: this.activeSelectErrores, 
+                    click: this.activeSelectErrors, 
                     icon: "mdi-cursor-default",
                     modo: "visualizar" 
                 },
@@ -1124,13 +1098,13 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 },
                 {   title: "Editar posición del Error",
                     active: "modifyError", 
-                    click: this.activeModifyErrores, 
+                    click: this.activeModifyErrors, 
                     icon: "mdi-arrow-all",
                     modo: "editar"
                 },
                 {   title: "Eliminar Error", 
-                    active: "deleteErrores", 
-                    click: this.deleteErrores, 
+                    active: "deleteErrors", 
+                    click: this.deleteErrors, 
                     icon: "mdi-delete",
                     modo: "editar"
 

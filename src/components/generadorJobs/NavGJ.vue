@@ -16,7 +16,7 @@
         dense
         v-for="opcionJob in navGroup.items"
         :key="opcionJob.name"
-        @click="activar(opcionJob.active)"
+        @click="emitChangeMenu(opcionJob.active)"
         class="hover:bg-blue-100"
       >
         <v-list-item-icon>
@@ -48,10 +48,10 @@ export default {
     },
 
      methods: {
-      activar(datos) {
+      emitChangeMenu(datos) {
         this.$emit('cambiomenu', datos);
       },
-      cambiarRol(rol) {
+      changeRole(rol) {
         this.userRole = rol;
         localStorage.rol = rol;
       },

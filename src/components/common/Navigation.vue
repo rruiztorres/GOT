@@ -99,7 +99,7 @@
                   v-for="rol in roles"
                   :key="rol.name"
                   class="hover:bg-gray-200 w-80"
-                  @click="cambiarRol(rol)" 
+                  @click="changeRol(rol)" 
                 >
                   <v-list-item-title
                   class="text-xs ml-3">
@@ -128,9 +128,9 @@
 
 <!-- MENU OPCIONES SEGUN ROL -->
   <div class="ml-1">
-    <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="cambiarMenu" :hacerMini="mini"></NavGJ></div>
-    <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="cambiarMenu" :hacerMini="mini"></NavOpEsp></div>
-    <div v-if="userRole=='Control de Calidad'"><Ccalidad @cambiomenu="cambiarMenu" :hacerMini="mini"></Ccalidad></div>
+    <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="changeMenu" :hacerMini="mini"></NavGJ></div>
+    <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="changeMenu" :hacerMini="mini"></NavOpEsp></div>
+    <div v-if="userRole=='Control de Calidad'"><Ccalidad @cambiomenu="changeMenu" :hacerMini="mini"></Ccalidad></div>
   </div>
 
 <!-- FIN MENU OPCIONES SEGUN ROL -->
@@ -174,18 +174,18 @@ import {roles} from '@/assets/mixins/roles.js';
 
     
     methods: {
-      cambiarMenu(data){
+      changeMenu(data){
         this.newMenu = data;
         this.$emit('cambiomenu', data);
       },
-      cambiarRol(rol) {
+      changeRol(rol) {
         this.userRole = rol.name;
         localStorage.rol = rol.name;
         //debug
         //console.log("el rol pasó a ser " + rol.name)
         
         //hay que cambiar dashboard por defecto también al cambiar rol usuario
-        this.cambiarMenu(rol.default)
+        this.changeMenu(rol.default)
       },
 
     },
