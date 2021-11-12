@@ -2,7 +2,7 @@
   <div class="bg-gray-200 h-full pb-6">
     <!--TOOLBAR SUPERIOR -->
     <v-toolbar dark color="primary">
-      <v-btn icon dark @click="compruebaDatos"><v-icon>mdi-close</v-icon></v-btn>
+      <v-btn icon dark @click="checkData"><v-icon>mdi-close</v-icon></v-btn>
       <v-toolbar-title
         >EDITANDO JOB - <b>{{ job.job }}</b></v-toolbar-title
       >
@@ -11,14 +11,14 @@
       <v-btn class="w-24 bg-red-500 mr-5" dark text @click="closeDialog"
         >CANCELAR</v-btn
       >
-      <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="actualizaDatosBD"
+      <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="updateDataBD"
         >GUARDAR DATOS</v-btn
       >
       <v-btn
         class="w-24 bg-green-500 mr-5"
         dark
         text
-        @click="generarJobErrores()"
+        @click="generateJobsErrors()"
         >GENERAR</v-btn
       >
     </v-toolbar>
@@ -255,7 +255,7 @@
                 <div class="mt-6 flex">
                     <v-btn class="w-24 bg-red-500" dark text @click="showAlert = false">CANCELAR</v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn class="w-24 bg-green-500" dark text @click="cerrarSinGuardar()">OK</v-btn>
+                    <v-btn class="w-24 bg-green-500" dark text @click="closeWithoutSave()">OK</v-btn>
                 </div>
               </v-card-actions>
           </v-card>
@@ -310,7 +310,7 @@ export default {
       console.log(item);
     },
 
-    cerrarSinGuardar(){
+    closeWithoutSave(){
       this.showAlert = false;
       //Borramos ediciones sin guardar
       this.editandoJob = this.job;
@@ -327,7 +327,7 @@ export default {
       this.showEditJob = data;
     },
 
-    compruebaDatos(){
+    checkData(){
       if (this.edicionSinGuardar == true){
         this.showAlert = true;
       } else {
@@ -335,23 +335,22 @@ export default {
       }
     },
 
-    actualizarJobEditado(job){
+    updateEditedJob(job){
       this.editandoJob.expediente = job.expediente;
-      this.editandoJob.arreglo_job = job.perfil;
-      this.editandoJob.deteccion_job = job.detectado;
-      this.editandoJob.gravedad_job = job.gravedad;
-      this.editandoJob.asignacion_job = job.asignar;
-      this.editandoJob.nombre_operador = job.operador;
+      this.editandoJob.arreglo_job = job.arreglo_job;
+      this.editandoJob.deteccion_job = job.deteccion_job;
+      this.editandoJob.gravedad_job = job.gravedad_job;
+      this.editandoJob.asignacion_job = job.asignacion_job;
+      this.editandoJob.nombre_operador = job.nombre_operador;
       this.editandoJob.descripcion = job.descripcion;
-      this.editandoJob.geometria_json = job.geometriaJSON;
-      this.editandoJob.geometria = this.stringifyJobGeometry(job.geometriaJSON);
+      this.editandoJob.geometria_json = job.geometria_json;
+      this.editandoJob.geometria = this.stringifyJobGeometry(job.geometria_json);
       this.editandoJob.resumen = job.descripcion.substr(0,30) + "...";
 
       this.edicionSinGuardar = true;
     },
 
-    generarJobErrores() {
-      console.log(this.editandoJob)
+    generateJobsErrors() {
       this.resultado = this.generarJobError([this.editandoJob],[]);
       if (this.resultado.procesadoOK == false) {
         this.showInfo(this.resultado.mensaje, "red");
@@ -379,7 +378,7 @@ export default {
 
     storeJobs(job) {
       this.editandoJob = job;
-      this.actualizarJobEditado(this.editandoJob);
+      this.updateEditedJob(this.editandoJob);
       this.datosJobToDataTable();
     },
 
@@ -396,11 +395,11 @@ export default {
       //Enviamos señal sin cambio a map
       this.mapReset = false;
       this.activeTab = 0;
-      this.getErroresFromJob();
+      this.getErroresFromJobBD();
       this.datosJobToDataTable();
     },
 
-    getErroresFromJob() {
+    getErroresFromJobBD() {
       axios
         .get(`${process.env.VUE_APP_API_ROUTE}/error/` + this.job.job)
         .then((data) => {
@@ -427,7 +426,7 @@ export default {
       this.mapReset = true;
     },
 
-    actualizaDatosBD() {
+    updateDataBD() {
       //1 .- Actualizar datos de job en BD
       
       if (this.edicionSinGuardar == true) {

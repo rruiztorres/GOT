@@ -133,7 +133,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="error" dark @click="closeEditJob()">CANCELAR</v-btn>
-            <v-btn color="success" dark @click="guardarDatosJob()">ACEPTAR</v-btn>
+            <v-btn color="success" dark @click="storeJobData()">ACEPTAR</v-btn>
           </v-card-actions>
         </div>
       </v-card>
@@ -149,7 +149,7 @@ export default {
   mixins: [makeArrayFromApi],
 
   mounted(){
-      this.obtenerParametrosJob();
+      this.getJobParameters();
   },
 
   props: ["job"],
@@ -168,45 +168,45 @@ export default {
       this.$emit("closeEditJob", false);
     },
 
-    guardarDatosJob(){
-      this.job.asignar = this.asignacionJob;
+    storeJobData(){
+      this.job.asignacion_job = this.asignacionJob;
       this.job.descripcion = this.descJob;
-      this.job.detectado = this.deteccionJob;
+      this.job.deteccion_job = this.deteccionJob;
       this.job.expediente = this.expedienteJob;
-      this.job.gravedad = this.gravedadJob;
-      this.job.jobGran = this.jobGrande;
-      this.job.operador = this.nombreOperadorJob;
-      this.job.perfil = this.perfilJob;
-      this.job.tipoBandeja = this.tipoBandejaJob;
+      this.job.gravedad_job = this.gravedadJob;
+      this.job.job_grande = this.jobGrande;
+      this.job.nombre_operador = this.nombreOperadorJob;
+      this.job.arreglo_job = this.perfilJob;
+      this.job.tipo_bandeja = this.tipoBandejaJob;
 
       //Emitir cambios y cerrar
       this.$emit("editedJob", this.editedJob);
       this.closeEditJob();
     },
 
-    obtenerParametrosJob(){
-        axios.get(`${process.env.VUE_APP_API_ROUTE}/jobParameters`).then((data) => {
-            this.objeto = data.data;
-            //makeArrayFromApi (objetoAPI, arrayCrear, columnaBD)
-            this.makeArrayFromApi(this.objeto.expediente,this.expediente, 'expediente')
-            this.makeArrayFromApi(this.objeto.asignacion,this.asignacion, 'asignacion')
-            this.makeArrayFromApi(this.objeto.deteccion,this.deteccion, 'deteccion')
-            this.makeArrayFromApi(this.objeto.gravedad,this.gravedad, 'gravedad')
-            this.makeArrayFromApi(this.objeto.operador,this.nombreOperador, 'nombre_operador')
-            this.makeArrayFromApi(this.objeto.perfilJob,this.perfil, 'arreglo')                  
-            this.makeArrayFromApi(this.objeto.tipoBandeja,this.tipoBandeja, 'tipo_bandeja')
+    getJobParameters(){
+      axios.get(`${process.env.VUE_APP_API_ROUTE}/jobParameters`).then((data) => {
+          this.objeto = data.data;
+          //makeArrayFromApi (objetoAPI, arrayCrear, columnaBD)
+          this.makeArrayFromApi(this.objeto.expediente,this.expediente, 'expediente')
+          this.makeArrayFromApi(this.objeto.asignacion,this.asignacion, 'asignacion')
+          this.makeArrayFromApi(this.objeto.deteccion,this.deteccion, 'deteccion')
+          this.makeArrayFromApi(this.objeto.gravedad,this.gravedad, 'gravedad')
+          this.makeArrayFromApi(this.objeto.operador,this.nombreOperador, 'nombre_operador')
+          this.makeArrayFromApi(this.objeto.perfilJob,this.perfil, 'arreglo')                  
+          this.makeArrayFromApi(this.objeto.tipoBandeja,this.tipoBandeja, 'tipo_bandeja')
 
-            //Valores preasignados del job a editar
-            this.descJob = this.job.descripcion;
-            this.jobGrande = this.job.jobGran;
-            this.expedienteJob = this.job.expediente;
-            this.deteccionJob = this.job.detectado;
-            this.perfilJob = this.job.perfil;
-            this.gravedadJob = this.job.gravedad;
-            this.asignacionJob = this.job.asignar;
-            this.tipoBandejaJob = this.job.tipoBandeja;
-            this.nombreOperadorJob = this.job.operador;
-            })
+          //Valores preasignados del job a editar
+          this.descJob = this.job.descripcion;
+          this.jobGrande = this.job.job_grande;
+          this.expedienteJob = this.job.expediente;
+          this.deteccionJob = this.job.deteccion_job;
+          this.perfilJob = this.job.arreglo_job;
+          this.gravedadJob = this.job.gravedad_job;
+          this.asignacionJob = this.job.asignacion_job;
+          this.tipoBandejaJob = this.job.tipo_bandeja;
+          this.nombreOperadorJob = this.job.nombre_operador;
+          })
     },
   },
 

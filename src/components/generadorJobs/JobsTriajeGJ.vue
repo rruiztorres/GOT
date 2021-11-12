@@ -44,7 +44,7 @@
               class="h-full"
             >
               <EditarJob
-                @datosActualizados="actualizarDatos"
+                @datosActualizados="updateData"
                 @dialog="dialogClose"
                 :job="editedItem"
               ></EditarJob>
@@ -173,7 +173,7 @@ export default {
       //
     },
 
-    actualizarDatos(data){
+    updateData(data){
       if (data == true) {
         this.initialize();
       }

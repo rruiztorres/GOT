@@ -82,7 +82,7 @@
           </template>
 
           <template v-slot:[`item.bloqueado`]="{ item }">
-            <v-icon v-if="compruebaBloqueo(item.bloqueado) == false" color="red">
+            <v-icon v-if="checkBlocking(item.bloqueado) == false" color="red">
               mdi-block-helper
             </v-icon>
           </template>
@@ -96,11 +96,12 @@
 <script>
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
+import { checkBlocking } from '@/assets/mixins/checkBlocking.js';
 
 
 export default {
   name: "BandejaOpEsp",
-  mixins: [getColor],
+  mixins: [getColor, checkBlocking],
 
   data: () => ({
     dialog: false,
@@ -158,15 +159,6 @@ export default {
   methods: {
     dummy() {
       console.log()
-    },
-
-    compruebaBloqueo(jobBloquea){
-      if (jobBloquea == false ){
-        //console.log(jobBloquea)
-        return true
-      } else {
-        return false
-      }
     },
 
     editItem(item) {
