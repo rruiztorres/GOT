@@ -489,7 +489,7 @@
                 <v-spacer class="mb-4"></v-spacer>
                 <v-card-actions class="justify-end" style="padding:0rem;">
                     <v-btn class="w-28" color="error" elevation="3" @click="cerrarVentanaInfoJob()">CANCELAR</v-btn>
-                    <v-btn class="w-28" color="primary" elevation="3" @click="abrirFormularioEdicionJob()">EDITAR</v-btn>
+                    <v-btn class="w-28" :disabled="modoMapa == 'visualizar'" color="primary" elevation="3" @click="abrirFormularioEdicionJob()">EDITAR</v-btn>
                     <v-btn class="w-28" color="success" elevation="3" @click="actualizarJobEditado()">ACEPTAR</v-btn>
                 </v-card-actions>
             </v-card>
