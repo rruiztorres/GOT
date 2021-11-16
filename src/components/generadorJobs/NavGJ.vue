@@ -6,7 +6,7 @@
       :key="navGroup.name">
 
       <div v-if="hacerMini==false">
-        <v-list-item-title class="ml-4 my-2 text-l font-bold">{{navGroup.group}}</v-list-item-title>
+        <v-list-item-title class="ml-4 my-1 text-l font-bold">{{navGroup.group}}</v-list-item-title>
       </div>
 
       <div v-if="hacerMini==true">
@@ -80,10 +80,16 @@ export default {
               ]
             },
             {
+              group: 'Errores sin Asignar',
+              items: [
+                {group: 'Errores sin Asignar', name:'Ver Errores', icon:'mdi-map-marker-question'},
+                {group: 'Errores sin Asignar', name:'Gestionar Errores', icon:'mdi-table-search'},
+              ]
+            },
+            {
               group: 'Informes',
               items: [
                 {group: 'Informes', name:'Vista General', icon:'mdi-finance'},
-                {group: 'Informes',name:'Mis KPI', icon:'mdi-card-account-details-star'},
               ]
             },
           ],

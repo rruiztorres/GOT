@@ -119,6 +119,7 @@
                     </v-alert>
                 </v-overlay>
 
+                <!--ALERTA DATOS SIN GUARDAR-->
                 <v-overlay :value="showAlert">
                   <v-card class="p-3 w-80">
                    <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
@@ -324,8 +325,8 @@ export default {
             { text: 'Estado', value: 'estado' },
             { text: 'Id Error', value:'idError'},
             { text: 'Asignado a Job', value: 'asocJob' },
-            { text: 'Tipo Error', value: 'tipo' },              
-            { text: 'Tema Error', value: 'tema' },
+            { text: 'Tipo Error', value: 'tipo_error' },              
+            { text: 'Tema Error', value: 'tema_error' },
             { text: 'Descripcion', value: 'descripcion' },                  
         ],
 

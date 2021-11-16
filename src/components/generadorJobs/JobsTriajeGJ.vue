@@ -11,6 +11,7 @@
             <div class="p-3 flex bg-blue-500 w-full items-center">
               <v-btn disabled dark color="success" class="mr-3">GENERAR JOBS</v-btn>
               <v-btn disabled dark color="error" class="mr-3">RECHAZAR JOBS</v-btn>
+              <v-btn disabled dark color="error" class="mr-3">ASIGNAR OPERADOR</v-btn>
               <v-spacer></v-spacer>
 
               <v-text-field
@@ -122,6 +123,7 @@ export default {
       { text: "Detectado en", align: "start", sortable: true, value: "deteccion_job"},
       { text: "Perfil", align: "start", sortable: true, value: "arreglo_job"},
       { text: "Descripción", align: "start", sortable: true, value: "resumen"}, //hay que hacer desde API un "resumen" ademas de la desc completa
+      { text: "Operador", align: "start", sortable: true, value: "nombre_operador"},
       { text: "Acciones", value: "actions", sortable: false },
     ],
     jobs: [],

@@ -15,21 +15,25 @@
 
             <!--GEOMETRIAS MAPA -->
 
-            <!--jobs-->        
-            <vl-layer-vector 
-                :z-index="2">
+            <!--Geometrias de job--> 
+            <vl-layer-vector :z-index="1">
                 <vl-source-vector :features.sync="jobs" ident="jobs"></vl-source-vector>
                 <vl-style-box>
-                    <vl-style-stroke color="green"></vl-style-stroke>
-                    <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+                    <vl-style-stroke color="blue" :width="2"></vl-style-stroke>
                 </vl-style-box>
             </vl-layer-vector>
-
+            
+            <!-- Seleccion de geometria job--> 
             <vl-interaction-select
                 v-if="drawType == null && toolActive == 'selectJob'"
                 :features.sync="selectedJobs">
+                <vl-style-box>
+                    <vl-style-stroke color="red" :width="4"></vl-style-stroke>
+                    <vl-style-fill color="rgba(255,255,255,0.7)" ></vl-style-fill>
+                </vl-style-box>
             </vl-interaction-select>
 
+            <!-- Creacion geometrias de job -->
             <vl-interaction-draw 
             type="Polygon" 
             source="jobs"
@@ -40,6 +44,7 @@
                 </vl-style-box>
             </vl-interaction-draw>
 
+            <!--Edición geometrias de job -->
             <vl-interaction-modify
             type="Polygon"
             source="jobs"
@@ -47,23 +52,31 @@
             </vl-interaction-modify>
             <!--fin jobs-->
 
-            <!-- ERRORES -->
+            <!--Geometrias de Error -->
             <vl-layer-vector 
                 :z-index="3">
                 <vl-source-vector :features.sync="errores" ident="errores"></vl-source-vector>
                 <vl-style-box>
                     <vl-style-circle :radius="7">
-                        <vl-style-fill color="red"></vl-style-fill>
-                        <vl-style-stroke color="white"></vl-style-stroke>
+                        <vl-style-fill color="blue"></vl-style-fill>
+                        <vl-style-stroke color="white" :width="3"></vl-style-stroke>
                     </vl-style-circle>
                 </vl-style-box>
             </vl-layer-vector>
 
+            <!--Seleccion geometrias errores -->
             <vl-interaction-select
                 v-if="drawType == null && toolActive == 'selectError'"
                 :features.sync="selectedErrores">
+                <vl-style-box>
+                    <vl-style-circle :radius="9">
+                        <vl-style-fill color="red"></vl-style-fill>
+                        <vl-style-stroke color="white"></vl-style-stroke>
+                    </vl-style-circle>
+                </vl-style-box>
             </vl-interaction-select>
 
+            <!-- Creacion geometrias de errores -->
             <vl-interaction-draw 
             type="Point" 
             source="errores"
@@ -76,14 +89,15 @@
                 </vl-style-box>
             </vl-interaction-draw>
 
+            <!--Edicion geometrias de errores-->
             <vl-interaction-modify
             type="Point"
             source="errores"
             :active="toolActive == 'modifyError'">
             </vl-interaction-modify>
+            <!-- fin errores -->
 
-    <!-- ================================ CAPAS WMTS ================================= -->    
-
+            <!-- CAPAS WMTS -->    
             <vl-layer-tile 
             id="wmts" 
             :z-index="0">
@@ -96,7 +110,7 @@
                 :style-name="activeMap.styleName">
                 </vl-source-wmts>
             </vl-layer-tile>
-        </vl-map>
+        </vl-map>     
 
         <!--PANEL DE CONTROL -->
         <v-app class="font-sans" style="float: right; height: 0rem">
@@ -192,7 +206,7 @@
             </v-card>
         </v-app>
 
-        <!-- VENTANA INFORMACION -->
+        <!-- VENTANA INFORMACION MAPA (Centro, zoom, etc) -->
         <v-card style="
         top: -6.5rem;
         margin: 1rem;
@@ -442,10 +456,8 @@
             </v-alert>
         </template>
 
-
-        <!-- ========================== INFO JOBS ============================== -->
-
-        <v-dialog v-model="ventanaInfoJob" width="500">
+        <!-- INFORMACION DEL JOB -->
+        <v-dialog v-model="ventanaInfoJob" width="550">
             <v-card class="p-4 shadow shadow-l">
                 <v-card-title>PROPIEDADES DEL JOB {{jobMostrarInfo.job}}</v-card-title>
                 <table class="w-full">
@@ -495,6 +507,7 @@
             </v-card>
         </v-dialog>
 
+        <!-- FORMULARIO EDICIÓN DEL JOB -->
         <v-dialog v-model="formularioEdicionJob" width="500">
             <FormularioDatosJob
             :job="jobMostrarInfo"
@@ -502,7 +515,54 @@
             >
             </FormularioDatosJob>
         </v-dialog>
-        
+
+        <!-- INFORMACION DEL ERROR -->
+        <v-dialog v-model="ventanaInfoError" width="550">
+            <v-card class="p-4 shadow shadow-l">
+                <v-card-title><p>PROPIEDADES DEL ERROR <b>{{errorMostrarInfo.error}}</b></p></v-card-title>
+                <table class="w-full">
+                    <tr class="bg-gray-100">
+                        <td class="w-1/3 border border-gray p-2"><b>DESCRIPCIÓN:</b></td>
+                        <td class="border border-gray p-2">{{errorMostrarInfo.descripcion}}</td>
+                    </tr>
+                    <tr>
+                        <td class="w-1/3 border border-gray p-2"><b>TEMA:</b></td>
+                        <td class="border border-gray p-2">{{errorMostrarInfo.tema_error}}</td>
+                    </tr>
+                    <tr class="bg-gray-100">
+                        <td class="w-1/3 border border-gray p-2"><b>TIPO:</b></td>
+                        <td class="border border-gray p-2">{{errorMostrarInfo.tipo_error}}</td>
+                    </tr>
+                    <tr>
+                        <td class="w-1/3 border border-gray p-2"><b>VIA ENTRADA:</b></td>
+                        <td class="border border-gray p-2">{{errorMostrarInfo.via_ent}}</td>
+                    </tr>
+                    <tr class="bg-gray-100">
+                        <td class="w-1/3 border border-gray p-2"><b>ESTADO:</b></td>
+                        <td class="border border-gray p-2">{{errorMostrarInfo.estado}}</td>
+                    </tr>
+                    <tr>
+                        <td class="w-1/3 border border-gray p-2"><b>ASOC. A JOB:</b></td>
+                        <td class="border border-gray p-2">{{errorMostrarInfo.job}}</td>
+                    </tr>
+                </table>
+                <v-spacer class="mb-4"></v-spacer>
+                <v-card-actions class="justify-end" style="padding:0rem;">
+                    <v-btn class="w-28" color="error" elevation="3" @click="ventanaInfoError = false">CANCELAR</v-btn>
+                    <v-btn class="w-28" :disabled="modoMapa == 'visualizar'" color="primary" elevation="3" @click="openFormEditError()">EDITAR</v-btn>
+                    <v-btn class="w-28" color="success" elevation="3" @click="updateEditedError()">ACEPTAR</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- FORMULARIO EDICIÓN DEL ERROR -->
+        <v-dialog v-model="formularioEdicionError" width="500">
+            <FormularioDatosError
+            :error="errorMostrarInfo"
+            @closeEditError="formularioEdicionError=false"
+            >
+            </FormularioDatosError>
+        </v-dialog>   
     </div>
 </template>
 
@@ -517,12 +577,14 @@ import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry';
 import { stringifyErrorGeometry } from '@/assets/mixins/stringifyErrorGeometry';
 
 import FormularioDatosJob from '@/components/common/FormularioDatosJob';
+import FormularioDatosError from '@/components/common/FormularioDatosError';
 
     export default {
         props: ["modoMapa", "jobsRecibidos", "erroresRecibidos", "reset"],
 
         components:{
             FormularioDatosJob,
+            FormularioDatosError
         },
 
         computed: {
@@ -554,7 +616,7 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
             this.getJobParameters();
             this.getErrorParameters();
             this.retrieveJobFromBD();
-            this.retrieveErrorsFromBD();
+            this.retrieveErrorsFromBD();         
         },
 
         watch:{
@@ -572,8 +634,11 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 if(this.errores.length != 0 && this.toolActive == 'drawErrors'){
                     this.editError = true
                 }
-            },
 
+                if(this.errores.length != 0 && this.toolActive == 'modifyError'){
+                    this.$emit("errores", this.erroresAttrb)
+                }
+            },
         },
 
         methods:{
@@ -586,12 +651,27 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 this.ventanaInfoJob = false;
             },
 
+            updateEditedError(){
+                for (this.index in this.erroresAttrb){
+                    if (this.erroresAttrb[this.index].id==this.errorMostrarInfo.id){
+                        this.erroresAttrb[this.index] = this.errorMostrarInfo
+                        this.erroresAttrb[this.index].geometria = this.stringifyErrorGeometry(this.errorMostrarInfo.geometria_json)
+                    }
+                }
+                this.$emit("errores", this.erroresAttrb)
+                this.ventanaInfoError = false;
+            },
+
             closeWindowInfoJob(){
                 this.ventanaInfoJob = false;
             },
             
             openFormEditJob(){
                 this.formularioEdicionJob = true;
+            },
+
+            openFormEditError(){
+                this.formularioEdicionError = true;
             },
 
             showInfoError(){
@@ -604,13 +684,17 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                                 if (this.erroresAttrb[this.indexattrb].id == this.selectedErrores[this.index].id){
                                     this.errorSeleccionado = this.erroresAttrb[this.indexattrb];
                                     this.errorMostrarInfo = {
-                                        idError: this.errorSeleccionado.idError,
+                                        id: this.errorSeleccionado.id,
+                                        id_error: this.errorSeleccionado.id_error,
+                                        error: this.errorSeleccionado.error,
                                         descripcion: this.errorSeleccionado.descripcion,
-                                        tema: this.errorSeleccionado.tema,
-                                        tipo: this.errorSeleccionado.tipo,
-                                        viaEnt: this.errorSeleccionado.viaEnt,
+                                        tema_error: this.errorSeleccionado.tema_error,
+                                        tipo_error: this.errorSeleccionado.tipo_error,
+                                        via_ent: this.errorSeleccionado.via_ent,
                                         estado: this.errorSeleccionado.estado,
-                                        asocJob: this.errorSeleccionado.asocJob,
+                                        job: this.errorSeleccionado.job,
+                                        geometria: null,
+                                        geometria_json: this.errorSeleccionado.geometria_json,
                                     }
                                 }
                             }
@@ -701,13 +785,16 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                             //Atributos
                             this.newAttrbErrorBd = {
                                 id: md5(this.erroresRecibidos[this.index].id_error),
-                                idError: this.erroresRecibidos[this.index].error,
+                                id_error: this.erroresRecibidos[this.index].id_error,
+                                error: this.erroresRecibidos[this.index].error,
                                 descripcion: this.erroresRecibidos[this.index].descripcion,
-                                asocJob: this.erroresRecibidos[this.index].job,
-                                tema: this.erroresRecibidos[this.index].tema_error,
-                                tipo: this.erroresRecibidos[this.index].tipo_error,
-                                viaEnt: this.erroresRecibidos[this.index].via_ent,
+                                job: this.erroresRecibidos[this.index].job,
+                                tema_error: this.erroresRecibidos[this.index].tema_error,
+                                tipo_error: this.erroresRecibidos[this.index].tipo_error,
+                                via_ent: this.erroresRecibidos[this.index].via_ent,
                                 estado: this.erroresRecibidos[this.index].estado,
+                                geometria: null,
+                                geometria_json: this.erroresRecibidos[this.index].geometria_json,
                             };
                             this.erroresAttrb.push(this.newAttrbErrorBd);
                         }
@@ -815,14 +902,14 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                 let newAttrbError = {
                     id: this.errores[this.errores.length-1].id,
                     estado: 'Marcado',
-                    idError: null,
+                    id_error: null,
                     asocJob: null,
-                    tipo: this.selectTipoError,
-                    tema: this.selectTema,
+                    tipo_error: this.selectTipoError,
+                    tema_error: this.selectTema,
                     descripcion: this.descError,
                     geometria: this.stringifyErrorGeometry(this.errores[this.errores.length-1].geometry),
-                    geometriaJSON: this.errores[this.errores.length-1].geometry,
-                    viaEnt: 'IDV',
+                    geometria_json: this.errores[this.errores.length-1].geometry,
+                    via_ent: 'IDV',
                 }
                 this.erroresAttrb.push(newAttrbError);
                 this.editError = false;
@@ -1058,7 +1145,7 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                     icon: "mdi-cursor-default",
                     modo: "visualizar" 
                 },
-                {   title: "Editar Propiedades del Job", 
+                {   title: "Ver / Editar Propiedades del Job", 
                     active: "getJobInfo", 
                     click: this.activeInfoJob, 
                     icon: "mdi-square-edit-outline",
@@ -1090,10 +1177,10 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
                     icon: "mdi-cursor-default",
                     modo: "visualizar" 
                 },
-                {   title: "Información del Error",
+                {   title: "Ver / Editar Propiedades del Error",
                     active: "getErrorInfo", 
                     click: this.activeInfoError, 
-                    icon: "mdi-information",
+                    icon: "mdi-square-edit-outline",
                     modo: "visualizar"
                 },
                 {   title: "Editar posición del Error",
@@ -1159,6 +1246,9 @@ import FormularioDatosJob from '@/components/common/FormularioDatosJob';
             ventanaInfoError: false,
             jobMostrarInfo: {},
             formularioEdicionJob: false,
+            errorMostrarInfo: {},
+            formularioEdicionError: false,
+            
         }
     }
 }

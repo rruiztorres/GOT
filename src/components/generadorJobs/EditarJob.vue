@@ -28,9 +28,7 @@
       <v-card>
         <v-tabs v-model="activeTab" fixed-tabs background-color="#0341a6" dark>
           <v-tab :key="1" @click="activateMap(false)">Datos del Job</v-tab>
-          <v-tab :key="2" @click="activateMap(true)"
-            >Localización en el Mapa</v-tab
-          >
+          <v-tab :key="2" @click="activateMap(true)">Localización en el Mapa</v-tab>
           <v-tab :key="3" @click="activateMap(false)">Datos adjuntos</v-tab>
 
           <v-tabs-slider color="#76aff5"></v-tabs-slider>
@@ -203,20 +201,6 @@
                 <br />
               </div>
             </v-card>
-
-            <!--MENSAJES DE INFORMACION-->
-            <v-overlay :value="showMessage">
-              <v-alert
-                class="mx-7"
-                :color="messageType"
-                dark
-                border="top"
-                icon="mdi-alert-circle-outline"
-                transition="scale-transition"
-              >
-                {{ message }}
-              </v-alert>
-            </v-overlay>
           </v-tab-item>
 
 
@@ -259,6 +243,20 @@
                 </div>
               </v-card-actions>
           </v-card>
+        </v-overlay>
+
+        <!--MENSAJES DE INFORMACION-->
+        <v-overlay :value="showMessage">
+          <v-alert
+            class="mx-7"
+            :color="messageType"
+            dark
+            border="top"
+            icon="mdi-alert-circle-outline"
+            transition="scale-transition"
+          >
+            {{ message }}
+          </v-alert>
         </v-overlay>
       </v-card>
     </template>
@@ -395,6 +393,7 @@ export default {
       //Enviamos señal sin cambio a map
       this.mapReset = false;
       this.activeTab = 0;
+
       this.getErroresFromJobBD();
       this.datosJobToDataTable();
     },
@@ -406,11 +405,12 @@ export default {
           this.erroresBruto = data.data.errores;
           for (this.elemento in this.erroresBruto) {
             this.errores.push(this.erroresBruto[this.elemento]);
+            this.errores[this.elemento].job = this.job.id_job
           }
         })
         .catch((data) => {
           console.log(data);
-        });
+      });
     },
 
     closeDialog() {
@@ -426,16 +426,28 @@ export default {
       this.mapReset = true;
     },
 
+    updateErrorsBD(data, index){
+      this.errores[index].descripcion = data.descripcion;
+      this.errores[index].error = data.error;
+      this.errores[index].estado = data.estado;
+      this.errores[index].geometria = data.geometria;
+      this.errores[index].geometria_json = data.geometria_json;
+      this.errores[index].id_error = data.id_error;
+      this.errores[index].job = data.job;
+      this.errores[index].tema_error = data.tema_error;
+      this.errores[index].tipo_error = data.tipo_error;
+      this.errores[index].via_ent = data.via_ent;
+    },
+
+
     updateDataBD() {
-      //1 .- Actualizar datos de job en BD
-      
+      //1 .- Actualizar datos de job en BD   
       if (this.edicionSinGuardar == true) {
         axios
         .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, this.editandoJob)
           .then((data) => {
               this.edicionSinGuardar = false;
               this.$emit("datosActualizados", true);
-
               this.showInfo(data.data.mensaje, "green");
               setTimeout(this.closeInfo, 2000);
           })
@@ -444,10 +456,40 @@ export default {
           });
         
       }
-      //2 .- Comprobar que no se ha insertado ningún error nuevo
-      //3 .- Actualizar datos de errores en BD
+      //2 .- Si se registra un error nuevo realizar insercion (si está dentro de job)
+      //asignar id job
+      for (this.index in this.errores){
+        this.errores[this.index].asocJob = this.job.id_job;
+      }
+
+      for (this.index in this.errores) {
+        if (this.errores[this.index].error == null){
+           axios
+            .post(`${process.env.VUE_APP_API_ROUTE}/postError`, this.errores[this.index])
+            .then( data => {
+              if (data.status == 201){
+                this.updateErrorsBD(data.data.error[0], this.index);
+              }
+              else if (data.status == 203){
+                //Eliminamos error fuera del job
+                this.errores.pop()
+              }
+            });
+        } else {
+          //3 .- Los errores ya existian en BD . Actualizar datos
+          axios
+          .put(`${process.env.VUE_APP_API_ROUTE}/updateError`, this.errores[this.index])
+          .then( data => {
+            if (data.status == 201){
+              this.updateErrorsBD(data.data.error[0], this.index);
+            } 
+          })
+        } 
+      }   
     },
   },
+
+ 
 
   data() {
     return {
