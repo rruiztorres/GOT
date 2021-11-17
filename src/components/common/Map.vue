@@ -19,7 +19,7 @@
             <vl-layer-vector :z-index="1">
                 <vl-source-vector :features.sync="jobs" ident="jobs"></vl-source-vector>
                 <vl-style-box>
-                    <vl-style-stroke color="blue" :width="2"></vl-style-stroke>
+                    <vl-style-stroke color="blue" :width="4"></vl-style-stroke>
                 </vl-style-box>
             </vl-layer-vector>
             
@@ -901,15 +901,16 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                 //TODO: parece imposible unificar todo en un mismo array... 
                 let newAttrbError = {
                     id: this.errores[this.errores.length-1].id,
-                    estado: 'Marcado',
                     id_error: null,
-                    asocJob: null,
-                    tipo_error: this.selectTipoError,
-                    tema_error: this.selectTema,
+                    error: null,
                     descripcion: this.descError,
-                    geometria: this.stringifyErrorGeometry(this.errores[this.errores.length-1].geometry),
-                    geometria_json: this.errores[this.errores.length-1].geometry,
+                    job: null,
+                    tema_error: this.selectTema,
+                    tipo_error: this.selectTipoError,    
                     via_ent: 'IDV',
+                    estado: 'Marcado',
+                    geometria: this.stringifyErrorGeometry(this.errores[this.errores.length-1].geometry),
+                    geometria_json: this.errores[this.errores.length-1].geometry,            
                 }
                 this.erroresAttrb.push(newAttrbError);
                 this.editError = false;

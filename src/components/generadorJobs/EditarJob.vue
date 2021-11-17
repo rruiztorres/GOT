@@ -267,6 +267,7 @@
 import { getColor } from '@/assets/mixins/getColor';
 import { generarJobError } from '@/assets/mixins/generarJobError';
 import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry';
+import pointInPolygon from "point-in-polygon";
 
 import axios from "axios";
 import Map from "@/components/common/Map";
@@ -382,6 +383,7 @@ export default {
 
     storeErrors(errores) {
       this.errores = errores;
+      this.edicionSinGuardar = true;
     },
 
     activateMap(active) {
@@ -426,66 +428,64 @@ export default {
       this.mapReset = true;
     },
 
-    updateErrorsBD(data, index){
-      this.errores[index].descripcion = data.descripcion;
-      this.errores[index].error = data.error;
-      this.errores[index].estado = data.estado;
-      this.errores[index].geometria = data.geometria;
-      this.errores[index].geometria_json = data.geometria_json;
-      this.errores[index].id_error = data.id_error;
-      this.errores[index].job = data.job;
-      this.errores[index].tema_error = data.tema_error;
-      this.errores[index].tipo_error = data.tipo_error;
-      this.errores[index].via_ent = data.via_ent;
+    errorInJob(polygon, point){
+      //Evalua si un punto de error está dentro de un job
+      this.polygon = [polygon];
+      this.point = [
+        point.coordinates[0],
+        point.coordinates[1],
+      ];
+      this.inside = pointInPolygon(this.point, this.polygon[0]);
+      return this.inside;
     },
 
-
     updateDataBD() {
-      //1 .- Actualizar datos de job en BD   
+      //1 .- Actualizar Datos Job en BD ¿geometria?
       if (this.edicionSinGuardar == true) {
+        this.updateEditedJob(this.editandoJob)
         axios
         .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, this.editandoJob)
           .then((data) => {
-              this.edicionSinGuardar = false;
-              this.$emit("datosActualizados", true);
-              this.showInfo(data.data.mensaje, "green");
-              setTimeout(this.closeInfo, 2000);
+              this.statusJob = data.status;
           })
           .catch((data) => {
             console.log(data);
           });
-        
-      }
-      //2 .- Si se registra un error nuevo realizar insercion (si está dentro de job)
-      //asignar id job
-      for (this.index in this.errores){
-        this.errores[this.index].asocJob = this.job.id_job;
       }
 
-      for (this.index in this.errores) {
-        if (this.errores[this.index].error == null){
-           axios
-            .post(`${process.env.VUE_APP_API_ROUTE}/postError`, this.errores[this.index])
-            .then( data => {
-              if (data.status == 201){
-                this.updateErrorsBD(data.data.error[0], this.index);
-              }
-              else if (data.status == 203){
-                //Eliminamos error fuera del job
-                this.errores.pop()
-              }
-            });
-        } else {
-          //3 .- Los errores ya existian en BD . Actualizar datos
-          axios
-          .put(`${process.env.VUE_APP_API_ROUTE}/updateError`, this.errores[this.index])
-          .then( data => {
-            if (data.status == 201){
-              this.updateErrorsBD(data.data.error[0], this.index);
-            } 
-          })
+      //2 .- No permitir insercion fuera job
+      this.continue = true;
+      for (this.index in this.errores){   
+        this.errorDentro = this.errorInJob(this.editandoJob.geometria_json.coordinates[0], this.errores[this.index].geometria_json)
+        if (this.errorDentro == false){
+          this.continue = false;
         } 
-      }   
+      }
+
+      //2a .- Si errores ok continuamos
+      if (this.continue == true){
+        //asignamos numero job actual
+        for (this.index in this.errores){
+          this.errores[this.index].job = this.job.id_job;
+        }
+        axios
+          .post(`${process.env.VUE_APP_API_ROUTE}/postErrores`, this.errores)
+            .then((data) => {
+              this.statusErrores = data.status;
+              this.edicionSinGuardar = false;              
+              this.errores = data.data.errores
+
+              this.$emit("datosActualizados", true);
+              this.showInfo("Datos guardados correctamente", "green");
+              setTimeout(this.closeInfo, 2000);  
+            })
+      } else {
+        //Lanzar aviso error fuera de job
+        this.$emit("datosActualizados", true);
+        this.showInfo("No se pueden insertar errores fuera del job, revise los datos", "red");
+        setTimeout(this.closeInfo, 2000);   
+      }
+      
     },
   },
 
