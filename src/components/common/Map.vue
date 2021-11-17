@@ -936,6 +936,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     this.gravedadJob = this.gravedad[this.asignarValoresDefault(this.objeto.gravedad, 'id_gravedad')];
                     this.perfilJob = this.perfil[this.asignarValoresDefault(this.objeto.perfilJob, 'id_arreglo')];
                     this.tipoBandejaJob = this.tipoBandeja[this.asignarValoresDefault(this.objeto.tipoBandeja, 'id_tipo_bandeja')];
+                    this.nombreOperadorJob = null;
                     })
             },
 

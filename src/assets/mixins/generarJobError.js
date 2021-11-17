@@ -8,6 +8,8 @@ import axios from "axios";
 export const generarJobError = {
     methods: {
         generarJobError(jobs, errores) {
+            console.log(jobs, errores);
+            
             if (jobs.length == 0) {
                 //No existen jobs, lanzar alerta
                 const enviarDatos = {
@@ -24,7 +26,7 @@ export const generarJobError = {
                         };
                         return enviarDatos;
                     } else {
-                        if (jobs[index].nombre_operador.length == 0){
+                        if (jobs[index].nombre_operador == null){
                             //No tiene operador asignado = bandeja genérica
                             this.actualizarJob = {
                                 nuevoEstado: 'En bandeja',
