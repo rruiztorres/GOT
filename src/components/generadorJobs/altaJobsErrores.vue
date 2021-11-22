@@ -267,7 +267,7 @@ export default {
             .then(data => { console.log ("Jobs actualizados correctamente ", data)})
         },
 
-        // GUARDAR DATOS MAESTRO -definir algoritmo guardado-
+        // GUARDAR DATOS MAESTRO
         saveData(){
             this.showLoading = true;
             this.jobsErrores = {

@@ -67,7 +67,6 @@ export default {
             { group: 'Gestión de jobs',
               items: [
                 {name:'Alta de Jobs / Errores', icon:'mdi-briefcase-plus', active:'altaJobsErrores'}, 
-                {name:'Jobs Devueltos', icon:'mdi-briefcase-off', active:'JobsDevGJ'},
                 {name:'Jobs en Triaje', icon:'mdi-briefcase-search', active:'JobsTriajeGJ'},
                 {name:'Recuperar Jobs', icon:'mdi-briefcase-upload', active:'RecuperarJobs'},
               ]

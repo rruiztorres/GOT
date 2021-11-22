@@ -213,7 +213,7 @@
                 :jobsRecibidos="editandoJob"
                 :erroresRecibidos="errores"
                 :reset="mapReset"
-                @job="storeJobs"
+                @jobs="storeJobs"
                 @errores="storeErrors"
               >
               </Map>
@@ -267,13 +267,15 @@
 import { getColor } from '@/assets/mixins/getColor';
 import { generarJobError } from '@/assets/mixins/generarJobError';
 import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry';
+import { stringifyErrorGeometry } from '@/assets/mixins/stringifyErrorGeometry'
+
 import pointInPolygon from "point-in-polygon";
 
 import axios from "axios";
 import Map from "@/components/common/Map";
 
 export default {
-  mixins: [getColor, generarJobError, stringifyJobGeometry],
+  mixins: [getColor, generarJobError, stringifyJobGeometry, stringifyErrorGeometry],
 
   props: ["job", "error", "center"],
 
@@ -335,21 +337,21 @@ export default {
     },
 
     updateEditedJob(job){
-      this.editandoJob.expediente = job.expediente;
-      this.editandoJob.arreglo_job = job.arreglo_job;
-      this.editandoJob.deteccion_job = job.deteccion_job;
-      this.editandoJob.gravedad_job = job.gravedad_job;
-      this.editandoJob.asignacion_job = job.asignacion_job;
-      this.editandoJob.nombre_operador = job.nombre_operador;
-      this.editandoJob.descripcion = job.descripcion;
-      this.editandoJob.geometria_json = job.geometria_json;
-      this.editandoJob.geometria = this.stringifyJobGeometry(job.geometria_json);
-      this.editandoJob.resumen = job.descripcion.substr(0,30) + "...";
-
-      this.edicionSinGuardar = true;
+        this.updateJob = job[0]
+        this.editandoJob.expediente = this.updateJob.expediente;
+        this.editandoJob.arreglo_job = this.updateJob.arreglo_job;
+        this.editandoJob.deteccion_job = this.updateJob.deteccion_job;
+        this.editandoJob.gravedad_job = this.updateJob.gravedad_job;
+        this.editandoJob.asignacion_job = this.updateJob.asignacion_job;
+        this.editandoJob.nombre_operador = this.updateJob.nombre_operador;
+        this.editandoJob.descripcion = this.updateJob.descripcion;
+        this.editandoJob.geometria_json = this.updateJob.geometria_json;
+        this.edicionSinGuardar = true;
     },
 
     generateJobsErrors() {
+      //TODO: Comprobar que las ediciones se han guardado.
+
       this.resultado = this.generarJobError([this.editandoJob],[]);
       if (this.resultado.procesadoOK == false) {
         this.showInfo(this.resultado.mensaje, "red");
@@ -372,6 +374,13 @@ export default {
     },
 
     datosJobToDataTable() {
+      //caso edicion devuelve arrays hay que convertir a objeto
+      if (this.editandoJob.length > 0){
+        this.editandoJob = this.editandoJob[0];
+        //añadimos atributos
+        this.editandoJob.resumen = this.editandoJob.descripcion.substr(0,30) + "...";
+        this.editandoJob.geometria = this.stringifyJobGeometry(this.editandoJob.geometria_json);
+      }
       this.datosJob = [this.editandoJob];
     },
 
@@ -384,19 +393,25 @@ export default {
     storeErrors(errores) {
       this.errores = errores;
       this.edicionSinGuardar = true;
+      
+      for (this.index in errores){
+        this.errores[this.index].geometria = this.stringifyErrorGeometry(errores[this.index].geometria_json)
+      }
     },
 
     activateMap(active) {
       this.mapIsActive = active;
     },
 
-    //inicializa la tabla de jobs
     initialize() {
       //Enviamos señal sin cambio a map
       this.mapReset = false;
       this.activeTab = 0;
 
-      this.getErroresFromJobBD();
+      //Evita crear claves duplicadas en el array de errores
+      if (this.errores.length == 0) {
+        this.getErroresFromJobBD();
+      }
       this.datosJobToDataTable();
     },
 
@@ -440,11 +455,11 @@ export default {
     },
 
     updateDataBD() {
+      console.log("enviar job", this.datosJob)
       //1 .- Actualizar Datos Job en BD ¿geometria?
       if (this.edicionSinGuardar == true) {
-        this.updateEditedJob(this.editandoJob)
         axios
-        .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, this.editandoJob)
+        .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, this.datosJob)
           .then((data) => {
               this.statusJob = data.status;
           })

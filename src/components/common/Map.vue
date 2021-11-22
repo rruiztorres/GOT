@@ -619,6 +619,11 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             this.retrieveErrorsFromBD();         
         },
 
+        beforeDestroy(){
+            this.$emit("errores", this.erroresAttrb);
+            this.$emit('jobs', this.jobsAttrb);
+        },
+
         watch:{
             jobs(){
                 if(this.jobs.length != 0 && this.toolActive == 'drawJobs'){
@@ -627,6 +632,15 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
                 if(this.jobs.length != 0 && this.toolActive == 'modifyJob'){
                     this.$emit('jobs', this.jobsAttrb)
+                }
+
+                //Actualizacion de geometrias al vuelo
+                if(this.jobsAttrb.length > 0){
+                    for (this.index in this.jobs){
+                        if (this.jobs[this.index].id == this.jobsAttrb[this.index].id){
+                            this.jobsAttrb[this.index].geometria_json = this.jobs[this.index].geometry;
+                        }
+                    }
                 }
             },
             
@@ -637,6 +651,15 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
                 if(this.errores.length != 0 && this.toolActive == 'modifyError'){
                     this.$emit("errores", this.erroresAttrb)
+                }
+
+                //Actualizacion de geometrias al vuelo
+                if(this.erroresAttrb.length > 0){
+                    for (this.index in this.errores){
+                        if (this.errores[this.index].id == this.erroresAttrb[this.index].id){
+                            this.erroresAttrb[this.index].geometria_json = this.errores[this.index].geometry;
+                        }
+                    }
                 }
             },
         },
