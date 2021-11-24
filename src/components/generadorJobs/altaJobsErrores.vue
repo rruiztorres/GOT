@@ -278,21 +278,29 @@ export default {
             axios
             .post(`${process.env.VUE_APP_API_ROUTE}/postJobsErrores`, this.jobsErrores)
             .then( data => {
-                if (data.status == 201) {
-                    //Asignamos los id dados por la base de datos en la petición
-                    for (this.index in this.jobs){
-                        this.jobs[this.index].job = data.data.jobs[this.index]
-                    }
-                    for (this.index in this.errores){
-                        this.errores[this.index].asocJob = data.data.errores[this.index].job;
-                        this.errores[this.index].idError = data.data.errores[this.index].idError;
-                    }
+                if(data.data.tipo == 'Errores sin asignar'){
                     this.datosGuardados = true;
                     this.showLoading = false;
                     this.showInfo("Datos guardados correctamente", "green");
                     setTimeout(this.closeInfo,2000);
                 } else {
-                    console.log(data.data.mensaje);
+                    if (data.status == 201) {
+                        //Asignamos los id dados por la base de datos en la petición
+                        
+                        for (this.index in this.jobs){
+                            this.jobs[this.index].job = data.data.jobs[this.index]
+                        }
+                        for (this.index in this.errores){
+                            this.errores[this.index].asocJob = data.data.errores[this.index].job;
+                            this.errores[this.index].idError = data.data.errores[this.index].idError;
+                        }
+                        this.datosGuardados = true;
+                        this.showLoading = false;
+                        this.showInfo("Datos guardados correctamente", "green");
+                        setTimeout(this.closeInfo,2000);
+                    } else {
+                        console.log(data.data.mensaje);
+                    }
                 }
             })   
         }

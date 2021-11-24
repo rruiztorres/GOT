@@ -88,7 +88,6 @@ export default {
 
   methods:{
     initializeParameters(){
-      this.date1 = '';
       this.nExp = '';
       this.storeObservationsExp('');
     },
@@ -154,7 +153,6 @@ export default {
         this.mensajeFlotante.mensaje = mensaje;
         this.mensajeFlotante.aceptar = aceptar;             //Muestra el boton de "entendido"
     },
-
 
     closeInfoMessage(){
         this.mensajeFlotante.visibilidad = false;
