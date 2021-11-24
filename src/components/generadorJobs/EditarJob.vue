@@ -41,9 +41,10 @@
                 <v-row class="h-full mb-6">
                   <v-col cols="8">
                     <v-card class="mb-6">
-                      <v-card-title class="bg-blue-200"
-                        >DATOS DEL JOB</v-card-title
-                      >
+                      <v-card-title class="bg-blue-200">
+                      DATOS DEL JOB
+                      </v-card-title>
+                      
 
                       <v-data-table
                         :headers="jobHeaders"
@@ -75,6 +76,12 @@
                             <v-chip :color="getColor(item.estado)" dark>
                               {{ item.estado }}
                             </v-chip>
+                          </template>
+
+                          <template v-slot:[`item.actions`]="{ item }">
+                            <v-btn title="Eliminar Error" icon dark class="bg-red-500 mr-1">
+                              <v-icon @click="confirmDelete(item)"> mdi-trash-can </v-icon>
+                            </v-btn>
                           </template>
                         </v-data-table>
                       </div>
@@ -245,6 +252,21 @@
           </v-card>
         </v-overlay>
 
+        <!-- AVISO ELIMINAR ERRORES -->
+        <v-overlay :value="showAlertError">
+          <v-card class="p-3 w-80">
+            <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
+            <h3 class="text-center text-l">Esta acción no se puede deshacer ¿continuar con el borrado?</h3>
+              <v-card-actions>
+                <div class="mt-6 flex">
+                    <v-btn class="w-24 bg-red-500" dark text @click="showAlertError = false">CANCELAR</v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn class="w-24 bg-green-500" dark text @click="deleteError(errorBorrar)">OK</v-btn>
+                </div>
+              </v-card-actions>
+          </v-card>
+        </v-overlay>
+
         <!--MENSAJES DE INFORMACION-->
         <v-overlay :value="showMessage">
           <v-alert
@@ -307,15 +329,48 @@ export default {
   },
 
   methods: {
-    dummy(item) {
-      console.log(item);
+    confirmDelete(errorBorrar){
+      this.showAlertError = true;
+      this.errorBorrar = errorBorrar;
+    },
+
+    deleteError(error){
+      if (error.error != null){
+        axios
+        .delete(`${process.env.VUE_APP_API_ROUTE}/deleteError`,  {data: {error}})
+        .then( (data) => {
+          if (data.status == 201){
+            this.showInfo(data.data.mensaje, "green");
+            setTimeout(this.closeInfo, 2000);
+
+            //Actualizar array errores
+            for (this.index in this.errores){
+              if (this.errores[this.index].error == error.error){
+                this.errores.splice(this.index,1)
+              }
+            }
+          } else {
+            this.showInfo(data.data.mensaje, "red");
+            setTimeout(this.closeInfo, 2000);
+          }
+        })
+      } else {
+        this.showInfo("Error eliminado correctamente", "green");
+        setTimeout(this.closeInfo, 2000);
+        //Actualizar array errores
+        for (this.index in this.errores){
+          if (this.errores[this.index].error == error.error){
+            this.errores.splice(this.index,1)
+          }
+        }
+      }
+      this.showAlertError = false;
     },
 
     closeWithoutSave(){
       this.showAlert = false;
       //Borramos ediciones sin guardar
       this.editandoJob = this.job;
-      this.edicionSinGuardar = false;
       this.closeDialog();
     },
 
@@ -346,20 +401,23 @@ export default {
         this.editandoJob.nombre_operador = this.updateJob.nombre_operador;
         this.editandoJob.descripcion = this.updateJob.descripcion;
         this.editandoJob.geometria_json = this.updateJob.geometria_json;
-        this.edicionSinGuardar = true;
     },
 
     generateJobsErrors() {
       //TODO: Comprobar que las ediciones se han guardado.
-
-      this.resultado = this.generarJobError([this.editandoJob],[]);
-      if (this.resultado.procesadoOK == false) {
-        this.showInfo(this.resultado.mensaje, "red");
-        setTimeout(this.closeInfo, 2000);
-      } else if (this.resultado.procesadoOK == true) {
-        this.showInfo(this.resultado.mensaje, "green");
-        setTimeout(this.closeInfo, 2000);
-        setTimeout(this.closeDialog, 2200);
+      if (this.edicionSinGuardar == false){
+        this.resultado = this.generarJobError([this.editandoJob],[]);
+        if (this.resultado.procesadoOK == false) {
+          this.showInfo(this.resultado.mensaje, "red");
+          setTimeout(this.closeInfo, 2000);
+        } else if (this.resultado.procesadoOK == true) {
+          this.showInfo(this.resultado.mensaje, "green");
+          setTimeout(this.closeInfo, 2000);
+          setTimeout(this.closeDialog, 2200);
+        } 
+      } else {
+          this.showInfo("Guarde los datos antes de generar el job", "red");
+          setTimeout(this.closeInfo, 2000);
       }
     },
 
@@ -378,7 +436,6 @@ export default {
       if (this.editandoJob.length > 0){
         this.editandoJob = this.editandoJob[0];
         //añadimos atributos
-        this.editandoJob.resumen = this.editandoJob.descripcion.substr(0,30) + "...";
         this.editandoJob.geometria = this.stringifyJobGeometry(this.editandoJob.geometria_json);
       }
       this.datosJob = [this.editandoJob];
@@ -388,12 +445,16 @@ export default {
       this.editandoJob = job;
       this.updateEditedJob(this.editandoJob);
       this.datosJobToDataTable();
+      this.edicionSinGuardar = true;
     },
 
     storeErrors(errores) {
+      if (this.editandoJob == errores){
+        console.log("sin cambios error")
+      }
       this.errores = errores;
       this.edicionSinGuardar = true;
-      
+
       for (this.index in errores){
         this.errores[this.index].geometria = this.stringifyErrorGeometry(errores[this.index].geometria_json)
       }
@@ -455,7 +516,6 @@ export default {
     },
 
     updateDataBD() {
-      console.log("enviar job", this.datosJob)
       //1 .- Actualizar Datos Job en BD ¿geometria?
       if (this.edicionSinGuardar == true) {
         axios
@@ -487,12 +547,12 @@ export default {
           .post(`${process.env.VUE_APP_API_ROUTE}/postErrores`, this.errores)
             .then((data) => {
               this.statusErrores = data.status;
-              this.edicionSinGuardar = false;              
               this.errores = data.data.errores
 
               this.$emit("datosActualizados", true);
               this.showInfo("Datos guardados correctamente", "green");
               setTimeout(this.closeInfo, 2000);  
+              this.edicionSinGuardar = false;
             })
       } else {
         //Lanzar aviso error fuera de job
@@ -517,6 +577,7 @@ export default {
         { text: "Tipo", value: "tipo_error" },
         { text: "Descripcion", value: "descripcion" },
         { text: "Procedencia", value: "via_ent" },
+        { text: "Acciones", value: "actions" },
       ],
 
       jobHeaders: [
@@ -527,7 +588,7 @@ export default {
         { text: "Gravedad", value: "gravedad_job" },
         { text: "Asignado a", value: "asignacion_job" },
         { text: "Operador", value: "nombre_operador" },
-        { text: "Descripción", value: "resumen" },
+        { text: "Descripción", value: "descripcion" },
       ],
 
       mapReset: false,
@@ -540,12 +601,16 @@ export default {
 
       showEditJob: false,
       jobEditar: null,
+      edicionSinGuardar: false,
 
       //CAPACIDAD EDICION JOBS
       editandoJob: this.job,
 
       //ALERTA DATOS SIN GUARDAD
       showAlert: false,
+
+      //ALERTA BORRADO ERRORES
+      showAlertError: false,
     };
   },
 };

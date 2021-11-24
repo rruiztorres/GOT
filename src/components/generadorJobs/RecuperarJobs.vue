@@ -9,8 +9,8 @@
         <v-card elevation="0" class="mb-4">
           <div>
             <div class="p-3 flex bg-blue-500 w-full items-center">
-              <v-btn disabled dark color="success" class="mr-3">ACCION 1</v-btn>
-              <v-btn disabled dark color="error" class="mr-3">ACCION 2</v-btn>
+              <v-btn :disabled="groupActions()" dark color="success" class="mr-3" @click="recuperarTriaje()">RECUPERAR A TRIAJE</v-btn>
+              <v-btn :disabled="groupActions()" dark color="error" class="mr-3">RECHAZAR JOBS</v-btn>
               <v-spacer></v-spacer>
 
               <v-text-field
@@ -87,6 +87,21 @@
           </template>
         </v-data-table>
       </div>
+
+      <!--MENSAJES DE INFORMACION-->
+      <v-overlay :value="showMessage">
+        <v-alert
+          class="mx-7"
+          :color="messageType"
+          dark
+          border="top"
+          icon="mdi-alert-circle-outline"
+          transition="scale-transition"
+        >
+          {{ message }}
+        </v-alert>
+      </v-overlay>
+
     </v-app>
   </div>
 </template>
@@ -117,7 +132,6 @@ export default {
       { text: "Detectado en", align: "start", sortable: true, value: "deteccion_job"},
       { text: "Perfil", align: "start", sortable: true, value: "arreglo_job"},
       { text: "Descripción", align: "start", sortable: true, value: "resumen"}, //hay que hacer desde API un "resumen" ademas de la desc completa
-      { text: "Acciones", value: "actions", sortable: false },
     ],
     jobs: [],
     editedIndex: -1,
@@ -135,6 +149,9 @@ export default {
       job_detectado: "",
       job_arreglar: "",
     },
+    showMessage: false,
+    message: '',
+    messageType: '',
   }),
 
   computed: {
@@ -163,6 +180,50 @@ export default {
   methods: {
     dummy() {
       //
+    },
+    showInfo(message, type) {
+      this.showMessage = true;
+      this.message = message;
+      this.messageType = type;
+    },
+
+    closeInfo() {
+      this.showMessage = false;
+    },
+
+    recuperarTriaje(){
+      for (this.index in this.selected){
+        this.actualizarJob = {
+            nuevoEstado: 'En triaje',
+            nombre_operador: this.selected[this.index].nombre_operador,
+            job: this.selected[this.index].job
+        };
+        axios
+          .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, this.actualizarJob)
+          .then ((data)=> {
+            if (data != undefined){
+              this.showInfo(`Los jobs se han devuelto a triaje con éxito`, "green");
+              setTimeout(this.closeInfo, 2000);
+              //actualizar array jobs
+              for (this.index in this.jobs){
+                for (this.selectIndex in this.selected){
+                  if (this.jobs[this.index].job == this.selected[this.selectIndex].job){
+                    this.jobs.splice(this.index,1);
+                  } 
+                }
+              }
+              this.selected = [];
+            }
+          })
+      }
+    },
+
+    groupActions(){
+      if (this.selected == 0){
+        return true
+      } else {
+        return false
+      }
     },
 
     initialize() {

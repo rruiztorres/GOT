@@ -11,7 +11,7 @@ export const getColor = {
             
             if (estado == 'Deteccion de errores') return '#ffffff';         //blanco
             else if (estado == 'En bandeja') return '#ff6600'               //naranja
-            else if (estado == 'En bandeja_op') return '#ff6600'            //naranja
+            else if (estado == 'En bandeja_op') return '#d93d00'            //naranja
             else if (estado == 'En triaje') return '#ffcc00';               //amarillo
             else if (estado == 'Desestimada') return '#0066ff';             //azul
             else if (estado == 'No afecta / Se deriva') return '#0066ff';   //azul

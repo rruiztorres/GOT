@@ -1,17 +1,20 @@
 <template>
   <div>
     <v-app class="font-sans shadow-md rounded px-8 mr-8">
-      <h1 class="text-xl font-bold py-4 mt-2">
-        Jobs en Triaje
-      </h1>
+        <div class="flex">
+        <h1 class="text-xl font-bold py-4 mt-2 flex-grow">Jobs en Triaje</h1>
+        <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1" class="m-auto">
+          <v-icon x-large>mdi-help-box</v-icon>
+        </v-btn>
+      </div>
 
       <div class="overflow-y-auto">
         <v-card elevation="0" class="mb-4">
           <div>
             <div class="p-3 flex bg-blue-500 w-full items-center">
-              <v-btn disabled dark color="success" class="mr-3">GENERAR JOBS</v-btn>
-              <v-btn disabled dark color="error" class="mr-3">RECHAZAR JOBS</v-btn>
-              <v-btn disabled dark color="error" class="mr-3">ASIGNAR OPERADOR</v-btn>
+              <v-btn :disabled="groupActions()" dark color="success" @click="groupGenerate()" class="mr-3">GENERAR JOBS</v-btn>
+              <v-btn :disabled="groupActions()" dark color="#71717A" class="mr-3">ASIGNAR EXPEDIENTE</v-btn>
+              <v-btn :disabled="groupActions()" dark color="error" class="mr-3">ELIMINAR</v-btn>
               <v-spacer></v-spacer>
 
               <v-text-field
@@ -92,6 +95,21 @@
             </v-chip>
           </template>
         </v-data-table>
+
+        <!--MENSAJES DE INFORMACION-->
+        <v-overlay :value="showMessage">
+          <v-alert
+            class="mx-7"
+            :color="messageType"
+            dark
+            border="top"
+            icon="mdi-alert-circle-outline"
+            transition="scale-transition"
+          >
+            {{ message }}
+          </v-alert>
+        </v-overlay>
+
       </div>
     </v-app>
   </div>
@@ -100,12 +118,13 @@
 <script>
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
+import { generarJobError } from '@/assets/mixins/generarJobError';
 import EditarJob from '@/components/generadorJobs/EditarJob.vue';
 
 
 export default {
   name: "JobsTriajeGJ",
-  mixins: [getColor],
+  mixins: [getColor, generarJobError],
   components: {
     EditarJob,
   },
@@ -146,6 +165,10 @@ export default {
       arreglo_job: "",
       resumen:"",
     },
+
+    showMessage: false,
+    message: '',
+    messageType: '',
   }),
 
   computed: {
@@ -155,10 +178,6 @@ export default {
   },
 
   watch: {
-    selected(){
-      console.log(this.selected)
-    },
-
     dialog(val) {
       val || this.close();
     },
@@ -173,6 +192,73 @@ export default {
   methods: {
     dummy() {
       //
+    },
+
+    showInfo(message, type) {
+      this.showMessage = true;
+      this.message = message;
+      this.messageType = type;
+    },
+
+    closeInfo() {
+      this.showMessage = false;
+    },
+
+
+    groupGenerate(){
+      this.erroresEnJob = [];
+      //Recuperar errores por cada job
+      
+      for (this.index in this.selected){
+        axios
+        .get(`${process.env.VUE_APP_API_ROUTE}/error/` + this.selected[this.index].job)
+        .then ((data) => {
+          if (data.data.errores != undefined){
+            //El job tiene errores asociados
+            this.jobGenerar = [this.selected[this.index]];
+            this.erroresGenerar = data.data.errores;
+            this.resultado = this.generarJobError(this.jobGenerar, this.erroresGenerar);
+            
+            //Evaluar respuesta
+            if (this.resultado.procesadoOK == true){
+              this.showInfo(this.resultado.mensaje, "green");
+              setTimeout(this.closeInfo, 2000);        
+            } else {
+              console.log("Con Errores asociados -> procesado con estado distinto a 0")
+              console.log(this.resultado)
+            }
+          }        
+          
+          else {
+            //El job no tiene errores asociados.
+            this.jobGenerar = [this.selected[this.index]];
+            this.resultado = this.generarJobError(this.jobGenerar, []);
+     
+            //Evaluar respuesta
+            if (this.resultado.procesadoOK == true){
+              this.showInfo(this.resultado.mensaje, "green");
+              setTimeout(this.closeInfo, 2000);  
+            } else {
+              console.log("Sin errores asociados -> procesado con estado distinto a 0")
+              console.log(this.resultado)
+            }
+          }     
+        })
+        //Actualizar array de jobs
+        for (this.indexJob in this.jobs){
+          if (this.jobs[this.indexJob].job == this.selected[this.index].job){
+            this.jobs.splice(this.indexJob, 1)
+          }
+        }
+      }     
+    },
+
+    groupActions(){
+      if (this.selected == 0){
+        return true
+      } else {
+        return false
+      }
     },
 
     updateData(data){

@@ -635,10 +635,12 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                 }
 
                 //Actualizacion de geometrias al vuelo
-                if(this.jobsAttrb.length > 0){
-                    for (this.index in this.jobs){
-                        if (this.jobs[this.index].id == this.jobsAttrb[this.index].id){
-                            this.jobsAttrb[this.index].geometria_json = this.jobs[this.index].geometry;
+                if(this.jobsRecibidos != undefined){
+                    if(this.jobsAttrb.length > 0){
+                        for (this.index in this.jobs){
+                            if (this.jobs[this.index].id == this.jobsAttrb[this.index].id){
+                                this.jobsAttrb[this.index].geometria_json = this.jobs[this.index].geometry;
+                            }
                         }
                     }
                 }
@@ -654,10 +656,12 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                 }
 
                 //Actualizacion de geometrias al vuelo
-                if(this.erroresAttrb.length > 0){
-                    for (this.index in this.errores){
-                        if (this.errores[this.index].id == this.erroresAttrb[this.index].id){
-                            this.erroresAttrb[this.index].geometria_json = this.errores[this.index].geometry;
+                if(this.erroresRecibidos != null){
+                    if(this.erroresAttrb.length > 0){
+                        for (this.index in this.errores){
+                            if (this.errores[this.index].id == this.erroresAttrb[this.index].id){
+                                this.erroresAttrb[this.index].geometria_json = this.errores[this.index].geometry;
+                            }
                         }
                     }
                 }
