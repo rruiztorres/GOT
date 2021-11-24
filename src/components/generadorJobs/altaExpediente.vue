@@ -16,6 +16,7 @@
                 filled
                 label="Número de expediente"
                 outlined
+                :rules="[rules.required, rules.counter]"
               ></v-text-field>
             </v-row>
 
@@ -176,6 +177,12 @@ export default {
           type: "success",            
           mensaje: "introduzca texto",
           aceptar: true,  
+      },
+
+      //REGLAS NUMERO EXPEDIENTE 	2021_00000001
+      rules: {
+        required: value => !!value || 'Este campo es obligatorio.',
+        counter: value => value.length == 13 || 'El formato debe ser AAAA_00000000',
       },
     };
   },

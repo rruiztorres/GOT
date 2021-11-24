@@ -240,6 +240,7 @@
                             v-model="descJob"
                             dense filled auto-grow
                             label="Descripción del Job"
+                            :rules="[rules.descripcion, rules.required]"
                         ></v-textarea>
                         </v-col>
 
@@ -1277,6 +1278,12 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             formularioEdicionJob: false,
             errorMostrarInfo: {},
             formularioEdicionError: false,
+
+            //REGLAS FORMULARIOS
+            rules: {
+                required: value => !!value || 'Este campo es obligatorio.',
+                descripcion: value => value.length < 255 || 'La descripción no puede contener más de 255 caracteres',
+            },
             
         }
     }

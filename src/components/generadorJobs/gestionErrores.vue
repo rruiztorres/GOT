@@ -13,7 +13,6 @@
           <div>
             <div class="p-3 flex bg-blue-500 w-full items-center">
               <v-btn :disabled="groupActions()" dark color="success" class="mr-3">VER EN MAPA</v-btn>
-              <v-btn :disabled="groupActions()" dark color="error" class="mr-3">ELIMINAR</v-btn>
               <v-spacer></v-spacer>
 
               <v-text-field
@@ -34,8 +33,7 @@
           :items="errores"
           :search="search"
           class="font-sans"
-          item-key="job"
-          show-select>
+          >
           <template v-slot:top>
             <!-- VENTANA EDICION INCIDENCIA -->
             <v-dialog
@@ -78,8 +76,8 @@
           </template>
 
           <template v-slot:[`item.actions`]="{ item }">
-            <v-btn title="Editar Job" icon dark class="bg-blue-500 mr-1">
-              <v-icon small @click="editItem(item)"> mdi-pencil </v-icon>
+            <v-btn title="Eliminar Error" icon dark class="bg-red-500 mr-1">
+              <v-icon @click="editItem(item)"> mdi-delete-empty </v-icon>
             </v-btn>
           </template>
 
@@ -134,11 +132,12 @@ export default {
     search: "",
     headers: [
       { text: "Estado", align: "start", sortable: true, value: "estado" },
-      { text: "Id. Provisional", align: "start", sortable: true, value: "" },
+      { text: "Fecha de alta", align: "start", sortable: true, value: " " },
       { text: "Tema", align: "start", sortable: true, value: "tema_error" },
       { text: "Tipo", align: "start", sortable: true, value: "tipo_error" },
       { text: "Descripción", align: "start", sortable: true, value: "descripcion" },
       { text: "Procedencia", align: "start", sortable: true, value: "via_ent" },
+      { text: "Acciones", align: "start", sortable: true, value: "actions" },
     ],
     errores: [],
     editedIndex: -1,

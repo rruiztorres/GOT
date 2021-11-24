@@ -9,6 +9,7 @@
         <v-card elevation="0" class="mb-4">
           <div>
             <div class="p-3 flex bg-blue-500 w-full items-center">
+              <v-btn disabled dark color="success" class="mr-3">NUEVO EXPEDIENTE</v-btn>
               <v-btn disabled dark color="success" class="mr-3">ASOCIAR A JOBS</v-btn>
               <v-btn disabled dark color="error" class="mr-3">FINALIZAR</v-btn>
               <v-spacer></v-spacer>
