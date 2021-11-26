@@ -617,12 +617,17 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             this.getJobParameters();
             this.getErrorParameters();
             this.retrieveJobFromBD();
-            this.retrieveErrorsFromBD();         
+            this.retrieveErrorsFromBD(); 
         },
 
         beforeDestroy(){
             this.$emit("errores", this.erroresAttrb);
             this.$emit('jobs', this.jobsAttrb);
+
+            //Reiniciar Arrays (evita claves duplicadas)
+            /*
+            this.jobs = [];
+            this.errores = [];*/
         },
 
         watch:{
@@ -657,12 +662,13 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                 }
 
                 //Actualizacion de geometrias al vuelo
-                if(this.erroresRecibidos != null){
-                    if(this.erroresAttrb.length > 0){
-                        for (this.index in this.errores){
-                            if (this.errores[this.index].id == this.erroresAttrb[this.index].id){
-                                this.erroresAttrb[this.index].geometria_json = this.errores[this.index].geometry;
-                            }
+                if( this.erroresRecibidos != null && 
+                    this.erroresAttrb.length > 0 &&
+                    this.errores.length === this.erroresAttrb.length
+                    ){    
+                    for (this.index in this.errores){
+                        if (this.errores[this.index].id == this.erroresAttrb[this.index].id){
+                            this.erroresAttrb[this.index].geometria_json = this.errores[this.index].geometry;
                         }
                     }
                 }
@@ -804,7 +810,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     if (this.erroresRecibidos){
                         for (this.index in this.erroresRecibidos){
                             this.newError = {
-                                id: md5(this.erroresRecibidos[this.index].id_error),
+                                id: md5(this.erroresRecibidos[this.index].geometria_json),
                                 geometry: this.erroresRecibidos[this.index].geometria_json,
                                 type: "Feature"
                             }
@@ -812,7 +818,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
                             //Atributos
                             this.newAttrbErrorBd = {
-                                id: md5(this.erroresRecibidos[this.index].id_error),
+                                id: md5(this.erroresRecibidos[this.index].geometria_json),
                                 id_error: this.erroresRecibidos[this.index].id_error,
                                 error: this.erroresRecibidos[this.index].error,
                                 descripcion: this.erroresRecibidos[this.index].descripcion,
@@ -1143,7 +1149,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             erroresAttrb:[],
 
             //HERRAMIENTAS
-            showMapTools: false,
+            showMapTools: true,
             toggleBtnError: 9,                //Muestra el boton seleccionado en panel control errores
             toggleBtnJob: 9,                  //Muestra el boton seleccionado en panel control jobs
             toolActive: null,

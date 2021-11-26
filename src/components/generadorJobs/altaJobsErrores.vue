@@ -261,18 +261,6 @@ export default {
             this.errores = errores;
         },
 
-        updateDataError(){
-            axios
-            .put(`${process.env.VUE_APP_API_ROUTE}/updateErrores` + this.errores)
-            .then(data => { console.log ("Errores actualizados correctamente ", data)})
-        },
-
-        updateDataJobs(){
-            axios
-            .put(`${process.env.VUE_APP_API_ROUTE}/updateJobs` + this.jobs)
-            .then(data => { console.log ("Jobs actualizados correctamente ", data)})
-        },
-
         // GUARDAR DATOS MAESTRO
         saveData(){
             this.showLoading = true;
