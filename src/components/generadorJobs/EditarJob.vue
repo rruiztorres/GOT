@@ -341,7 +341,7 @@ export default {
         .then( (data) => {
           if (data.status == 201){
             this.showInfo(data.data.mensaje, "green");
-            setTimeout(this.closeInfo, 2000);
+            setTimeout(this.closeInfo, 1000);
 
             //Actualizar array errores
             for (this.index in this.errores){
@@ -534,26 +534,59 @@ export default {
         this.errorDentro = this.errorInJob(this.editandoJob.geometria_json.coordinates[0], this.errores[this.index].geometria_json)
         if (this.errorDentro == false){
           this.continue = false;
-        } 
+        }
       }
 
       //2a .- Si errores ok continuamos
       if (this.continue == true){
-        //asignamos numero job actual
-        for (this.index in this.errores){
-          this.errores[this.index].job = this.job.id_job;
-        }
-        axios
-          .post(`${process.env.VUE_APP_API_ROUTE}/postErrores`, this.errores)
-            .then((data) => {
-              this.statusErrores = data.status;
-              this.errores = data.data.errores
+        this.ejecucionPostError = true;
+        this.ejecucionPutError = true;
 
-              this.$emit("datosActualizados", true);
-              this.showInfo("Datos guardados correctamente", "green");
-              setTimeout(this.closeInfo, 2000);  
-              this.edicionSinGuardar = false;
+        for (this.index in this.errores){
+        //Se trata de un error nuevo? -> hacer POST
+          if (this.errores[this.index].job == null){
+            //Asignamos ID Job actual (solo puede haber un job en edición)
+            this.errores[this.index].job = this.job.id_job
+
+            //Intentamos insercion del error nuevo
+            axios
+              .post(`${process.env.VUE_APP_API_ROUTE}/postError`, this.errores[this.index])
+              .then((data) => {
+                if (data.status == 201){
+                  //Actualizar en la tabla el error
+                  this.errores[this.index].error = data.data.error.error;
+                } else {
+                  this.ejecucionPostError = false;   
+                }
+              })
+          } else {
+            //Se trata de la edición de un error existente -> hacer PUT
+            //Asignamos ID Job actual (solo puede haber un job en edición)
+            this.errores[this.index].job = this.job.id_job
+            //Intentamos update de error existente
+            axios
+            .put(`${process.env.VUE_APP_API_ROUTE}/updateError`, this.errores[this.index])
+            .then((data) => {
+              if (data.status == 201){
+                //Actualizar en la tabla el error
+              } else {
+                this.ejecucionPutError = false;                
+              }
             })
+          }
+        }
+        //Resultado ejecucion errores
+        if (this.ejecucionPostError == true && this.ejecucionPutError == true){
+          //Ejecucion correcta
+          this.$emit("datosActualizados", true);
+          this.showInfo("Datos actualizados correctamente", "green");
+          setTimeout(this.closeInfo, 2000); 
+          this.edicionSinGuardar = false;
+        } else {
+          this.showInfo("Ocurrió un error, revise los datos", "red");
+          setTimeout(this.closeInfo, 2000); 
+        }
+
       } else {
         //Lanzar aviso error fuera de job
         this.$emit("datosActualizados", true);
