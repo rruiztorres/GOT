@@ -86,17 +86,7 @@
           </template>
 
           <template v-slot:no-data>
-            <div class="my-4">
-                <h3>Recuperando Jobs</h3>
-            </div>
-            <div class="my-4"> 
-                <v-progress-circular
-                :size="80"
-                :width="10"
-                color="primary"
-                indeterminate
-                ></v-progress-circular>
-            </div>
+            <v-btn color="primary" @click="initialize">Reset</v-btn>
           </template>
 
           <template v-slot:[`item.estado`]="{ item }">

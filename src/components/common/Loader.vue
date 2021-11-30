@@ -7,7 +7,6 @@
         <div v-if="activarMenu == 'AltaExpediente'"><AltaExpediente @closed="menuDefault"></AltaExpediente></div>
         <div v-if="activarMenu == 'EditarExpediente'"><EditarExpediente></EditarExpediente></div>
         <div v-if="activarMenu == 'RecuperarJobs'"><RecuperarJobs></RecuperarJobs></div>
-        <div v-if="activarMenu == 'GestionErrores'"><GestionErrores></GestionErrores></div>
 
         <!--Operador especializado-->
         <div v-if="activarMenu == 'BandejaOpEsp'"><BandejaOpEsp></BandejaOpEsp></div>
@@ -29,7 +28,6 @@ import BandejaOpEsp from '@/components/operadorEsp/BandejaOpEsp';
 import BandejaOp from '@/components/common/BandejaOp';
 import BandejaMisJobs from '@/components/common/BandejaMisJobs';
 import RecuperarJobs from '@/components/generadorJobs/RecuperarJobs';
-import GestionErrores from '@/components/generadorJobs/gestionErrores';
 
 
 
@@ -44,7 +42,6 @@ export default {
         BandejaOp,
         BandejaMisJobs,
         RecuperarJobs,
-        GestionErrores,
     },
 
     props: ['activarMenu'],

@@ -16,7 +16,6 @@
                 filled
                 label="Número de expediente"
                 outlined
-                :rules="[rules.required, rules.counter]"
               ></v-text-field>
             </v-row>
 
@@ -89,6 +88,7 @@ export default {
 
   methods:{
     initializeParameters(){
+      this.date1 = '';
       this.nExp = '';
       this.storeObservationsExp('');
     },
@@ -155,6 +155,7 @@ export default {
         this.mensajeFlotante.aceptar = aceptar;             //Muestra el boton de "entendido"
     },
 
+
     closeInfoMessage(){
         this.mensajeFlotante.visibilidad = false;
     },
@@ -177,12 +178,6 @@ export default {
           type: "success",            
           mensaje: "introduzca texto",
           aceptar: true,  
-      },
-
-      //REGLAS NUMERO EXPEDIENTE 	2021_00000001
-      rules: {
-        required: value => !!value || 'Este campo es obligatorio.',
-        counter: value => value.length == 13 || 'El formato debe ser AAAA_00000000',
       },
     };
   },

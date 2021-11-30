@@ -23,7 +23,7 @@
                 <v-spacer></v-spacer>
                 <v-btn class="w-24 bg-red-500 mr-5" dark text @click="checkData">CANCELAR</v-btn>
                 <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="saveData">GUARDAR DATOS</v-btn>
-                <v-btn :disabled="comprobarJob()" class="w-24 bg-green-500 mr-5" dark text @click="generateJobsErrors()">GENERAR</v-btn>
+                <v-btn class="w-24 bg-green-500 mr-5" dark text @click="generateJobsErrors()">GENERAR</v-btn>
         </v-toolbar>
 
             <template>
@@ -65,6 +65,7 @@
                                     :headers="jobHeaders"
                                     :items="jobs"
                                     class="elevation-1"
+                                    hide-default-footer
                                 >
                                     <template v-slot:[`item.estado`]="{ item }">
                                         <v-chip :color="getColor(item.estado)" dark>
@@ -82,6 +83,7 @@
                                     :headers="errorHeaders"
                                     :items="errores"
                                     class="elevation-1"
+                                    hide-default-footer
                                 >
                                     <template v-slot:[`item.estado`]="{ item }">
                                         <v-chip :color="getColor(item.estado)" dark>
@@ -199,14 +201,6 @@ export default {
     },
 
     methods: {
-        comprobarJob(){
-            if (this.jobs.length > 0){
-                return false
-            } else {
-                return true
-            }
-        },
-
         generateJobsErrors(){
             this.resultado = this.generarJobError(this.jobs, this.errores);
             if (this.resultado.procesadoOK == false) {
@@ -261,6 +255,18 @@ export default {
             this.errores = errores;
         },
 
+        updateDataError(){
+            axios
+            .put(`${process.env.VUE_APP_API_ROUTE}/updateErrores` + this.errores)
+            .then(data => { console.log ("Errores actualizados correctamente ", data)})
+        },
+
+        updateDataJobs(){
+            axios
+            .put(`${process.env.VUE_APP_API_ROUTE}/updateJobs` + this.jobs)
+            .then(data => { console.log ("Jobs actualizados correctamente ", data)})
+        },
+
         // GUARDAR DATOS MAESTRO
         saveData(){
             this.showLoading = true;
@@ -272,29 +278,21 @@ export default {
             axios
             .post(`${process.env.VUE_APP_API_ROUTE}/postJobsErrores`, this.jobsErrores)
             .then( data => {
-                if(data.data.tipo == 'Errores sin asignar'){
+                if (data.status == 201) {
+                    //Asignamos los id dados por la base de datos en la petición
+                    for (this.index in this.jobs){
+                        this.jobs[this.index].job = data.data.jobs[this.index]
+                    }
+                    for (this.index in this.errores){
+                        this.errores[this.index].asocJob = data.data.errores[this.index].job;
+                        this.errores[this.index].idError = data.data.errores[this.index].idError;
+                    }
                     this.datosGuardados = true;
                     this.showLoading = false;
                     this.showInfo("Datos guardados correctamente", "green");
                     setTimeout(this.closeInfo,2000);
                 } else {
-                    if (data.status == 201) {
-                        //Asignamos los id dados por la base de datos en la petición
-                        
-                        for (this.index in this.jobs){
-                            this.jobs[this.index].job = data.data.jobs[this.index]
-                        }
-                        for (this.index in this.errores){
-                            this.errores[this.index].asocJob = data.data.errores[this.index].job;
-                            this.errores[this.index].idError = data.data.errores[this.index].idError;
-                        }
-                        this.datosGuardados = true;
-                        this.showLoading = false;
-                        this.showInfo("Datos guardados correctamente", "green");
-                        setTimeout(this.closeInfo,2000);
-                    } else {
-                        console.log(data.data.mensaje);
-                    }
+                    console.log(data.data.mensaje);
                 }
             })   
         }

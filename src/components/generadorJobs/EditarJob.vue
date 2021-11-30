@@ -438,24 +438,23 @@ export default {
         //añadimos atributos
         this.editandoJob.geometria = this.stringifyJobGeometry(this.editandoJob.geometria_json);
       }
-      this.datosJob = [this.editandoJob];     
+      this.datosJob = [this.editandoJob];
     },
 
     storeJobs(job) {
       this.editandoJob = job;
       this.updateEditedJob(this.editandoJob);
       this.datosJobToDataTable();
-
-      for (this.index in this.datosJob){
-        this.datosJob[this.index].geometria = this.stringifyJobGeometry(this.datosJob[this.index].geometria_json)
-      }
       this.edicionSinGuardar = true;
     },
 
     storeErrors(errores) {
-      console.log("recibido cambio error", errores)
+      if (this.editandoJob == errores){
+        console.log("sin cambios error")
+      }
       this.errores = errores;
       this.edicionSinGuardar = true;
+
       for (this.index in errores){
         this.errores[this.index].geometria = this.stringifyErrorGeometry(errores[this.index].geometria_json)
       }
@@ -517,8 +516,6 @@ export default {
     },
 
     updateDataBD() {
-      this.ejecucion = 0;
-
       //1 .- Actualizar Datos Job en BD ¿geometria?
       if (this.edicionSinGuardar == true) {
         axios
@@ -542,48 +539,26 @@ export default {
 
       //2a .- Si errores ok continuamos
       if (this.continue == true){
+        //asignamos numero job actual
         for (this.index in this.errores){
-          //El error ya existe en base de datos?
-          if (this.errores[this.index].error != null){
-            //Actualizar el error
-            axios
-            .put(`${process.env.VUE_APP_API_ROUTE}/updateError`, this.errores[this.index])
-            .then((data) => {
-              if (data.data.status !== 201){
-                this.ejecucion = 1;
-                this.edicionSinGuardar = false;
-              }
-            })
-          } else {
-            //asignamos numero job actual
-            this.errores[this.index].job = this.job.id_job;
-            //Post error nuevo
-            axios
-            .post( `${process.env.VUE_APP_API_ROUTE}/postError`, this.errores[this.index] )
-            .then((data) => {
-              if (data.status == 201){
-                this.errores[this.index].error = data.data.error.error
-                this.edicionSinGuardar = false;
-              } else {
-                //Errores al insertar
-                this.ejecucion = 1;
-              }
-            })
-          }
+          this.errores[this.index].job = this.job.id_job;
         }
-        
+        axios
+          .post(`${process.env.VUE_APP_API_ROUTE}/postErrores`, this.errores)
+            .then((data) => {
+              this.statusErrores = data.status;
+              this.errores = data.data.errores
+
+              this.$emit("datosActualizados", true);
+              this.showInfo("Datos guardados correctamente", "green");
+              setTimeout(this.closeInfo, 2000);  
+              this.edicionSinGuardar = false;
+            })
       } else {
         //Lanzar aviso error fuera de job
         this.$emit("datosActualizados", true);
         this.showInfo("No se pueden insertar errores fuera del job, revise los datos", "red");
         setTimeout(this.closeInfo, 2000);   
-      }
-
-      if (this.ejecucion == 0){
-        //ejecucion correcta
-        this.$emit("datosActualizados", true);
-        this.showInfo("Datos actualizados correctamente", "green");
-        setTimeout(this.closeInfo, 2000);  
       }
       
     },

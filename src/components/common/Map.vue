@@ -240,7 +240,6 @@
                             v-model="descJob"
                             dense filled auto-grow
                             label="Descripción del Job"
-                            :rules="[rules.descripcion, rules.required]"
                         ></v-textarea>
                         </v-col>
 
@@ -617,17 +616,12 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             this.getJobParameters();
             this.getErrorParameters();
             this.retrieveJobFromBD();
-            this.retrieveErrorsFromBD(); 
+            this.retrieveErrorsFromBD();         
         },
 
         beforeDestroy(){
             this.$emit("errores", this.erroresAttrb);
             this.$emit('jobs', this.jobsAttrb);
-
-            //Reiniciar Arrays (evita claves duplicadas)
-            /*
-            this.jobs = [];
-            this.errores = [];*/
         },
 
         watch:{
@@ -662,13 +656,12 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                 }
 
                 //Actualizacion de geometrias al vuelo
-                if( this.erroresRecibidos != null && 
-                    this.erroresAttrb.length > 0 &&
-                    this.errores.length === this.erroresAttrb.length
-                    ){    
-                    for (this.index in this.errores){
-                        if (this.errores[this.index].id == this.erroresAttrb[this.index].id){
-                            this.erroresAttrb[this.index].geometria_json = this.errores[this.index].geometry;
+                if(this.erroresRecibidos != null){
+                    if(this.erroresAttrb.length > 0){
+                        for (this.index in this.errores){
+                            if (this.errores[this.index].id == this.erroresAttrb[this.index].id){
+                                this.erroresAttrb[this.index].geometria_json = this.errores[this.index].geometry;
+                            }
                         }
                     }
                 }
@@ -810,7 +803,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     if (this.erroresRecibidos){
                         for (this.index in this.erroresRecibidos){
                             this.newError = {
-                                id: md5(this.erroresRecibidos[this.index].geometria_json),
+                                id: md5(this.erroresRecibidos[this.index].id_error),
                                 geometry: this.erroresRecibidos[this.index].geometria_json,
                                 type: "Feature"
                             }
@@ -818,7 +811,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
                             //Atributos
                             this.newAttrbErrorBd = {
-                                id: md5(this.erroresRecibidos[this.index].geometria_json),
+                                id: md5(this.erroresRecibidos[this.index].id_error),
                                 id_error: this.erroresRecibidos[this.index].id_error,
                                 error: this.erroresRecibidos[this.index].error,
                                 descripcion: this.erroresRecibidos[this.index].descripcion,
@@ -1149,7 +1142,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             erroresAttrb:[],
 
             //HERRAMIENTAS
-            showMapTools: true,
+            showMapTools: false,
             toggleBtnError: 9,                //Muestra el boton seleccionado en panel control errores
             toggleBtnJob: 9,                  //Muestra el boton seleccionado en panel control jobs
             toolActive: null,
@@ -1284,12 +1277,6 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             formularioEdicionJob: false,
             errorMostrarInfo: {},
             formularioEdicionError: false,
-
-            //REGLAS FORMULARIOS
-            rules: {
-                required: value => !!value || 'Este campo es obligatorio.',
-                descripcion: value => value.length < 255 || 'La descripción no puede contener más de 255 caracteres',
-            },
             
         }
     }
