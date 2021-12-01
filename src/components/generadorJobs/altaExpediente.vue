@@ -9,13 +9,14 @@
         <v-row>
           <v-col cols="4">
             <v-row align="center" class="ml-1 p-3">
-              <!--TODO:Evitar que crezca-->
+              <!--TODO:Evitar que crezca-->      
               <v-text-field
                 v-model="nExp"
                 class="mt-12"
                 filled
                 label="Número de expediente"
                 outlined
+                :rules="[rules.required, rules.formNumExp]"
               ></v-text-field>
             </v-row>
 
@@ -88,7 +89,6 @@ export default {
 
   methods:{
     initializeParameters(){
-      this.date1 = '';
       this.nExp = '';
       this.storeObservationsExp('');
     },
@@ -179,6 +179,11 @@ export default {
           mensaje: "introduzca texto",
           aceptar: true,  
       },
+
+      rules: {
+          required: value => !!value || 'Obligatorio.',
+          formNumExp: value => value.length == 13 || 'El formato debe ser AAAA_00000000',
+        },
     };
   },
 };
