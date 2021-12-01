@@ -81,8 +81,7 @@ export default {
             {
               group: 'Errores sin Asignar',
               items: [
-                {group: 'Errores sin Asignar', name:'Ver Errores', icon:'mdi-map-marker-question'},
-                {group: 'Errores sin Asignar', name:'Gestionar Errores', icon:'mdi-table-search'},
+                {group: 'Errores sin Asignar', name:'Gestionar Errores', icon:'mdi-map-marker-question', active:'ErroresNoAsign'},
               ]
             },
             {
