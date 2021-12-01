@@ -568,7 +568,7 @@
 
 <script>
 import axios from "axios";
-import md5 from 'md5';
+import {v4 as uuidv4} from 'uuid';
 
 import { makeArrayFromApi } from '@/assets/mixins/makeArrayFromApi';
 import { asignarValoresDefault } from '@/assets/mixins/asignarValoresDefault';
@@ -578,6 +578,7 @@ import { stringifyErrorGeometry } from '@/assets/mixins/stringifyErrorGeometry';
 
 import FormularioDatosJob from '@/components/common/FormularioDatosJob';
 import FormularioDatosError from '@/components/common/FormularioDatosError';
+
 
     export default {
         props: ["modoMapa", "jobsRecibidos", "erroresRecibidos", "reset"],
@@ -653,10 +654,12 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
                 if(this.errores.length != 0 && this.toolActive == 'modifyError'){
                     this.$emit("errores", this.erroresAttrb)
-                }
+                }                
+            },
 
-                //Actualizacion de geometrias al vuelo
-                if(this.erroresRecibidos != null){
+            erroresAttrb(){
+            //Actualizacion de geometrias al vuelo
+               if(this.erroresRecibidos != null){
                     if(this.erroresAttrb.length > 0){
                         for (this.index in this.errores){
                             if (this.errores[this.index].id == this.erroresAttrb[this.index].id){
@@ -664,8 +667,8 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                             }
                         }
                     }
-                }
-            },
+                } 
+            }
         },
 
         methods:{
@@ -762,7 +765,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     if (this.jobsRecibidos) {
                         //Geometrias
                         this.newJob = {
-                            id: md5(this.jobsRecibidos.job),
+                            id: uuidv4(),
                             geometry: this.jobsRecibidos.geometria_json,
                             type: "Feature"
                         }
@@ -770,7 +773,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
                         //Atributos
                         this.newAttrbJobBd = {
-                            id: md5(this.jobsRecibidos.job),
+                            id: this.newJob.id,
                             expediente: this.jobsRecibidos.expediente,
                             job: this.jobsRecibidos.job,
                             descripcion: this.jobsRecibidos.descripcion,
@@ -803,7 +806,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     if (this.erroresRecibidos){
                         for (this.index in this.erroresRecibidos){
                             this.newError = {
-                                id: md5(this.erroresRecibidos[this.index].id_error),
+                                id: uuidv4(),
                                 geometry: this.erroresRecibidos[this.index].geometria_json,
                                 type: "Feature"
                             }
@@ -811,7 +814,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
                             //Atributos
                             this.newAttrbErrorBd = {
-                                id: md5(this.erroresRecibidos[this.index].id_error),
+                                id: this.newError.id,
                                 id_error: this.erroresRecibidos[this.index].id_error,
                                 error: this.erroresRecibidos[this.index].error,
                                 descripcion: this.erroresRecibidos[this.index].descripcion,
