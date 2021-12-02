@@ -283,13 +283,16 @@ export default {
                     for (this.index in this.jobs){
                         this.jobs[this.index].job = data.data.jobs[this.index]
                     }
-                    
-                    if (data.data.tipo != "Errores sin asignar"){
-                        for (this.index in this.errores){
-                            this.errores[this.index].asocJob = data.data.errores[this.index].job;
-                            this.errores[this.index].idError = data.data.errores[this.index].idError;
+                    //Asignar idJob a los errores dentro de job
+                    for (this.index in this.errores){
+                        for (this.asignIndex in data.data.errores){
+                            if (data.data.errores[this.asignIndex].asignado == true && data.data.errores[this.asignIndex].idInterno == this.errores[this.index].id){
+                                this.errores[this.index].asocJob = data.data.errores[this.asignIndex].job;
+                                this.errores[this.index].idError = data.data.errores[this.asignIndex].idError;
+                            }
                         }
                     }
+                               
                     this.datosGuardados = true;
                     this.showLoading = false;
                     this.showInfo("Datos guardados correctamente", "green");
