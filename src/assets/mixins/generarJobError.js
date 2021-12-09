@@ -67,7 +67,7 @@ export const generarJobError = {
                         } else {
                             //Grabar en base de datos
                             this.actualizarError = {
-                                nuevoEstado: "Pendiente solución",
+                                nuevoEstado: "Pendiente_solución",
                                 error: errores[errorIndex].idError
                             };
 
