@@ -206,51 +206,40 @@ export default {
 
 
     groupGenerate(){
-      this.erroresEnJob = [];
       //Recuperar errores por cada job
-      
       for (this.index in this.selected){
+        const jobAGenerar = [this.selected[this.index]];
         axios
-        .get(`${process.env.VUE_APP_API_ROUTE}/error/` + this.selected[this.index].job)
-        .then ((data) => {
+        .get(`${process.env.VUE_APP_API_ROUTE}/error/` + jobAGenerar[0].job)
+        .then ((data) => { 
           if (data.data.errores != undefined){
             //El job tiene errores asociados
-            this.jobGenerar = [this.selected[this.index]];
             this.erroresGenerar = data.data.errores;
-            this.resultado = this.generarJobError(this.jobGenerar, this.erroresGenerar);
-            
-            //Evaluar respuesta
-            if (this.resultado.procesadoOK == true){
-              this.showInfo(this.resultado.mensaje, "green");
-              setTimeout(this.closeInfo, 2000);        
-            } else {
-              console.log("Con Errores asociados -> procesado con estado distinto a 0")
-              console.log(this.resultado)
-            }
-          }        
-          
+          }             
           else {
             //El job no tiene errores asociados.
-            this.jobGenerar = [this.selected[this.index]];
-            this.resultado = this.generarJobError(this.jobGenerar, []);
-     
-            //Evaluar respuesta
-            if (this.resultado.procesadoOK == true){
-              this.showInfo(this.resultado.mensaje, "green");
-              setTimeout(this.closeInfo, 2000);  
-            } else {
-              console.log("Sin errores asociados -> procesado con estado distinto a 0")
-              console.log(this.resultado)
-            }
-          }     
+            this.erroresGenerar = [];
+          }
+          this.generarJobError(jobAGenerar, this.erroresGenerar);
         })
-        //Actualizar array de jobs
-        for (this.indexJob in this.jobs){
-          if (this.jobs[this.indexJob].job == this.selected[this.index].job){
-            this.jobs.splice(this.indexJob, 1)
+      }
+
+      //actualizar array jobs 
+      for (this.index in this.jobs){
+        for(this.selIndex in this.selected){
+          if (this.jobs[this.index].job == this.selected[this.selIndex].job){
+            this.jobs.splice(this.index, 1)
           }
         }
-      }     
+      }
+
+      //info 
+      this.showInfo("jobs generados correctamente", "green");
+      setTimeout(this.closeInfo, 1500);  
+      
+      //Deseleccionar
+      this.selected = [];
+      this.search = '';
     },
 
     groupActions(){

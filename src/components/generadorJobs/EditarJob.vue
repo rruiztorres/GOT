@@ -78,6 +78,10 @@
                             </v-chip>
                           </template>
 
+                          <template v-slot:no-data>
+                            <h1>No existen errores asociados al job</h1>
+                          </template>
+
                           <template v-slot:[`item.actions`]="{ item }">
                             <v-btn title="Eliminar Error" icon dark class="bg-red-500 mr-1">
                               <v-icon @click="confirmDelete(item)"> mdi-trash-can </v-icon>
