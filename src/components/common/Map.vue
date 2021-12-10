@@ -1160,8 +1160,8 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     format: 'image/jpeg'
                 },
                 {
-                    attribution: 'IGN Ocupación del Suelo - Instituto Geográfico Nacional',
-                    url: "https://servicios.idee.es/wmts/ocupacion-suelo",
+                    attribution: 'IGN MTN50 Primera Edición - Instituto Geográfico Nacional',
+                    url: "https://www.ign.es/wmts/primera-edicion-mtn",
                     layerName: "mtn50-edicion1", 
                     nombre: "MTN 50 1ª ED.", 
                     matrixSet: "EPSG:3857", 
@@ -1170,8 +1170,8 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     format: 'image/jpeg'
                 },
                 {
-                    attribution: 'IGN Ocupación del Suelo - Instituto Geográfico Nacional',
-                    url: "https://servicios.idee.es/wmts/ocupacion-suelo",
+                    attribution: 'IGN MTN25 Primera Edición - Instituto Geográfico Nacional',
+                    url: "https://www.ign.es/wmts/primera-edicion-mtn",
                     layerName: "mtn25-edicion1", 
                     nombre: "MTN 25 1ª ED.", 
                     matrixSet: "EPSG:3857", 
