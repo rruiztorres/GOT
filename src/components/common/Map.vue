@@ -110,6 +110,27 @@
                 :style-name="activeMap.styleName">
                 </vl-source-wmts>
             </vl-layer-tile>
+
+            <!-- INFORMACIÓN NUMEROS DE ERROR EN MAPA -->
+            <!--Meter en el div el control de capa --> 
+            <div v-if="activarMostrarIdError == true">
+                <vl-feature
+                    v-for="atribute in erroresAttrb"
+                    :key="atribute.error"
+                    ref="marker">
+                    <template
+                        v-if="atribute.error != null"
+                    >
+                        <vl-overlay
+                        :position="atribute.geometria_json.coordinates"
+                        :offset="[-48, -45]">
+                            <p class="bg-white p-2 text-xs font-bold rounded-md shadow-md">
+                                {{atribute.error}}
+                            </p>
+                        </vl-overlay>
+                    </template>
+                </vl-feature>
+            </div>
         </vl-map>     
 
         <!--PANEL DE CONTROL -->
@@ -147,51 +168,51 @@
 
                 <v-expand-transition>
                     <div v-show="showMapTools">
-                    <v-divider></v-divider>
+                        <v-divider></v-divider>
 
-                    <div class="text-center rounded bg-blue-800 p-2 md-1 text-white text-l">
-                    ERRORES
-                    </div>
-                    <div class="mt-2 flex">
-                        <v-btn-toggle v-model="toggleBtnError" color="blue accent-4">
-                            <v-btn
-                            v-for="item in errorPanel"
-                            :key="item.title"
-                            icon tile
-                            :title="item.title"
-                            @click="item.click()"
-                            :disabled="applyMode(item.modo)"
-                            >
+                        <div class="text-center rounded bg-blue-800 p-2 md-1 text-white text-l">
+                        ERRORES
+                        </div>
+                        <div class="mt-2 flex">
+                            <v-btn-toggle v-model="toggleBtnError" color="blue accent-4">
+                                <v-btn
+                                v-for="item in errorPanel"
+                                :key="item.title"
+                                icon tile
+                                :title="item.title"
+                                @click="item.click()"
+                                :disabled="applyMode(item.modo)"
+                                >
+                                    <v-icon color="#1E40AF">{{ item.icon }}</v-icon>
+                                </v-btn>
+                            </v-btn-toggle>
+                        </div>
+
+                        <v-spacer class="my-4"></v-spacer>
+
+                        <div class="text-center rounded bg-blue-800 p-2 md-1 text-white text-l">
+                        JOBS
+                        </div>
+                        <div class="mt-2 flex">
+                            <v-btn-toggle v-model="toggleBtnJob" color="blue accent-4">
+                                <v-btn
+                                v-for="item in jobsPanel"
+                                :key="item.title"
+                                icon tile
+                                :title="item.title"
+                                @click="item.click()"
+                                :disabled="applyMode(item.modo)"
+                                >
                                 <v-icon color="#1E40AF">{{ item.icon }}</v-icon>
                             </v-btn>
-                        </v-btn-toggle>
-                    </div>
-
-                    <v-spacer class="my-4"></v-spacer>
-
-                    <div class="text-center rounded bg-blue-800 p-2 md-1 text-white text-l">
-                    JOBS
-                    </div>
-                    <div class="mt-2 flex">
-                        <v-btn-toggle v-model="toggleBtnJob" color="blue accent-4">
-                            <v-btn
-                            v-for="item in jobsPanel"
-                            :key="item.title"
-                            icon tile
-                            :title="item.title"
-                            @click="item.click()"
-                            :disabled="applyMode(item.modo)"
-                            >
-                            <v-icon color="#1E40AF">{{ item.icon }}</v-icon>
-                        </v-btn>
-                        </v-btn-toggle>
-                    </div>
+                            </v-btn-toggle>
+                        </div>
                     
-                    <v-spacer class="my-8"></v-spacer>
+                        <v-spacer class="my-8"></v-spacer>
 
-                    <div class="rounded bg-blue-800 p-2 mb-1 text-white text-l text-center">
-                    CAPAS WMTS
-                    </div>
+                        <div class="rounded bg-blue-800 p-2 mb-1 text-white text-l text-center">
+                        CAPAS WMTS
+                        </div>
                         <v-btn
                             v-for="service in wmtsServices"
                             :key="service.nombre"
@@ -200,8 +221,16 @@
                             >{{service.nombre}}
                         </v-btn>
                         <v-spacer class="my-1"></v-spacer>
-                    </div>
 
+                        <v-switch
+                        class="bg-white pl-6 pt-4 rounded-md shadow-md"
+                        dense
+                        v-model="activarMostrarIdError"
+                        :label="`Mostrar ID Error`"
+                        ></v-switch>
+
+                        <v-spacer class="my-8"></v-spacer>                
+                    </div>
                 </v-expand-transition>
             </v-card>
         </v-app>
@@ -1121,13 +1150,33 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     format: 'image/jpeg'
                 },
                 {
-                    attribution: 'IGN PNOA - Máxima actualidad - Institutot Geográfico Nacional',
+                    attribution: 'IGN PNOA - Máxima actualidad - Instituto Geográfico Nacional',
                     url: "https://www.ign.es/wmts/pnoa-ma",
                     layerName: "OI.OrthoimageCoverage", 
                     nombre: "PNOA MA", 
                     matrixSet: "EPSG:3857", 
                     styleName: "default",
                     activeMap: 'ignPNOA', 
+                    format: 'image/jpeg'
+                },
+                {
+                    attribution: 'IGN Ocupación del Suelo - Instituto Geográfico Nacional',
+                    url: "https://servicios.idee.es/wmts/ocupacion-suelo",
+                    layerName: "mtn50-edicion1", 
+                    nombre: "MTN 50 1ª ED.", 
+                    matrixSet: "EPSG:3857", 
+                    styleName: "default",
+                    activeMap: 'ignMTN50Old', 
+                    format: 'image/jpeg'
+                },
+                {
+                    attribution: 'IGN Ocupación del Suelo - Instituto Geográfico Nacional',
+                    url: "https://servicios.idee.es/wmts/ocupacion-suelo",
+                    layerName: "mtn25-edicion1", 
+                    nombre: "MTN 25 1ª ED.", 
+                    matrixSet: "EPSG:3857", 
+                    styleName: "default",
+                    activeMap: 'ignMTN25Old', 
                     format: 'image/jpeg'
                 },
             ],
@@ -1143,7 +1192,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             erroresAttrb:[],
 
             //HERRAMIENTAS
-            showMapTools: false,
+            showMapTools: true,
             toggleBtnError: 9,                //Muestra el boton seleccionado en panel control errores
             toggleBtnJob: 9,                  //Muestra el boton seleccionado en panel control jobs
             toolActive: null,
@@ -1227,6 +1276,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
                 },
             ],
+            activarMostrarIdError: false,
 
             //FORMULARIO ALTA JOB   
             editJob: false,             //Visibilidad ventana editar atributos
