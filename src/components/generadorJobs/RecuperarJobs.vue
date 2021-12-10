@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <v-app class="font-sans shadow-md rounded px-8 mr-8">
+    <div style="width:98%;" class="m-auto rounded-md bg-white p-4 shadow-md">
       <h1 class="text-xl font-bold py-4 mt-2">
         Recuperar Jobs
       </h1>
@@ -101,8 +100,6 @@
           {{ message }}
         </v-alert>
       </v-overlay>
-
-    </v-app>
   </div>
 </template>
 

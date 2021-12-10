@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <v-app class="font-sans shadow-md rounded px-8 mr-8">
+  <div style="width:98%;" class="m-auto rounded-md bg-white p-4 shadow-md">
         <div class="flex">
         <h1 class="text-xl font-bold py-4 mt-2 flex-grow">Errores sin asignar</h1>
         <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1" class="m-auto">
@@ -84,7 +83,6 @@
         </v-overlay>
 
       </div>
-    </v-app>
   </div>
 </template>
 
