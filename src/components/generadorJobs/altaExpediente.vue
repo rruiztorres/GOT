@@ -1,5 +1,5 @@
 <template>
-  <v-app class="font-sans shadow-md rounded px-8 mr-8">
+  <div style="width:98%;" class="m-auto rounded-md bg-white p-4 shadow-md">
     <h1 class="text-xl font-bold py-4 mt-2">
       Alta de Expediente
     </h1>
@@ -69,8 +69,7 @@
             
         </v-dialog>
     </template>
-
-  </v-app>
+  </div>
 </template>
 
 <script>

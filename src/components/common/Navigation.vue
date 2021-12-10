@@ -1,39 +1,27 @@
 <template>
-<v-app class="font-sans h-full">
-  <v-navigation-drawer 
-    v-model="drawer" :mini-variant.sync="mini" floating permanent color="#EFF6FF">
-
-<!-- PANEL USUARIO -->
-    <template>
-      <div class="text-center" >
-        <v-menu
-        v-model="menu"
-        :close-on-click="closeOnClick"
-        :nudge-width="80"
-        offset-x
-        class="transition duration-1500 ease-in-out"
-        >
-          <template v-slot:activator="{ on, attrs }">
+  <div>
+ <!-- PANEL USUARIO -->
+    <div class="text-center" >
+      <v-menu
+      v-model="menu"
+      offset-x
+      class="transition duration-1500 ease-in-out"
+      >
+        <template v-slot:activator="{ on, attrs }">
           <div class="bg-blue-800 pt-7" style="height:14rem;">
             <v-img> 
 
-            <div v-if="mini==false">
+            <div>
               <img
               :src="avatar"
               class="w-20 border-2 border-gray-400 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
-              >
-            </div>
-            <div v-if="mini==true">
-              <img
-              :src="avatar"
-              class="w-10 mt-16 border-2 border-gray-400 rounded-full m-auto hover:opacity-70 transition duration-300 ease-in-out"
               >
             </div>
 
             </v-img>
 
             <v-list class="pt-0">
-              <v-list-item-content v-if="mini == false" class="text-white">
+              <v-list-item-content class="text-white">
                   <v-list-item-title v-model="userName">
                     {{userName}}
                   </v-list-item-title>
@@ -44,7 +32,7 @@
             </v-list>
 
             <!--BOTONES CONFIGURACION USUARIO -->
-            <v-list v-if="mini==false" class="flex pt-0">
+            <v-list class="flex pt-0">
                 <v-btn title="Configuración" dark class="m-1 flex-grow justify-center" color="#2563EB">
                   <v-icon title="Configuración" dark>mdi-cog</v-icon>
                 </v-btn>
@@ -61,84 +49,78 @@
                   <v-icon title="Cambio de Rol" dark>mdi-account-convert</v-icon>
                 </v-btn>
             </v-list>
-
           </div>
-          </template>
+        </template>
 
-          <!-- MENU DESPLEGABLE USUARIO -->
-          <v-card>
-            <v-list>
-              <v-list-item class="w-80">
-                <v-list-item-avatar>
-                  <img
-                  :src="avatar"
-                  >
-                </v-list-item-avatar>
+        <!-- MENU DESPLEGABLE USUARIO -->
+        <v-card>
+          <v-list>
+            <v-list-item class="w-80">
+              <v-list-item-avatar>
+                <img
+                :src="avatar"
+                >
+              </v-list-item-avatar>
 
-                <v-list-item-content>
-                  <v-list-item-title 
-                  v-model="userName"
-                  >
-                    {{userName}}
-                  </v-list-item-title>
-                  <v-list-item-subtitle 
-                  v-model="userRole"
-                  > 
-                    {{userRole}}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
+              <v-list-item-content>
+                <v-list-item-title 
+                v-model="userName"
+                >
+                  {{userName}}
+                </v-list-item-title>
+                <v-list-item-subtitle 
+                v-model="userRole"
+                > 
+                  {{userRole}}
+                </v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+
+          <v-divider></v-divider>
+            
+              <v-list>
+              <v-list-item-title class="p-2">Cambio de Rol</v-list-item-title>
+
+              <v-list-item
+                v-for="rol in roles"
+                :key="rol.name"
+                class="hover:bg-gray-200 w-80"
+                @click="changeRol(rol)" 
+              >
+                <v-list-item-title
+                class="text-xs ml-3">
+                {{ rol.name }}
+                </v-list-item-title>
+
+                <v-icon
+                v-if="userRole==rol.name" 
+                class="rounded-full p-1 bg-green-500" dark
+                >
+                  mdi-check
+                </v-icon>
               </v-list-item>
             </v-list>
+        </v-card> 
+        <!-- FIN MENU DESPLEGABLE USUARIO -->
+      </v-menu>
+    </div>
+     
+    <!-- FIN PANEL USUARIO -->
+    <v-divider></v-divider>
 
-            <v-divider></v-divider>
-              
-               <v-list>
-                <v-list-item-title class="p-2">Cambio de Rol</v-list-item-title>
+    <!-- MENU OPCIONES SEGUN ROL -->
+    <div class="ml-1">
+      <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="changeMenu"></NavGJ></div>
+      <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="changeMenu" ></NavOpEsp></div>
+      <div v-if="userRole=='Control de Calidad'"><Ccalidad @cambiomenu="changeMenu"></Ccalidad></div>
+    </div>
 
-                <v-list-item
-                  v-for="rol in roles"
-                  :key="rol.name"
-                  class="hover:bg-gray-200 w-80"
-                  @click="changeRol(rol)" 
-                >
-                  <v-list-item-title
-                  class="text-xs ml-3">
-                  {{ rol.name }}
-                  </v-list-item-title>
-
-                  <v-icon
-                  v-if="userRole==rol.name" 
-                  class="rounded-full p-1 bg-green-500" dark
-                  >
-                    mdi-check
-                  </v-icon>
-                </v-list-item>
-              </v-list>
-          </v-card> 
-          <!-- FIN MENU DESPLEGABLE USUARIO -->
-        </v-menu>
-      </div>
-    </template>      
-      
-<!-- FIN PANEL USUARIO -->
-
-  <v-divider></v-divider>
-
-
-
-<!-- MENU OPCIONES SEGUN ROL -->
-  <div class="ml-1">
-    <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="changeMenu" :hacerMini="mini"></NavGJ></div>
-    <div v-if="userRole=='Operador Especializado'"><NavOpEsp @cambiomenu="changeMenu" :hacerMini="mini"></NavOpEsp></div>
-    <div v-if="userRole=='Control de Calidad'"><Ccalidad @cambiomenu="changeMenu" :hacerMini="mini"></Ccalidad></div>
-  </div>
-
-<!-- FIN MENU OPCIONES SEGUN ROL -->
-    <div v-if="mini==false">
+    <!-- FIN MENU OPCIONES SEGUN ROL -->
+    <div>
       <v-spacer class="mt-4"></v-spacer>
     </div>
-  </v-navigation-drawer>
-</v-app>
+    </div>
 </template>
 
 <script>
@@ -153,24 +135,12 @@ import {roles} from '@/assets/mixins/roles.js';
 
   export default {
     name:'Navigation',
+
     mixins: [roles],
 
-    components: {
-      NavGJ,
-      NavOpEsp,
-      Ccalidad,
-    },
+    components: {NavGJ, NavOpEsp,Ccalidad,},
 
-    props: {
-      mini: {
-        type: Boolean,
-        default: false,
-      },
-
-      jobsBdjaOpEsp: {
-        default: 0,
-      }
-    },
+    jobsBdjaOpEsp: {default: 0},
 
     
     methods: {
@@ -188,11 +158,6 @@ import {roles} from '@/assets/mixins/roles.js';
         this.changeMenu(rol.default)
       },
 
-    },
-
-    watch: {
-      userRole() {/**/},
-      mini(){},
     },
 
     data () {
