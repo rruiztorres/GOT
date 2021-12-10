@@ -654,21 +654,19 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
                 if(this.errores.length != 0 && this.toolActive == 'modifyError'){
                     this.$emit("errores", this.erroresAttrb)
-                }                
-            },
-
-            erroresAttrb(){
-            //Actualizacion de geometrias al vuelo
-               if(this.erroresRecibidos != null){
-                    if(this.erroresAttrb.length > 0){
-                        for (this.index in this.errores){
-                            if (this.errores[this.index].id == this.erroresAttrb[this.index].id){
+                }
+                
+                //Actualización geometrías al vuelo
+                if(this.errores.length == this.erroresAttrb.length){
+                    for (this.index in this.errores){
+                        for (this.indexAttrb in this.erroresAttrb){
+                            if (this.errores[this.index].id == this.erroresAttrb[this.indexAttrb].id) {
                                 this.erroresAttrb[this.index].geometria_json = this.errores[this.index].geometry;
                             }
                         }
                     }
-                } 
-            }
+                }
+            },
         },
 
         methods:{

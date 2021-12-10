@@ -573,6 +573,14 @@ export default {
         .post(`${process.env.VUE_APP_API_ROUTE}/postError`, this.arrayPost)
         .then((data) => {
           if (data.status == 201){
+            //Actualizar numeros serie errores guardados
+            for (this.index in this.errores){
+              for (this.indexCreados in data.data.errores){
+                if (data.data.errores[this.indexCreados].id == this.errores[this.index].id){
+                  this.errores[this.index].error = data.data.errores[this.indexCreados].error
+                }
+              }
+            }
             //this.arrayPost = data.data.errores
           } else {
             this.ejecucionPostError = false; 
@@ -590,7 +598,7 @@ export default {
       }
 
       //Actualizamos datos
-      this.initialize();
+      //this.initialize();
 
       //Respuesta a usuario
       if (this.ejecucionPostError == true && this.ejecucionPutError == true && this.ejecucionPutJob == true){
