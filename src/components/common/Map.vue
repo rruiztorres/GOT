@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full">
+    <div style="height:96%">
         <!-- MAPA -->
         <vl-map 
             :load-tiles-while-animating="true" 
@@ -134,15 +134,17 @@
         </vl-map>     
 
         <!--PANEL DE CONTROL -->
-        <v-app class="font-sans" style="float: right; height: 0rem">
-            <v-card
-            class="p-2 border-2 border-blue-400"
+        <div class="font-sans" style="float: right; height: 0rem">
+            <div
+            class="p-2 rounded-sm"
             style="
-            top: -45.5rem;
+            position:absolute;
+            top:2.5rem;
+            right:1.7rem;
             margin-right: 1rem;
             width: 16rem;
-            box-shadow: 5px 5px 5px gray;
-            background-color: rgba(0, 60, 136, 0.5);
+            box-shadow: 0px 0px 5px 3px white;
+            background-color: rgba(0, 60, 136, 0.4);
             "
             >
                 <v-card-actions
@@ -232,8 +234,8 @@
                         <v-spacer class="my-8"></v-spacer>                
                     </div>
                 </v-expand-transition>
-            </v-card>
-        </v-app>
+            </div>
+        </div>
 
         <!-- VENTANA INFORMACION MAPA (Centro, zoom, etc) -->
         <v-card style="

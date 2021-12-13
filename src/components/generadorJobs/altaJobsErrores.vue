@@ -44,7 +44,7 @@
                         <v-card 
                         flat
                         class="p-8"
-                        style="height:50rem;"
+                        style="height:90vh;"
                         >
                             <Map @jobs="storeJobs" @errores="storeErrors" modoMapa="editar"></Map>
                          </v-card>
@@ -55,6 +55,7 @@
                         <v-card 
                         flat
                         class="p-8"
+                        style="height:87.5vh"
                         >
                             <v-spacer class="m-4"></v-spacer>
                             
