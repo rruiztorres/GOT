@@ -213,7 +213,7 @@
                         <v-spacer class="my-8"></v-spacer>
 
                         <div class="rounded bg-blue-800 p-2 mb-1 text-white text-l text-center">
-                        CAPAS WMTS
+                        CARTOGRAFÍA
                         </div>
                         <v-btn
                             v-for="service in wmtsServices"
@@ -1159,6 +1159,16 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     matrixSet: "EPSG:3857", 
                     styleName: "default",
                     activeMap: 'ignPNOA', 
+                    format: 'image/jpeg'
+                },
+                {
+                    attribution: 'IGN Mapa Ráster - Instituto Geográfico Nacional',
+                    url: "https://www.ign.es/wmts/mapa-raster",
+                    layerName: "MTN", 
+                    nombre: "Mapa Ráster", 
+                    matrixSet: "EPSG:3857", 
+                    styleName: "default",
+                    activeMap: 'ignMapaRaster', 
                     format: 'image/jpeg'
                 },
                 {

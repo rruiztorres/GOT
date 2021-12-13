@@ -140,7 +140,6 @@ export default {
       { text: "Detectado en", align: "start", sortable: true, value: "deteccion_job"},
       { text: "Perfil", align: "start", sortable: true, value: "arreglo_job"},
       { text: "Descripción", align: "start", sortable: true, value: "resumen"}, //hay que hacer desde API un "resumen" ademas de la desc completa
-      { text: "Operador", align: "start", sortable: true, value: "nombre_operador"},
       { text: "Acciones", value: "actions", sortable: false },
     ],
     jobs: [],
