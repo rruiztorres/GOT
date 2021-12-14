@@ -47,10 +47,6 @@
 
         props: ['activarMenu'],
 
-        mounted(){
-            console.log("montado loader", this.activarMenu)
-        },
-
         methods:{
             menuDefault(data){
                 this.$emit('cambiomenu', data);

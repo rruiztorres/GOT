@@ -820,9 +820,15 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                         this.jobsAttrb.push(this.newAttrbJobBd);
 
                         //getExtent
-                        this.datosExtent = this.getMapExtent(this.jobsRecibidos.geometria_json)
-                        this.center = this.datosExtent.centro;
-                        this.zoom = this.datosExtent.nuevoZoom;
+                        axios
+                        .get(`${process.env.VUE_APP_API_ROUTE}/jobExtent/`+ this.jobsRecibidos.job)
+                        .then((data)=> {
+                            this.datosExtent = this.getMapExtent(data.data);
+                            this.center = this.datosExtent.centro;
+                            this.zoom = this.datosExtent.nuevoZoom;
+                        })
+                        
+                        
                     }
                 }
             },
