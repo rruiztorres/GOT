@@ -75,8 +75,15 @@
             </v-dialog>
           </template>
 
-        <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
+          <template v-slot:no-data>
+            <div class="p-3">
+              <h1 class="text-2xl font-bold">VAYA...</h1>
+              <h1 class="text-xl">Parece que no existen jobs que puedan recuperarse</h1>
+              <img 
+                title=""
+                class="m-auto" 
+                width="400px" src="@/assets/no_data.jpg">
+            </div>
           </template>
 
           <template v-slot:[`item.estado`]="{ item }">

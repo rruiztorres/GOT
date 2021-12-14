@@ -13,7 +13,7 @@
             <div class="p-3 flex bg-blue-500 w-full items-center">
               <v-btn :disabled="groupActions()" dark color="success" @click="groupGenerate()" class="mr-3">GENERAR JOBS</v-btn>
               <v-btn :disabled="groupActions()" dark color="#71717A" class="mr-3">ASIGNAR EXPEDIENTE</v-btn>
-              <v-btn :disabled="groupActions()" dark color="error" class="mr-3">ELIMINAR</v-btn>
+              <v-btn :disabled="groupActions()" dark color="error" @click="deleteJobs()" class="mr-3">ELIMINAR</v-btn>
               <v-spacer></v-spacer>
 
               <v-text-field
@@ -85,7 +85,14 @@
           </template>
 
           <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
+            <div class="p-3">
+              <h1 class="text-2xl font-bold">¡ENHORABUENA!</h1>
+              <h1 class="text-xl">En estos momentos no existen jobs que necesiten triaje</h1>
+              <img 
+                title=""
+                class="m-auto" 
+                width="500px" src="@/assets/no_items_to_work.jpg">
+            </div>
           </template>
 
           <template v-slot:[`item.estado`]="{ item }">
@@ -187,8 +194,32 @@ export default {
   },
 
   methods: {
-    dummy() {
-      //
+    
+    deleteJobs(){
+      const deleteJobs = this.selected
+      axios
+      .delete(`${process.env.VUE_APP_API_ROUTE}/deleteJobs`, {data: deleteJobs}) 
+      .then((data) => {
+        if (data.status == 201){
+          this.showInfo(data.data.mensaje, "green");
+          setTimeout(this.closeInfo, 1500);
+
+          //Actualizar array jobs
+          for (this.index in this.jobs){
+            for (this.indexSelection in this.selected){
+              if (this.selected[this.indexSelection].id_job == this.jobs[this.index].id_job){
+                this.jobs.splice(this.index, 1)
+              }
+            }
+          }
+          //Deseleccionar jobs eliminados
+          this.selected = []
+
+        } else {
+          this.showInfo(data.data.mensaje, "red");
+          setTimeout(this.closeInfo, 1500);  
+        }
+      })
     },
 
     showInfo(message, type) {
