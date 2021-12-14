@@ -1,117 +1,117 @@
+function getZoomByExtent(altura, anchura){
+    if (anchura <= 535.4243033695966) {
+        if (altura <= 702.6388334439835) {
+            const zoom = 17.5;
+            return zoom
+        }
+    }
+    else if (anchura <= 1084.3608919996768){
+        if (altura <= 1418.7899521470536 ){
+            const zoom = 16.5;
+            return zoom
+        }
+    }
+    else if (anchura <= 2195.746354520321){
+        if (altura <= 2837.579904294922 ){
+            const zoom = 15.5;
+            return zoom
+        }
+    }
+    else if (anchura <= 4269.882141709328){
+        if (altura <= 5594.0860970390495 ){
+            const zoom = 14.5;
+            return zoom
+        }
+    }
+    else if (anchura <= 8566.788853920065){
+        if (altura <= 11161.147623561905 ){
+            const zoom = 13.5;
+            return zoom
+        }
+    }
+    else if (anchura <= 17079.52856680937){
+        if (altura <= 22214.196965054958 ){
+            const zoom = 12.5;
+            return zoom
+        }
+    }
+    else if (anchura <= 33402.36915913038){
+        if (altura <= 44536.492212176905 ){
+            const zoom = 11.5;
+            return zoom
+        }
+    }
+    else if (anchura <= 68318.11426721979){
+        if (altura <= 90153.96724503895 ){
+            const zoom = 10.5;
+            return zoom
+        }
+    }
+    else if (anchura <= 136203.83540617023){
+        if (altura <= 177281.18259216298){
+            const zoom = 9.5;
+            return zoom
+        }
+    }
+    else if (anchura <= 274137.2433254402){
+        if (altura <= 358021.51021051506){
+            const zoom = 8.5;
+            return zoom
+        }
+    }
+    else if (anchura <= 546544.91413779){
+        if (altura <= 710854.302881747){
+            const zoom = 7.5;
+            return zoom
+        }
+    }
+    else if (anchura <= 1082712.3931970196){
+        if (altura <= 1418249.4607373069){
+            const zoom = 6.5;
+            return zoom
+        } else {
+            const zoom = 5.5;
+            return zoom
+        }
+    }
+}
+
 export const getMapExtent = {
-
-    methods: {
-        distanciaPuntos(a ,b){
-            const xa = a[0];
-            const xb = b[0];
-            const ya = a[1];
-            const yb = b[1];
-
-            const distancia = Math.sqrt( Math.pow((xb-xa),2) + Math.pow((yb-ya),2) );
-            return distancia; 
-        },
-
-        getMapExtent(job){
-            
-            //Asginamos valor inicial
-            let xMax = job.coordinates[0][0][0]
-            let xMin = job.coordinates[0][0][0]
-            let yMax = job.coordinates[0][0][1]
-            let yMin = job.coordinates[0][0][1]
-
-            const jobGeometry = job.coordinates[0];
-
-            for (this.index in jobGeometry) {
-                if (jobGeometry[this.index][0] > xMax) {
-                    xMax = jobGeometry[this.index][0];
-                }
-                else if (jobGeometry[this.index][0] < xMin) {
-                    xMin = jobGeometry[this.index][0];
-                }
-                else if (jobGeometry[this.index][1] < yMin) {
-                    yMin = jobGeometry[this.index][1];
-                }
-                else if (jobGeometry[this.index][1] > yMax) {
-                    yMax = jobGeometry[this.index][1];
-                }
-            }
-
-            const distanciaA = this.distanciaPuntos([yMin, xMax], [yMin, xMin]);
-            const distanciaB = this.distanciaPuntos([yMin, xMin], [yMax, xMin]);
-            const anchoZoom = distanciaB;
-            const factorCorreccionY = 0;
-            const factorCorreccionX = 0;
-            const centroMapa = [(distanciaB/2)+xMin+factorCorreccionX,(distanciaA/2)+yMin+factorCorreccionY];
-
-            //Ajuste de zoom
-            let zoom = 5.5;
-
-            if (anchoZoom < 1000000 && anchoZoom > 600000) {
-                zoom = 6;
-            }
-
-            else if (anchoZoom < 600000 && anchoZoom > 300001) {
-                zoom = 7;
-            }
-
-            else if (anchoZoom < 300000 && anchoZoom > 150000) {
-                zoom = 8;
-            }
-
-            else if (anchoZoom < 150000 && anchoZoom > 68966) {
-                zoom = 9;
-            }
-
-            else if (anchoZoom < 68966 && anchoZoom > 34050) {
-                zoom = 10.5;
-            }
-
-            else if (anchoZoom < 34050 && anchoZoom > 17241) {
-                zoom = 11.5;
-            }
-
-            else if (anchoZoom < 17241 && anchoZoom > 8620) {
-                zoom = 12.5;
-            }
-
-            else if (anchoZoom < 8620 && anchoZoom > 4256) {
-                zoom = 13.5;
-            }
-
-            else if (anchoZoom < 4256 && anchoZoom > 2155) {
-                zoom = 14.5;
-            }
-
-            else if (anchoZoom < 2155 && anchoZoom > 1074) {
-                zoom = 15.5;
-            }
-
-            else if (anchoZoom < 1074 && anchoZoom > 537) {
-                zoom = 16.5;
-            }
-
-            else if (anchoZoom < 537 && anchoZoom > 266) {
-                zoom = 17.5;
-            }
-
-            else if (anchoZoom < 266 && anchoZoom > 138) {
-                zoom = 18.5;
-            }
-
-            else if (anchoZoom < 138 && anchoZoom > 0) {
-                zoom = 19.5;
-            }
-
-            const datosExtent = {
-                centro: centroMapa,
-                nuevoZoom : zoom,
-            };
-
-            return datosExtent;        
-        },
-
+    methods: {   
+      getMapExtent(data){
+        let extent = data.extent;
+        let centroid = data.centroid;
         
-            
+        //Formateo de data
+        extent = extent.split(",");
+        extent[4] = extent[4].slice(0,-2);
+        extent[0] = extent[4];
+        centroid = centroid.slice(6,-1);
+        centroid = centroid.split(" ");
         
+        //Calculo distancia puntos anchura
+        const anchXa = (extent[0].split(" "))[0]
+        const anchYa = (extent[0].split(" "))[1]
+        const anchXb = (extent[1].split(" "))[0]
+        const anchYb = (extent[1].split(" "))[1]
+        const distanciaAnchura = Math.sqrt((Math.pow((anchXb-anchXa),2))+(Math.pow((anchYb-anchYa),2)))
+
+        //Calculo distancia puntos altura
+        const altXa = (extent[3].split(" "))[0]
+        const altYa = (extent[3].split(" "))[1]
+        const altXb = (extent[4].split(" "))[0]
+        const altYb = (extent[4].split(" "))[1]
+        const distanciaAltura =  Math.sqrt((Math.pow((altXb-altXa),2))+(Math.pow((altYb-altYa),2)))
+
+        //Ajuste zoom segun extent
+        const zoom = getZoomByExtent(distanciaAnchura, distanciaAltura)
+        
+        //Salida
+        const datosExtent = {
+            centro: centroid,
+            nuevoZoom: zoom,
+        }
+        return datosExtent;
+      }
     },
 }
