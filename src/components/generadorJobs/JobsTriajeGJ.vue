@@ -80,7 +80,7 @@
 
           <template v-slot:[`item.actions`]="{ item }">
             <v-btn title="Editar Job" icon dark class="bg-blue-500 mr-1">
-              <v-icon small @click="editItem(item)"> mdi-pencil </v-icon>
+              <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
             </v-btn>
           </template>
 
