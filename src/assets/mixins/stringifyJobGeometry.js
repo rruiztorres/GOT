@@ -5,8 +5,8 @@ export const stringifyJobGeometry = {
         stringifyJobGeometry(geometry){
             this.coordinates = geometry.coordinates[0];
             this.string = "POLYGON((";
-            for (this.index in this.coordinates) {
-                this.coordinate = this.coordinates[this.index].toString();
+            for (let index in this.coordinates) {
+                this.coordinate = this.coordinates[index].toString();
                 this.coordinate = this.coordinate.replace(',',' ');
                 this.string = this.string + this.coordinate + ','
             }

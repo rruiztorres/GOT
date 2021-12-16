@@ -12,7 +12,7 @@
           <div>
             <div class="p-3 flex bg-blue-500 w-full items-center">
               <v-btn :disabled="groupActions()" dark color="success" @click="groupGenerate()" class="mr-3">GENERAR JOBS</v-btn>
-              <v-btn :disabled="groupActions()" dark color="#71717A" class="mr-3">ASIGNAR EXPEDIENTE</v-btn>
+              <v-btn :disabled="groupActions()" dark color="#71717A" @click="groupAsignExp()" class="mr-3">ASIGNAR EXPEDIENTE</v-btn>
               <v-btn :disabled="groupActions()" dark color="error" @click="deleteJobs()" class="mr-3">ELIMINAR</v-btn>
               <v-spacer></v-spacer>
 
@@ -116,6 +116,43 @@
           </v-alert>
         </v-overlay>
 
+        <!--SELECCION DE EXPEDIENTES (asignacion masiva)-->
+        <v-overlay :value="showExpSelect">
+          <v-card light class="bg-white p-3 rounded-md" style="width:50vw;">
+            <v-row>
+              <v-col cols="5">
+                <h1 class="text-xl mb-3 w-full self-auto">Expediente</h1>
+                <hr/>
+                <v-select
+                class="w-full mt-4"
+                :items="expedientes"
+                v-model="expediente"
+                label="Expediente"
+                solo
+                light
+                ></v-select>
+              </v-col>
+              <v-col cols="7">
+                <div>
+                  <h1 class="text-xl mb-3 w-full self-auto">Información</h1>
+                  <hr/>
+                  <div class="mt-4" v-if="expedienteInfo[0].observaciones != null && expedienteInfo[0].fecha">
+                    <b>Observaciones: </b><p v-html="expedienteInfo[0].observaciones"></p>
+                    <b>Fecha alta: </b><p v-html="expedienteInfo[0].fecha"></p>
+                    <b>Estado: </b><p v-html="expedienteInfo[0].finalizado"></p>
+                  </div>
+                </div>
+              </v-col>
+            </v-row>
+            <v-row>
+                <div class="w-full p-3 bg-gray-100 self-auto">
+                  <v-btn dark color="success" @click="asignExpToSelect()" class="mr-3">ASIGNAR A SELECCIÓN</v-btn>
+                  <v-btn dark color="error" @click="showExpSelect = !showExpSelect" class="mr-3">CANCELAR</v-btn>
+                </div>
+            </v-row>
+          </v-card>
+        </v-overlay>
+
       </div>
   </div>
 </template>
@@ -125,11 +162,12 @@ import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import { generarJobError } from '@/assets/mixins/generarJobError';
 import EditarJob from '@/components/generadorJobs/EditarJob.vue';
+import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry';
 
 
 export default {
   name: "JobsTriajeGJ",
-  mixins: [getColor, generarJobError],
+  mixins: [getColor, generarJobError, stringifyJobGeometry],
   components: {
     EditarJob,
   },
@@ -173,27 +211,87 @@ export default {
     showMessage: false,
     message: '',
     messageType: '',
-  }),
 
-  computed: {
-    formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
-    },
-  },
+    //MANEJO EXPEDIENTES
+    showExpSelect: false,
+    expedientes: [],
+    expediente:'',
+    expedienteInfo: [{
+      fecha: null,
+      observaciones: null,
+      finalizado: null,
+    }],
+  }),
 
   watch: {
     dialog(val) {
       val || this.close();
     },
+
     dialogDelete(val) {
       val || this.closeDelete();
     },
+
+    expediente(){
+      if(this.expediente != null){
+        axios
+        .get(`${process.env.VUE_APP_API_ROUTE}/expediente/`+ this.expediente)
+        .then((data) => {
+          this.expedienteInfo[0].fecha = (data.data.respuesta[0].fecha).slice(0,10);
+          this.expedienteInfo[0].observaciones = data.data.respuesta[0].observaciones;
+          if (data.data.respuesta[0].finalizado == true){
+            this.expedienteInfo[0].finalizado = "Finalizado"
+          } else {
+            this.expedienteInfo[0].finalizado = "Abierto"
+          }
+        })
+      }
+    },
   },
+
   created() {
     this.initialize();
   },
 
   methods: {
+    asignExpToSelect(){
+      //Asigna el expediente a la seleccion de jobs actual   
+      for (this.index in this.selected){
+        this.selected[this.index].geometria = this.stringifyJobGeometry(this.selected[this.index].geometria_json);
+        this.selected[this.index].expediente = this.expediente;
+        
+        axios
+        .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, [this.selected[this.index]])
+        .then((data)=>{
+          this.showExpSelect = false;
+          this.selected = [];
+          if (data.status == 201){
+            this.showInfo("Los expedientes se han asignado a la selección", "green");
+            setTimeout(this.closeInfo, 1500);
+          } else {
+            this.showInfo(data.data.mensaje, "red");
+            setTimeout(this.closeInfo, 1500);
+          }
+        })
+        
+      }
+      
+    },
+
+    groupAsignExp(){
+      this.showExpSelect = true;
+      this.getExpedientes();
+    },
+
+    getExpedientes(){
+      axios
+      .get(`${process.env.VUE_APP_API_ROUTE}/expedientes`)
+      .then((data)=>{
+        for (this.index in data.data.respuesta){
+          this.expedientes.push(data.data.respuesta[this.index].expediente)
+        }
+      })
+    },
     
     deleteJobs(){
       const deleteJobs = this.selected
