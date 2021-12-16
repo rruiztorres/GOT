@@ -4,7 +4,7 @@
       Editar Expedientes
     </h1>
 
-    <div class="overflow-y-auto">
+    <div class="overflow-y-auto" style="height:88vh;">
       <v-card elevation="0" class="mb-4">
         <div>
           <div class="p-3 flex bg-blue-500 w-full items-center">
