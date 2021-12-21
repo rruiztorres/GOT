@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-full">
     <div 
     class="bg-white shadow-md border border-gray-300 mb-4"
     v-if="editor">
@@ -77,11 +77,11 @@
       </v-btn>      
     </div>
     
-      <editor-content 
-      class="bg-white border border-gray-400 p-6"
-      style="height:27rem;"
-      :editor="editor" 
-      />
+    <editor-content 
+    class="bg-white border shadow-md border border-gray-300 p-6"
+    style="height:100%"
+    :editor="editor" 
+    />
   </div>
 </template>
 

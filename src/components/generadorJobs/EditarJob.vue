@@ -29,7 +29,7 @@
         <v-tabs v-model="activeTab" fixed-tabs background-color="#0341a6" dark>
           <v-tab :key="1" @click="activateMap(false)">Datos del Job</v-tab>
           <v-tab :key="2" @click="activateMap(true)">Localización en el Mapa</v-tab>
-          <v-tab :key="3" @click="activateMap(false)">Datos adjuntos</v-tab>
+          <v-tab :key="3" @click="activateMap(false)">Proceso</v-tab>
 
           <v-tabs-slider color="#76aff5"></v-tabs-slider>
 
@@ -39,7 +39,7 @@
             <v-card flat class="p-8">
               <div class="min-w-1/4">
                 <v-row class="h-full mb-6">
-                  <v-col cols="8">
+                  <v-col cols="12">
                     <v-card class="mb-6">
                       <v-card-title class="bg-blue-200">
                       DATOS DEL JOB
@@ -91,123 +91,6 @@
                       </div>
                     </v-card>
                   </v-col>
-
-                  <!-- LOG DEL JOB -->
-                  <v-col cols="4">
-                    <v-card>
-                      <v-card-title class="bg-blue-200">LOG</v-card-title>
-                      <template>
-                        <v-container style="max-width: 600px;">
-                          <v-timeline dense>
-                            <v-timeline-item
-                              class="mb-4"
-                              fill-dot
-                              color="green"
-                              small
-                            >
-                              <v-card class="p-4">
-                                <v-row justify="space-between">
-                                  <v-col cols="12">
-                                    <v-chip
-                                      class="white--text ml-0 w-full"
-                                      color="green"
-                                      label
-                                    >
-                                      Inserciones automáticas - 09:25 PM
-                                      (10/02/2021)
-                                    </v-chip>
-                                    <p class="my-3">
-                                      Incidencia insertada por proceso
-                                      automático
-                                    </p>
-                                  </v-col>
-                                </v-row>
-                              </v-card>
-                            </v-timeline-item>
-
-                            <v-timeline-item
-                              class="mb-4"
-                              fill-dot
-                              color="#9CA3AF"
-                              small
-                            >
-                              <v-card class="p-4">
-                                <v-row justify="space-between">
-                                  <v-col cols="12">
-                                    <v-chip
-                                      class="white--text ml-0 w-full"
-                                      color="#9CA3AF"
-                                      label
-                                    >
-                                      Job en Triaje - 10:25 PM (10/02/2021)
-                                    </v-chip>
-                                    <p class="my-3">
-                                      El Generador de Jobs Raúl Ruiz Torres está
-                                      realizando el triaje del job
-                                    </p>
-                                  </v-col>
-                                </v-row>
-                              </v-card>
-                            </v-timeline-item>
-
-                            <v-timeline-item
-                              class="mb-4"
-                              fill-dot
-                              color="green"
-                              small
-                            >
-                              <v-card class="p-4">
-                                <v-row justify="space-between">
-                                  <v-col cols="12">
-                                    <v-chip
-                                      class="white--text ml-0 w-full"
-                                      color="green"
-                                      label
-                                    >
-                                      Job Generado - 11:45 PM (10/02/2021)
-                                    </v-chip>
-                                    <p class="my-3">
-                                      Job generado por el generador de jobs Raúl
-                                      Ruiz Torres y asignado a bandeja
-                                      operadores
-                                    </p>
-                                  </v-col>
-                                </v-row>
-                              </v-card>
-                            </v-timeline-item>
-
-                            <v-timeline-item
-                              class="mb-4"
-                              fill-dot
-                              color="red"
-                              small
-                            >
-                              <v-card class="p-4">
-                                <v-row justify="space-between">
-                                  <v-col cols="12">
-                                    <v-chip
-                                      class="white--text ml-0 w-full"
-                                      color="red"
-                                      label
-                                    >
-                                      Error de versionado - 11:55 PM
-                                      (10/02/2021)
-                                    </v-chip>
-                                    <p class="my-3">
-                                      No se ha podido crear la versión del Job
-                                    </p>
-                                    <v-btn color="primary" small
-                                      >Solucionar</v-btn
-                                    >
-                                  </v-col>
-                                </v-row>
-                              </v-card>
-                            </v-timeline-item>
-                          </v-timeline>
-                        </v-container>
-                      </template>
-                    </v-card>
-                  </v-col>
                 </v-row>
                 <br />
               </div>
@@ -234,9 +117,9 @@
 
           <!--DATOS ADJUNTOS-->
           <v-tab-item>
-            <v-card flat class="p-8">
-              <v-spacer class="m-4"></v-spacer>
-            </v-card>
+
+                <Logger></Logger>
+
           </v-tab-item>
           <!--FIN DATOS ADJUNTOS-->
         </v-tabs>
@@ -299,6 +182,7 @@ import pointInPolygon from "point-in-polygon";
 
 import axios from "axios";
 import Map from "@/components/common/Map";
+import Logger from "@/components/common/Logger";
 
 export default {
   mixins: [getColor, generarJobError, stringifyJobGeometry, stringifyErrorGeometry],
@@ -315,6 +199,7 @@ export default {
 
   components: {
     Map,
+    Logger,
   },
 
   created() {
@@ -322,6 +207,7 @@ export default {
   },
 
   watch: {
+
     job() {
       //vuelve a lanzar el initialize cuando detecta un cambio de job
       if (this.job.job) {

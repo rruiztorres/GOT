@@ -5,11 +5,8 @@
       v-for="navGroup in navItems"
       :key="navGroup.name">
 
-      <div v-if="hacerMini==false">
+      <div>
         <v-list-item-title class="ml-4 my-1 text-l font-bold">{{navGroup.group}}</v-list-item-title>
-      </div>
-
-      <div v-if="hacerMini==true">
       </div>
 
       <v-list-item
@@ -40,14 +37,8 @@
 
 export default {
     name: 'NavGJ',
-    props: {
-        hacerMini: {
-            type: Boolean,
-            default: false,
-        }
-    },
 
-     methods: {
+    methods: {
       emitChangeMenu(datos) {
         this.$emit('cambiomenu', datos);
       },
@@ -73,9 +64,7 @@ export default {
             },
             { group: 'Gestion de Expedientes',
               items: [
-                {group: 'Gestión de Expedientes', name:'Alta de expediente', icon:'mdi-note-plus', active:'AltaExpediente'}, 
-                {group: 'Gestión de Expedientes',name:'Editar expedientes', icon:'mdi-file-document-edit', active:'EditarExpediente'},
-                {group: 'Gestión de Expedientes',name:'Estado expedientes', icon:'mdi-note-search', active:''},
+                {group: 'Gestión de Expedientes',name:'Gestion Expedientes', icon:'mdi-file-document-edit', active:'GestionExpedientes'},
               ]
             },
             {

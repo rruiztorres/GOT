@@ -5,23 +5,42 @@
       </h1>
 
       <div class="overflow-y-auto">
+        
+        <!--PANEL ACCIONES SUPERIOR -->
         <v-card elevation="0" class="mb-4">
-          <div>
-            <div class="p-3 flex bg-blue-500 w-full items-center">
-              <v-btn :disabled="groupActions()" dark color="success" class="mr-3" @click="recuperarTriaje()">RECUPERAR A TRIAJE</v-btn>
-              <v-btn :disabled="groupActions()" dark color="error" class="mr-3">RECHAZAR JOBS</v-btn>
-              <v-spacer></v-spacer>
-
-              <v-text-field
-                v-model="search"
-                append-icon="mdi-magnify"
-                label="Buscar"
-                single-line
-                hide-details
-                class="bg-white p-2"
-              ></v-text-field>
-            </div>
-          </div>
+          <v-row class="m-0 bg-blue-500 items-center">
+              <v-col cols="12" md="6">
+                <v-row>
+                  <v-col cols="12" md="5">
+                    <v-btn 
+                      class="w-full"
+                      :disabled="groupActions()" 
+                      dark color="success" 
+                      @click="recuperarTriaje()">
+                      RECUPERAR A TRIAJE
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12" md="5">
+                    <v-btn 
+                      class="w-full"
+                      :disabled="groupActions()" 
+                      dark color="error" >
+                      RECHAZAR JOBS
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  label="Buscar"
+                  single-line
+                  hide-details
+                  class="bg-white p-2"
+                ></v-text-field>
+              </v-col>
+          </v-row>
         </v-card>
 
         <v-data-table

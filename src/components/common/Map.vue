@@ -651,6 +651,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             this.retrieveErrorsFromBD();         
         },
 
+
         beforeDestroy(){
             this.$emit("errores", this.erroresAttrb);
             this.$emit('jobs', this.jobsAttrb);
@@ -677,7 +678,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     }
                 }
             },
-            
+           
             errores(){
                 if(this.errores.length != 0 && this.toolActive == 'drawErrors'){
                     this.editError = true
