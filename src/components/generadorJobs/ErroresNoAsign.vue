@@ -12,7 +12,7 @@
           <div>
             <div class="p-3 flex bg-blue-500 w-full items-center">
               <v-btn dark color="info" class="mr-3">VER EN MAPA</v-btn>
-              <v-btn :disabled="groupActions()" dark color="error" class="mr-3">BORRAR</v-btn>
+              <v-btn :disabled="groupActions()" dark color="error" class="mr-3">DESESTIMAR</v-btn>
               <v-spacer></v-spacer>
 
               <v-text-field

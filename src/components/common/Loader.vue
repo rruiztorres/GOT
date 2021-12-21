@@ -3,8 +3,7 @@
         <!--Generador de Jobs-->
         <div v-if="activarMenu == 'altaJobsErrores'"><AltaJobsErrores @closed="menuDefault"></AltaJobsErrores></div>
         <div v-if="activarMenu == 'JobsTriajeGJ'"><JobsTriajeGJ></JobsTriajeGJ></div>
-        <div v-if="activarMenu == 'AltaExpediente'"><AltaExpediente @closed="menuDefault"></AltaExpediente></div>
-        <div v-if="activarMenu == 'EditarExpediente'"><EditarExpediente></EditarExpediente></div>
+        <div v-if="activarMenu == 'GestionExpedientes'"><GestionExpedientes></GestionExpedientes></div>
         <div v-if="activarMenu == 'RecuperarJobs'"><RecuperarJobs></RecuperarJobs></div>
         <div v-if="activarMenu == 'ErroresNoAsign'"><ErroresNoAsign></ErroresNoAsign></div>
 
@@ -21,8 +20,7 @@
 <script>
     import JobsTriajeGJ from '@/components/generadorJobs/JobsTriajeGJ';
     import AltaJobsErrores from '@/components/generadorJobs/altaJobsErrores';
-    import AltaExpediente from '@/components/generadorJobs/altaExpediente';
-    import EditarExpediente from '@/components/generadorJobs/editarExpediente';
+    import GestionExpedientes from '@/components/generadorJobs/GestionExpedientes';
     import BandejaOpEsp from '@/components/operadorEsp/BandejaOpEsp';
     import BandejaOp from '@/components/common/BandejaOp';
     import BandejaMisJobs from '@/components/common/BandejaMisJobs';
@@ -36,8 +34,7 @@
         components: {
             JobsTriajeGJ,
             AltaJobsErrores,
-            AltaExpediente,
-            EditarExpediente,
+            GestionExpedientes,
             BandejaOpEsp,
             BandejaOp,
             BandejaMisJobs,

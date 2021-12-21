@@ -8,24 +8,60 @@
       </div>
 
       <div class="overflow-y-auto">
-        <v-card elevation="0" class="mb-4">
-          <div>
-            <div class="p-3 flex bg-blue-500 w-full items-center">
-              <v-btn :disabled="groupActions()" dark color="success" @click="groupGenerate()" class="mr-3">GENERAR JOBS</v-btn>
-              <v-btn :disabled="groupActions()" dark color="#71717A" @click="groupAsignExp()" class="mr-3">ASIGNAR EXPEDIENTE</v-btn>
-              <v-btn :disabled="groupActions()" dark color="error" @click="deleteJobs()" class="mr-3">ELIMINAR</v-btn>
-              <v-spacer></v-spacer>
-
-              <v-text-field
-                v-model="search"
-                append-icon="mdi-magnify"
-                label="Buscar"
-                single-line
-                hide-details
-                class="bg-white p-2"
-              ></v-text-field>
-            </div>
-          </div>
+        
+        <!--PANEL ACCIONES SUPERIOR -->
+        <v-card elevation="0 mb-4">
+            <v-row class="m-0 bg-blue-500 items-center">
+              <v-col cols="12" md="8">
+                <v-row>
+                  <v-col cols="12" md="3">
+                    <v-btn 
+                      class="w-full"
+                      :disabled="groupActions()" 
+                      dark color="success" 
+                      @click="groupGenerate()">
+                      GENERAR JOBS
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12" md="3">
+                    <v-btn
+                      class="w-full"
+                      :disabled="groupActions()" 
+                      dark color="#71717A" 
+                      @click="groupAsignExp()">
+                      ASIGNAR EXP.
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12" md="3">
+                    <v-btn
+                      class="w-full"
+                      :disabled="groupActions()" 
+                      dark color="warning">
+                      DESESTIMAR
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12" md="3">       
+                    <v-btn
+                      class="w-full"
+                      :disabled="groupActions()" 
+                      dark color="error" 
+                      @click="deleteJobs()">
+                    ELIMINAR
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  label="Buscar"
+                  single-line
+                  hide-details
+                  class="bg-white p-2"
+                ></v-text-field>
+              </v-col>
+            </v-row>
         </v-card>
 
         <v-data-table
@@ -80,18 +116,21 @@
 
           <template v-slot:[`item.actions`]="{ item }">
             <v-btn title="Editar Job" icon dark class="bg-blue-500 mr-1">
-              <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
+              <v-icon @click="editItem(item)"> mdi-lead-pencil </v-icon>
             </v-btn>
           </template>
 
           <template v-slot:no-data>
             <div class="p-3">
-              <h1 class="text-2xl font-bold">¡ENHORABUENA!</h1>
-              <h1 class="text-xl">En estos momentos no existen jobs que necesiten triaje</h1>
-              <img 
-                title=""
-                class="m-auto" 
-                width="500px" src="@/assets/no_items_to_work.jpg">
+                <v-progress-circular
+                  :size="70"
+                  :width="7"
+                  color="blue"
+                  indeterminate
+                  class="mb-6"
+                ></v-progress-circular>
+                <br/>
+                <h2 class="text-gray-500 text-lg">Recuperando Jobs desde la base de datos ... por favor espere.</h2>
             </div>
           </template>
 
@@ -116,40 +155,54 @@
           </v-alert>
         </v-overlay>
 
-        <!--SELECCION DE EXPEDIENTES (asignacion masiva)-->
+        <!--SELECCION DE EXPEDIENTES (asignacion masiva) TODO: sacar a componente-->
         <v-overlay :value="showExpSelect">
-          <v-card light class="bg-white p-3 rounded-md" style="width:50vw;">
-            <v-row>
-              <v-col cols="5">
-                <h1 class="text-xl mb-3 w-full self-auto">Expediente</h1>
-                <hr/>
-                <v-select
-                class="w-full mt-4"
-                :items="expedientes"
-                v-model="expediente"
-                label="Expediente"
-                solo
-                light
-                ></v-select>
-              </v-col>
-              <v-col cols="7">
-                <div>
-                  <h1 class="text-xl mb-3 w-full self-auto">Información</h1>
-                  <hr/>
-                  <div class="mt-4" v-if="expedienteInfo[0].observaciones != null && expedienteInfo[0].fecha">
-                    <b>Observaciones: </b><p v-html="expedienteInfo[0].observaciones"></p>
-                    <b>Fecha alta: </b><p v-html="expedienteInfo[0].fecha"></p>
-                    <b>Estado: </b><p v-html="expedienteInfo[0].finalizado"></p>
-                  </div>
-                </div>
-              </v-col>
-            </v-row>
-            <v-row>
-                <div class="w-full p-3 bg-gray-100 self-auto">
-                  <v-btn dark color="success" @click="asignExpToSelect()" class="mr-3">ASIGNAR A SELECCIÓN</v-btn>
+          <v-card light class="bg-white rounded-md" style="width:40vw; min-width:430px;">
+            <v-card-title class="bg-blue-200">Asignación de Expediente
+              <v-spacer></v-spacer>
+              <v-card-actions>
+                <div class="w-full">
+                  <v-btn dark color="success" :disabled="expediente == null" @click="asignExpToSelect()" class="mr-3">ASIGNAR A SELECCIÓN</v-btn>
                   <v-btn dark color="error" @click="showExpSelect = !showExpSelect" class="mr-3">CANCELAR</v-btn>
                 </div>
-            </v-row>
+              </v-card-actions>
+            </v-card-title>
+            <v-row>
+              <v-col>
+                <div>
+                  <div class="p-3">
+                    <v-card-text>Seleccione un expediente </v-card-text>
+                    <v-select
+                    class="mx-3"
+                    :items="expedientes"
+                    v-model="expediente"
+                    label="Expediente"
+                    solo
+                    light
+                    ></v-select>
+                  </div>
+                    
+                    <v-card-title class="bg-blue-200">Información</v-card-title>
+
+                    <div class="p-5" v-if="expedienteInfo[0].observaciones != null && expedienteInfo[0].fecha">
+                      <div class="text-sm text-gray-400 ml-1">Observaciones: </div>
+                      <div class="bg-gray-100 rounded-md p-2 mb-2"><p v-html="expedienteInfo[0].observaciones"></p></div>
+                      <div class="text-sm text-gray-400 ml-1">Fecha alta: </div>
+                      <div class="bg-gray-100 rounded-md p-2 mb-2"><p v-html="expedienteInfo[0].fecha"></p></div>
+                      <div class="text-sm text-gray-400 ml-1">Estado: </div>
+                      <div class="bg-gray-100 rounded-md p-2 mb-2"><p v-html="expedienteInfo[0].finalizado"></p></div>
+                    </div>
+                    <div class="p-5" v-else>
+                      <div class="text-sm text-gray-400 ml-1">Observaciones:</div>
+                      <div class="bg-gray-100 rounded-md p-2 mb-2 text-gray-400">Seleccione un expediente para ver información</div>
+                      <div class="text-sm text-gray-400 ml-1">Fecha alta: </div>
+                      <div class="bg-gray-100 rounded-md p-2 mb-2"></div>
+                      <div class="text-sm text-gray-400 ml-1">Estado: </div>
+                      <div class="bg-gray-100 rounded-md p-2 mb-2"></div>
+                    </div>
+                </div>
+              </v-col>
+            </v-row>          
           </v-card>
         </v-overlay>
 
@@ -215,7 +268,7 @@ export default {
     //MANEJO EXPEDIENTES
     showExpSelect: false,
     expedientes: [],
-    expediente:'',
+    expediente: null,
     expedienteInfo: [{
       fecha: null,
       observaciones: null,

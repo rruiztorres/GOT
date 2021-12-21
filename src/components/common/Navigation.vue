@@ -109,6 +109,7 @@
     <!-- FIN PANEL USUARIO -->
     <v-divider></v-divider>
 
+
     <!-- MENU OPCIONES SEGUN ROL -->
     <div class="ml-1">
       <div v-if="userRole=='Generador de Jobs'"><NavGJ @cambiomenu="changeMenu"></NavGJ></div>
