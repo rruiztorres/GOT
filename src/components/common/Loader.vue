@@ -1,18 +1,20 @@
 <template>
     <div class="bg-blue-800" style="height:10.05rem;">
-        <!--Generador de Jobs-->
-        <div v-if="activarMenu == 'altaJobsErrores'"><AltaJobsErrores @closed="menuDefault"></AltaJobsErrores></div>
-        <div v-if="activarMenu == 'JobsTriajeGJ'"><JobsTriajeGJ></JobsTriajeGJ></div>
-        <div v-if="activarMenu == 'GestionExpedientes'"><GestionExpedientes></GestionExpedientes></div>
-        <div v-if="activarMenu == 'RecuperarJobs'"><RecuperarJobs></RecuperarJobs></div>
-        <div v-if="activarMenu == 'ErroresNoAsign'"><ErroresNoAsign></ErroresNoAsign></div>
+        <div>
+            <!--Generador de Jobs-->
+            <div v-if="activarMenu == 'altaJobsErrores'"><AltaJobsErrores @closed="menuDefault"></AltaJobsErrores></div>
+            <div v-if="activarMenu == 'JobsTriajeGJ'"><JobsTriajeGJ></JobsTriajeGJ></div>
+            <div v-if="activarMenu == 'GestionExpedientes'"><GestionExpedientes></GestionExpedientes></div>
+            <div v-if="activarMenu == 'RecuperarJobs'"><RecuperarJobs></RecuperarJobs></div>
+            <div v-if="activarMenu == 'ErroresNoAsign'"><ErroresNoAsign></ErroresNoAsign></div>
 
-        <!--Operador especializado-->
-        <div v-if="activarMenu == 'BandejaOpEsp'"><BandejaOpEsp></BandejaOpEsp></div>
-        <!--Comun a ambos -->
-        <div v-if="activarMenu == 'BandejaMisJobs'"><BandejaMisJobs></BandejaMisJobs></div>
-        <!--Operador-->
-        <div v-if="activarMenu == 'BandejaOp'"><BandejaOp></BandejaOp></div>
+            <!--Operador especializado-->
+            <div v-if="activarMenu == 'BandejaOpEsp'"><BandejaOpEsp></BandejaOpEsp></div>
+            <!--Comun a ambos -->
+            <div v-if="activarMenu == 'BandejaMisJobs'"><BandejaMisJobs></BandejaMisJobs></div>
+            <!--Operador-->
+            <div v-if="activarMenu == 'BandejaOp'"><BandejaOp></BandejaOp></div>
+        </div>
 
     </div>
 </template>

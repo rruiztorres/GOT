@@ -319,7 +319,7 @@ export default {
           this.showExpSelect = false;
           this.selected = [];
           if (data.status == 201){
-            this.showInfo("Los expedientes se han asignado a la selección", "green");
+            this.showInfo("El expediente ha sido asignado a los jobs seleccionados", "green");
             setTimeout(this.closeInfo, 1500);
           } else {
             this.showInfo(data.data.mensaje, "red");

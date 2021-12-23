@@ -98,10 +98,6 @@
             <div class="p-3">
               <h1 class="text-2xl font-bold">VAYA...</h1>
               <h1 class="text-xl">Parece que no existen jobs que puedan recuperarse</h1>
-              <img 
-                title=""
-                class="m-auto" 
-                width="400px" src="@/assets/no_data.jpg">
             </div>
           </template>
 
@@ -219,10 +215,21 @@ export default {
         this.actualizarJob = {
             nuevoEstado: 'En triaje',
             nombre_operador: this.selected[this.index].nombre_operador,
-            job: this.selected[this.index].job
+            job: this.selected[this.index].job,
+            id_job: this.selected[this.index].id_job
         };
+
+        //Objeto Log
+        this.log = {
+            idEventoLogger: 10, //JOB RECUPERADO A TRIAJE
+            procesoJob: 'GOT',
+            usuario: localStorage.usuario,
+            observaciones: '',
+            departamento: '',
+            resultadoCC: '',
+        }
         axios
-          .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, this.actualizarJob)
+          .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, [this.actualizarJob, this.log])
           .then ((data)=> {
             if (data != undefined){
               this.showInfo(`Los jobs se han devuelto a triaje con éxito`, "green");

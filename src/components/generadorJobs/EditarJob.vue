@@ -27,9 +27,9 @@
     <template>
       <v-card>
         <v-tabs v-model="activeTab" fixed-tabs background-color="#0341a6" dark>
-          <v-tab :key="1" @click="activateMap(false)">Datos del Job</v-tab>
-          <v-tab :key="2" @click="activateMap(true)">Localización en el Mapa</v-tab>
-          <v-tab :key="3" @click="activateMap(false)">Proceso</v-tab>
+          <v-tab :key="1" @click="activateMap(false), activateLogger(false)">Datos del Job</v-tab>
+          <v-tab :key="2" @click="activateMap(true), activateLogger(false)">Localización en el Mapa</v-tab>
+          <v-tab :key="3" @click="activateMap(false), activateLogger(true)">Proceso</v-tab>
 
           <v-tabs-slider color="#76aff5"></v-tabs-slider>
 
@@ -100,7 +100,7 @@
 
           <!--LOCALIZACIÓN EN EL MAPA-->
           <v-tab-item>
-            <v-card flat class="p-8" style="height:50rem;">
+            <v-card flat class="p-8" style="height:86vh">
               <Map
                 v-if="mapIsActive == true"
                 modoMapa="editar"
@@ -115,13 +115,15 @@
           </v-tab-item>
           <!-- FIN LOCALIZACION EN EL MAPA -->
 
-          <!--DATOS ADJUNTOS-->
+          <!--PROCESO-->
           <v-tab-item>
-
-                <Logger></Logger>
-
+                <Logger 
+                  v-if="loggerIsActive == true"
+                  :job="job"
+                  :errores="errores"
+                ></Logger>
           </v-tab-item>
-          <!--FIN DATOS ADJUNTOS-->
+          <!--PROCESO-->
         </v-tabs>
 
         <!-- AVISO DATOS SIN GUARDAR (lo utilizamos también en mapa ¿sacar a componente? ) -->
@@ -355,6 +357,10 @@ export default {
       this.mapIsActive = active;
     },
 
+    activateLogger(active) {
+      this.loggerIsActive = active;
+    },
+
     initialize() {
       //Enviamos señal sin cambio a map
       this.mapReset = false;
@@ -418,10 +424,19 @@ export default {
       this.ejecucionPutError = true;
       this.ejecucionPutJob = true;
 
+      this.log = {
+          idEventoLogger: 6, //JOB MODIFICADO
+          procesoJob: 'GOT',
+          usuario: localStorage.usuario,
+          observaciones: '',
+          departamento: '',
+          resultadoCC: '',
+      }
+
       //Actualizamos datos de job
       if (this.edicionSinGuardar == true) {
         axios
-        .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, this.datosJob)
+        .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, [this.datosJob, this.log])
           .then((data) => {
               if (data.status !== 201) {
                 this.ejecucionPutJob = false;
@@ -553,6 +568,9 @@ export default {
 
       //ALERTA BORRADO ERRORES
       showAlertError: false,
+
+      //LOGGER
+      loggerIsActive: false,
     };
   },
 };

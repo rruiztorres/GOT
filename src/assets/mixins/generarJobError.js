@@ -29,18 +29,31 @@ export const generarJobError = {
                             this.actualizarJob = {
                                 nuevoEstado: 'En bandeja',
                                 nombre_operador: null, 
-                                job: jobs[index].job
+                                job: jobs[index].job,
+                                id_job: jobs[index].id_job
                             };
                         } else {
                             //Si tiene operador asignado = asignacion directa a su bandeja
                             this.actualizarJob = {
                                 nuevoEstado: 'En bandeja_op',
                                 nombre_operador: jobs[index].nombre_operador,
-                                job: jobs[index].job
+                                job: jobs[index].job,
+                                id_job: jobs[index].id_job
                             };
                         }
+
+                        //Objeto Log
+                        this.log = {
+                            idEventoLogger: 7, //JOB GENERADO
+                            procesoJob: 'GOT',
+                            usuario: localStorage.usuario,
+                            observaciones: '',
+                            departamento: '',
+                            resultadoCC: '',
+                        }
+
                         axios
-                        .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, this.actualizarJob)
+                        .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, [this.actualizarJob, this.log])
                         .then(() => {
                             //No existen errores, no lanzar alerta
                         })

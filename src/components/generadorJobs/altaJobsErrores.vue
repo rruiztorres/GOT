@@ -271,9 +271,17 @@ export default {
         // GUARDAR DATOS MAESTRO
         saveData(){
             this.showLoading = true;
+            this.log = {
+                procesoJob: 'GOT',
+                usuario: localStorage.usuario,
+                observaciones: '',
+                departamento: '',
+                resultadoCC: '',
+            }
             this.jobsErrores = {
                 jobs: this.jobs,
-                errores: this.errores
+                errores: this.errores,
+                log: this.log,
             };
             
             axios

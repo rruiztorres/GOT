@@ -1,14 +1,12 @@
 <template>
   <div>
     <v-list 
-      class="mb-4" 
+      dense
       v-for="navGroup in navItems"
       :key="navGroup.name">
-
-      <div>
-        <v-list-item-title class="ml-4 my-1 text-l font-bold">{{navGroup.group}}</v-list-item-title>
-      </div>
-
+      
+      <v-subheader class="ml-2 font-bold">{{navGroup.group}}</v-subheader><hr/>
+  
       <v-list-item
         dense
         v-for="opcionJob in navGroup.items"
@@ -23,11 +21,6 @@
       </v-list-item>
     </v-list>
 
-
-    <v-btn color="green" dark class="w-56 ml-4">
-      <v-icon class="mr-6">mdi-email-outline</v-icon>
-      ENVIAR AVISO
-    </v-btn>
   </div>
 
   
@@ -55,28 +48,28 @@ export default {
     data() {
         return {
           navItems:[
-            { group: 'Gestión de jobs',
+            { group: 'Jobs',
               items: [
                 {name:'Alta de Jobs / Errores', icon:'mdi-briefcase-plus', active:'altaJobsErrores'}, 
                 {name:'Jobs en Triaje', icon:'mdi-briefcase-search', active:'JobsTriajeGJ'},
                 {name:'Recuperar Jobs', icon:'mdi-briefcase-upload', active:'RecuperarJobs'},
               ]
             },
-            { group: 'Gestion de Expedientes',
+            { group: 'Expedientes',
               items: [
-                {group: 'Gestión de Expedientes',name:'Gestion Expedientes', icon:'mdi-file-document-edit', active:'GestionExpedientes'},
+                {name:'Gestionar Expedientes', icon:'mdi-file-document-edit', active:'GestionExpedientes'},
               ]
             },
             {
               group: 'Errores sin Asignar',
               items: [
-                {group: 'Errores sin Asignar', name:'Gestionar Errores', icon:'mdi-map-marker-question', active:'ErroresNoAsign'},
+                {name:'Gestionar Errores', icon:'mdi-map-marker-question', active:'ErroresNoAsign'},
               ]
             },
             {
               group: 'Informes',
               items: [
-                {group: 'Informes', name:'Vista General', icon:'mdi-finance'},
+                {name:'Vista General', icon:'mdi-finance'},
               ]
             },
           ],

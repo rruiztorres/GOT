@@ -1,11 +1,4 @@
 export const getColor = {
-    
-    data(){
-
-    },
-    created(){
-        this.getColor();
-    },
     methods: {
         getColor(estado){
             

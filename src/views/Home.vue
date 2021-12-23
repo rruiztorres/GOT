@@ -111,7 +111,7 @@
                     </div>
                     <div class="btn-wrapper text-center">
                       <!--logo-->
-                      <img class="w-4/5 m-auto" src="../assets/logoIGN.jpg" />
+                      <img class="w-4/5 m-auto" src="../assets/img/logo_web_IGN_CNIG.png" />
                     </div>
                     <hr class="mt-6 border-b-1 border-gray-400" />
                   </div>

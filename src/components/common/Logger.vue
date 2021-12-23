@@ -2,23 +2,23 @@
     <v-container>
         <!--LOG DEL JOB-->
         <v-row>
-            <v-col>
-                <v-card>     
+            <v-col cols="12" md="4">
+                <v-card style="max-height:83vh; overflow:scroll">     
                     <v-card-title class="bg-blue-200">LOG DEL JOB</v-card-title>
                     <v-list three-line class="pt-0">
-                        <template v-for="(item) in example">
+                        <template v-for="(item) in log">
                             <v-list-item
-                            :key="item.title"
+                            :key="item.hora"
                             :class="item.class"
                             >
                                 <v-list-item-avatar>
-                                    <v-icon :title="item.procDesc" class="grey" dark>
+                                    <v-icon :title="item.procDesc" :class=(item.claseProceso) dark>
                                         {{item.icon}}
                                     </v-icon>
                                 </v-list-item-avatar>
 
                                 <v-list-item-content>
-                                    <v-list-item-subtitle v-html="item.fecha"></v-list-item-subtitle>
+                                    <v-list-item-subtitle v-html="`${item.fecha} - ${item.hora}`"></v-list-item-subtitle>
                                     <v-list-item-title v-html="item.title"></v-list-item-title>
                                     <v-list-item-subtitle v-html="item.subtitle"></v-list-item-subtitle>
                                 </v-list-item-content>
@@ -29,7 +29,7 @@
             </v-col>
             
             <!--ACCIONES DISPONIBLES-->
-            <v-col>
+            <v-col cols="12" md="3">
                 <!-- Las card las podemos sacar a componente?-->
                 <v-card>
                     <v-card-title class="bg-blue-200">ACCIONES DISPONIBLES</v-card-title>
@@ -69,75 +69,151 @@
                     </v-card-actions>
                 </v-card>
             </v-col>
+
+            <!--RESUMEN JOB-->
+            <v-col cols="12" md="5">
+                <!-- Las card las podemos sacar a componente?-->
+                <v-card>
+                    <v-card-title class="bg-blue-200" title="No se puede finalizar un job con errores pendientes de solución">
+                        ESTADO
+                        <v-spacer></v-spacer>
+                        <v-btn disabled class="bg-green-500" dark text> GESTIONAR SOLUCIÓN</v-btn>
+                    </v-card-title>
+                    <div class="p-3">
+                        <v-row>
+                            <v-col cols="12">
+                                <v-card>
+                                    <div class="bg-gray-200 w-full p-1">
+                                        <h2 class="ml-2">Job</h2>
+                                    </div>
+                                    <v-data-table
+                                    :headers="jobHeaders"
+                                    :items="[job]"
+                                    class="font-sans"
+                                    hide-default-footer
+                                    >
+                                    <template v-slot:[`item.estado`]="{ item }">
+                                        <v-chip :color="getColor(item.estado)" dark>
+                                        {{ item.estado }}
+                                        </v-chip>
+                                    </template>
+                                    </v-data-table>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+
+                        <v-row>
+                            <v-col cols="12">
+                                <v-card>
+                                    <div class="bg-gray-200 w-full p-1">
+                                        <h2 class="ml-2">Errores</h2>
+                                    </div>
+                                    <v-data-table
+                                    :headers="errorHeaders"
+                                    :items="errores"
+                                    class="font-sans"
+                                    hide-default-footer
+                                    >
+                                    <template v-slot:[`item.estado`]="{ item }">
+                                        <v-chip :color="getColor(item.estado)" dark>
+                                        {{ item.estado }}
+                                        </v-chip>
+                                    </template>
+                                    </v-data-table>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </div>
+
+                    <v-card-actions>
+                        <v-alert
+                            dense
+                            outlined
+                            type="error"
+                            class="w-full"
+                            >
+                            El job aun tiene errores pendientes de solución
+                        </v-alert>
+                    </v-card-actions>
+                </v-card>
+            </v-col>
         </v-row>
     </v-container>
 </template>
 
 <script>
+import axios from 'axios'
+import {getLogIcons} from '@/assets/mixins/getLogIcons';
+import {getColor} from '@/assets/mixins/getColor';
 
 export default {
   name: "Logger",
 
+  props: ["job", "errores"],
+
+  mixins: [getLogIcons,getColor],
+
+  computed: {
+    returnJob() {
+      return this.job;
+    },
+
+    returnErrores(){
+        return this.errores;
+    }
+  },
+
+  mounted(){
+      this.initialize();
+  },
+
   methods:{
-      dummy(){
-          console.log("hago cosas")
+      initialize(){
+          axios
+          .get(`${process.env.VUE_APP_API_ROUTE}/getLogByJob/` + this.job.job)
+          .then((data) => {
+                if(data.status == 201){
+                    this.returnFormatLog(data.data.log)
+                }  
+          })
+
+      },
+
+      returnFormatLog(log){
+        for (this.index in log){
+            this.arrayFecha = (log[this.index].fecha).split("T")
+            this.logNewEntry = {
+            claseProceso: "green",
+            class: "",
+            icon: this.getLogIcons(log[this.index].codigo),
+            procDesc: log[this.index].codigo,
+            fecha: this.arrayFecha[0],
+            hora: (this.arrayFecha[1]).slice(0,-1),
+            title: log[this.index].evento,
+            subtitle: log[this.index].descripcion,                
+            }
+            this.log.push(this.logNewEntry);
+        }
       }
   },
   
   data() {
     return {
         buttonLoading: false,
+        log: [],
 
-        example: [
-        {
-            class:"bg-green-100",
-            icon: "mdi-robot-industrial",
-            procDesc: "IPA",
-            fecha: '12/12/2021 - 09:55:10',
-            title: 'Versión Generada',
-            subtitle: 'El proceso de versionado terminó con éxito',
-        },
-        {
-            class: null,
-            icon: "mdi-robot-industrial",
-            procDesc: "VSO",
-            fecha: '12/12/2021 - 09:55:10',
-            title: 'Versión Solicitada',
-            subtitle: 'El operador John Doe solicitó la versión del job',
-        },
-        {
-            class: null,
-            icon: "mdi-account-hard-hat",
-            procDesc: "JAO",
-            fecha: '12/12/2021 - 09:55:10',
-            title: 'Job Asignado a Operador',
-            subtitle: 'El generador de jobs Raúl Ruiz Torres asignó el job al operador John Doe',
-        },
-        {
-            class: null,
-            icon: "mdi-lead-pencil",
-            procDesc: "JMD",
-            fecha: '11/12/2021 - 12:20:22',
-            title: 'Job Modificado',
-            subtitle: 'El job ha sido editado por el generador de jobs Raúl Ruiz Torres',
-        },
-        {
-            class: null,
-            icon: "mdi-magnify",
-            procDesc: "JET",
-            fecha: '10/12/2021 - 10:03:58',
-            title: 'Job en Triaje',
-            subtitle: 'El job se encuentra en triaje',
-        },
-        {
-            class: null,
-            icon: "mdi-robot-industrial",
-            procDesc: "IPA",
-            fecha: '10/12/2021 - 10:03:56',
-            title: 'Inserción por proceso automático',
-            subtitle: 'Job insertado por proceso automático FME',
-        },
-      ],
+        jobHeaders: [
+            { text: "Estado", value: "estado" },
+            { text: "Detectado en", value: "deteccion_job" },
+            { text: "Gravedad", value: "gravedad_job" },
+            { text: "Descripción", value: "descripcion" },
+        ],
+
+        errorHeaders: [
+            { text: "Estado", value: "estado" },
+            { text: "Error", value: "error" },
+            { text: "Descripcion", value: "descripcion" },
+        ],
     }
   }
 }

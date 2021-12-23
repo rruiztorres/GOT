@@ -47,6 +47,7 @@
                                 <v-date-picker
                                     no-title
                                     locale="es-ES"
+                                    :first-day-of-week="1"
                                     :show-current="false"
                                     width="325"
                                     color="green"
@@ -69,6 +70,7 @@
                                 <v-date-picker
                                     no-title
                                     locale="es-ES"
+                                    :first-day-of-week="1"
                                     :show-current="false"
                                     width="325"
                                     color="red"

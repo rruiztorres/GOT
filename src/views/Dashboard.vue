@@ -9,10 +9,12 @@
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <!--<v-toolbar-title>GOT</v-toolbar-title>-->
       <v-spacer></v-spacer>
-      <img
-        class="border border-white h-10 mr-1"
-        src="@/assets/logoIGNmini.png"
-      />
+      <a href="https://www.ign.es" target="blank">
+        <img
+          class="border border-white h-10 mr-1"
+          src="@/assets/img/logo_web_IGN_CNIG.png"
+        />
+      </a>
     </v-app-bar>
 
     <!-- LOADER -->
