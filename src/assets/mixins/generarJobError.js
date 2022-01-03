@@ -69,9 +69,15 @@ export const generarJobError = {
 
                 if (errores.length != 0) {
                     //Hay errores registrados
-                    for (let errorIndex in errores){
+                    for (this.errorIndex in errores){
+                        //Definimos objeto error
+                        this.actualizarError = {
+                            nuevoEstado: "Pendiente_solución",
+                            id_error: errores[this.errorIndex].id_error,
+                        };
+
                         //Los datos no se han guardado
-                        if (errores[errorIndex].job == null) {
+                        if (errores[this.errorIndex].job == null) {
                             const enviarDatos = {
                                 procesadoOK: false,
                                 mensaje: "Por favor, guarde los datos antes de generar"
@@ -79,13 +85,9 @@ export const generarJobError = {
                             return enviarDatos;
                         } else {
                             //Grabar en base de datos
-                            this.actualizarError = {
-                                nuevoEstado: "Pendiente_solución",
-                                error: errores[errorIndex].idError
-                            };
-
+                            console.log("estoy enviando error aqui", this.actualizarError)
                             axios
-                            .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosError`, this.actualizarError)
+                            .put(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosError`, this.actualizarError)
                             .then(() => {
                                 //No existen errores, no lanzar alerta
                             })

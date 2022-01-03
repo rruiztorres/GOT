@@ -27,9 +27,9 @@
     <template>
       <v-card>
         <v-tabs v-model="activeTab" fixed-tabs background-color="#0341a6" dark>
-          <v-tab :key="1" @click="activateMap(false), activateLogger(false)">Datos del Job</v-tab>
-          <v-tab :key="2" @click="activateMap(true), activateLogger(false)">Localización en el Mapa</v-tab>
-          <v-tab :key="3" @click="activateMap(false), activateLogger(true)">Proceso</v-tab>
+          <v-tab :key="1" @click="activateMap(false)">Datos del Job</v-tab>
+          <v-tab :key="2" @click="activateMap(true)">Localización en el Mapa</v-tab>
+          <v-tab :key="3" @click="activateMap(false)">Proceso</v-tab>
 
           <v-tabs-slider color="#76aff5"></v-tabs-slider>
 
@@ -106,7 +106,6 @@
                 modoMapa="editar"
                 :jobsRecibidos="editandoJob"
                 :erroresRecibidos="errores"
-                :reset="mapReset"
                 @jobs="storeJobs"
                 @errores="storeErrors"
               >
@@ -118,9 +117,8 @@
           <!--PROCESO-->
           <v-tab-item>
                 <Logger 
-                  v-if="loggerIsActive == true"
-                  :job="job"
-                  :errores="errores"
+                  :jobsRecibidos="editandoJob"
+                  :erroresRecibidos="errores"
                 ></Logger>
           </v-tab-item>
           <!--PROCESO-->
@@ -209,7 +207,6 @@ export default {
   },
 
   watch: {
-
     job() {
       //vuelve a lanzar el initialize cuando detecta un cambio de job
       if (this.job.job) {
@@ -342,9 +339,6 @@ export default {
     },
 
     storeErrors(errores) {
-      if (this.editandoJob == errores){
-        console.log("sin cambios error")
-      }
       this.errores = errores;
       this.edicionSinGuardar = true;
 
@@ -357,13 +351,8 @@ export default {
       this.mapIsActive = active;
     },
 
-    activateLogger(active) {
-      this.loggerIsActive = active;
-    },
-
     initialize() {
       //Enviamos señal sin cambio a map
-      this.mapReset = false;
       this.activeTab = 0;
 
       //Evita crear claves duplicadas en el array de errores
@@ -399,9 +388,6 @@ export default {
       //Borramos datos obtenidos, si no se duplican la siguiente vez que se abre la consulta
       this.errores = [];
       this.erroresBruto = [];
-
-      //Reseteamos mapa
-      this.mapReset = true;
     },
 
     errorInJob(polygon, point){
@@ -482,7 +468,6 @@ export default {
                 }
               }
             }
-            //this.arrayPost = data.data.errores
           } else {
             this.ejecucionPostError = false; 
           }
@@ -497,9 +482,6 @@ export default {
           }
         })
       }
-
-      //Actualizamos datos
-      //this.initialize();
 
       //Respuesta a usuario
       if (this.ejecucionPostError == true && this.ejecucionPutError == true && this.ejecucionPutJob == true){

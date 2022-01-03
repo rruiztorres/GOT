@@ -612,7 +612,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
 
     export default {
-        props: ["modoMapa", "jobsRecibidos", "erroresRecibidos", "reset"],
+        props: ["modoMapa", "jobsRecibidos", "erroresRecibidos"],
 
         components:{
             FormularioDatosJob,
@@ -628,9 +628,6 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             },
             returnErroresRecibidos(){
             return this.erroresRecibidos;
-            },
-            returnReset(){
-            return this.reset;
             },
         },
 
