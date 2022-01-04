@@ -1,6 +1,6 @@
 <div align="center">
-  <h1>GOT</h1>
-  <h2>Gestor de Órdenes de Trabajo para entorno BDIG</h2>
+  <h1>GOT - Gestor de Órdenes de Trabajo para entorno BDIG</h1>
+  <h2>En fase de desarrollo 🚀</h2>
 </div>
 
 <div align="center">
@@ -17,19 +17,19 @@
   <a title="Language" href="https://vuejs.org/" target="_blank">
     <img src="https://img.shields.io/badge/Lang-vuejs 2-brightgreen">
   </a>  
-  <a title="Language" href="https://www.w3schools.com/js/" target="_blank">
-    <img src="https://img.shields.io/static/v1?label=Lang&message=Javascript&color=brightgreen">
-  </a>
-  <a title="Language" href="https://tailwindcss.com/" target="_blank">
-    <img src="https://img.shields.io/badge/Lang-tailwind-brightgreen">
+  <a title="Language" href="https://vuetifyjs.com/en/" target="_blank">
+    <img src="https://img.shields.io/badge/Lang-Vuetify-brightgreen">
   </a> 
+  <a title="Language" href="https://tailwindcss.com/" target="_blank">
+    <img src="https://img.shields.io/badge/Lang-Tailwind css-brightgreen">
+  </a>
   <a title="GNU GPL v3" href="LICENSE.md">
     <img src="https://img.shields.io/badge/License-GPLv3-red.svg">
   </a>
 </p>
 
 <div>
-  <p>GOT es un sistema de gestión de órdenes de trabajo para el entorno BDIG en el Insituto Geográfico Nacional. Actualmente en fase de desarrollo.</p>
+  <p>GOT es un sistema de gestión de órdenes de trabajo para el entorno BDIG en el Insituto Geográfico Nacional. Maneja datos geográficos junto a las opciones típicas en un Help Desk o gestor de tickets.</p>
   <p>Funciona en conjunto con la API/REST del entorno disponible <a href="https://github.com/rruiztorres/GOT_APIREST.git" target="blank">en este repositorio</a></p>
 </div>
 
