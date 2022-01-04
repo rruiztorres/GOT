@@ -30,26 +30,23 @@
 
 <div>
   <p>GOT es un sistema de gestión de órdenes de trabajo para el entorno BDIG en el Insituto Geográfico Nacional. Actualmente en fase de desarrollo.</p>
+  <p>Funciona en conjunto con la API/REST del entorno disponible <a href="https://github.com/rruiztorres/GOT_APIREST.git" target="blank">en este repositorio</a></p>
 </div>
 
+<hr/>
+<br/>
 
-
-## Project setup
+### Inicializar el repositorio
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Ejecutar servidor de desarrollo
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Compilar para producción
 ```
 npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
 ```
