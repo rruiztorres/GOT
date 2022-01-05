@@ -1,6 +1,5 @@
 <div align="center">
-  <h1>GOT - Gestor de Órdenes de Trabajo para entorno BDIG</h1>
-  <h2>En fase de desarrollo 🚀</h2>
+  <h1>GOT - Gestor de Órdenes de Trabajo para entorno BDIG 🗺️</h1>
 </div>
 
 <div align="center">
