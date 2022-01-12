@@ -1,7 +1,7 @@
 <template>
-  <div class="h-full">
-    <div 
-    class="bg-white shadow-md border border-gray-300 mb-4"
+  <div class="editorContainer">
+    <div
+    class="editorToolbar" 
     v-if="editor">
       <v-btn title="deshacer" icon @click="editor.chain().focus().undo().run()">
         <v-icon>mdi-reply</v-icon> 
@@ -77,8 +77,8 @@
       </v-btn>      
     </div>
     
-    <editor-content 
-    class="bg-white border shadow-md border border-gray-300 p-6"
+    <editor-content
+    class="editorContent"
     style="height:100%"
     :editor="editor" 
     />
@@ -239,4 +239,22 @@ export default {
     margin: 2rem 0;
   }
 }
+</style>
+
+<style scoped>
+  .editorContainer {
+    background-color:#f0f0f0;
+    border-radius: 3px;
+    padding: 1rem;
+  }
+
+  .editorToolbar {
+    background-color: white;
+    border: 1px solid gray;
+  }
+  .editorContent {
+    margin-top: 0.25rem;
+    padding: 1rem;
+    background-color: white;
+  }
 </style>

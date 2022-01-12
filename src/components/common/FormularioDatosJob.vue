@@ -1,13 +1,16 @@
 <template>  
       <v-card light width="500">
-        <v-card-title class="text-lg text-white bg-blue-500"
+        <v-card-title
+        class="titleJobForm"
+        dark
           >Editar Atributos Job
           <v-spacer></v-spacer>
         </v-card-title>
-        <div class="p-1">
+        <div>
           <!--TextEditor descripciones error-->
           <v-col class="bg-gray-200" cols="12">
             <v-textarea
+              class="textAreaJob"
               v-model="descJob"
               dense
               filled
@@ -16,79 +19,86 @@
             ></v-textarea>
           </v-col>
 
-          <v-spacer class="mt-2"></v-spacer>
+          <v-spacer ></v-spacer>
 
           <v-col cols="12">
-            <v-row style="margin-bottom: -2.5rem">
-              <v-col cols="4" class="mt-3"> Job Grande: </v-col>
+            <v-row class="formRow">
+              <v-col 
+              class="formRowTitle"
+              cols="4" > Job Grande: </v-col>
               <v-col cols="8" style="padding:0rem 0.7rem 1rem; 0rem;">
                 <v-switch
-                  style="padding-top:0.5rem;"
+                  class="switchBigJob"
                   inset
                   v-model="jobGrande"
                 ></v-switch>
               </v-col>
             </v-row>
 
-            <v-row style="margin-bottom: -2.5rem">
-              <v-col cols="4" class="mt-3"> Expediente </v-col>
+            <v-row class="formRow">
+              <v-col 
+              class="formRowTitle"
+              cols="4"> Expediente </v-col>
               <v-col cols="8">
                 <v-select
                   dense
                   filled
-                  class="text-m"
                   :items="expediente"
                   v-model="expedienteJob"
                 ></v-select>
               </v-col>
             </v-row>
 
-            <v-row style="margin-bottom: -2.5rem">
-              <v-col cols="4" class="mt-3"> Detectado en: </v-col>
+            <v-row class="formRow">
+              <v-col 
+              class="formRowTitle"
+              cols="4"> Detectado en: </v-col>
               <v-col cols="8">
                 <v-select
                   dense
                   filled
-                  class="text-m"
                   :items="deteccion"
                   v-model="deteccionJob"
                 ></v-select>
               </v-col>
             </v-row>
 
-            <v-row style="margin-bottom: -2.5rem">
-              <v-col cols="4" class="mt-3"> Perfil job: </v-col>
+            <v-row class="formRow">
+              <v-col 
+              class="formRowTitle"
+              cols="4"> Perfil job: </v-col>
               <v-col cols="8">
                 <v-select
                   dense
                   filled
-                  class="text-m"
                   :items="perfil"
                   v-model="perfilJob"
                 ></v-select>
               </v-col>
             </v-row>
 
-            <v-row style="margin-bottom: -2.5rem">
-              <v-col cols="4" class="mt-3"> Gravedad: </v-col>
+            <v-row class="formRow">
+              <v-col 
+              class="formRowTitle"
+              cols="4"> Gravedad: </v-col>
               <v-col cols="8">
                 <v-select
                   dense
                   filled
-                  class="text-m"
                   :items="gravedad"
                   v-model="gravedadJob"
                 ></v-select>
               </v-col>
             </v-row>
 
-            <v-row style="margin-bottom: -2.5rem">
-              <v-col cols="4" class="mt-3"> Asignar a: </v-col>
+            <v-row class="formRow">
+              <v-col 
+              class="formRowTitle"
+              cols="4"> Asignar a: </v-col>
               <v-col cols="8">
                 <v-select
                   dense
                   filled
-                  class="text-m"
                   :items="asignacion"
                   v-model="asignacionJob"
                 ></v-select>
@@ -99,12 +109,13 @@
               v-if="asignacionJob == 'Bandeja de Jobs'"
               style="margin-bottom: -2.5rem"
             >
-              <v-col cols="4" class="mt-3"> Enviar a: </v-col>
+              <v-col 
+              class="formRowTitle"
+              cols="4"> Enviar a: </v-col>
               <v-col cols="8">
                 <v-select
                   dense
                   filled
-                  class="text-m"
                   :items="tipoBandeja"
                   v-model="tipoBandejaJob"
                 ></v-select>
@@ -115,12 +126,13 @@
               v-if="asignacionJob == 'Bandeja de Jobs'"
               style="margin-bottom: -2.5rem"
             >
-              <v-col cols="4" class="mt-3"> Operador: </v-col>
+              <v-col 
+              class="formRowTitle"
+              cols="4"> Operador: </v-col>
               <v-col cols="8">
                 <v-select
                   dense
                   filled
-                  class="text-m"
                   :items="nombreOperador"
                   v-model="nombreOperadorJob"
                 ></v-select>
@@ -128,9 +140,11 @@
             </v-row>
           </v-col>
 
-          <v-spacer class="mt-5"></v-spacer>
+          <v-spacer></v-spacer>
 
-          <v-card-actions>
+          <v-card-actions
+            class="actionForm"
+          >
             <v-spacer></v-spacer>
             <v-btn color="error" dark @click="closeEditJob()">CANCELAR</v-btn>
             <v-btn color="success" dark @click="storeJobData()">ACEPTAR</v-btn>
@@ -234,3 +248,50 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+      /*FORMULARIOS ALTA ERROR JOB */
+    .titleErrorForm {
+        background-color: #E53935;
+        color: white;
+        font-weight: 400 !important;
+    }
+
+    .containerForm {
+        font-weight: 400 !important;
+    }
+
+    .textAreaError {
+        margin-top: 0.5rem;
+    }
+
+    .titleJobForm {
+        background-color: #039BE5;
+        color: white;
+        font-weight: 400 !important;
+    }
+
+    .formRow {
+        margin-top: 0.5rem;
+        margin-bottom: -2.5rem
+    }
+    
+    .switchBigJob {
+        margin-top: 0.2rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .actionForm {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #ECEFF1;
+    }
+
+    .textAreaJob {
+        margin-top: 0.5rem;
+    }
+
+    .formRowTitle {
+        margin-top: 0.46rem;
+    }
+</style>

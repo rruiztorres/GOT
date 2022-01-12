@@ -1,104 +1,122 @@
 <template>
-  <div style="width:98%;" class="m-auto rounded-md bg-white p-4 shadow-md">
-      <h1 class="text-xl font-bold py-4 mt-2">
-        Bandeja de Jobs (Operadores Especializados)
-      </h1>
+  <div class="panelContainer">
+    <div class="panelHeader">
+      <h2 class="panelHeader-title">Bandeja de Jobs (Operadores Especializados)</h2>
+      <v-spacer></v-spacer>
+      <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1">
+        <v-icon x-large>mdi-help-box</v-icon>
+      </v-btn>
+    </div>
 
-      <div class="overflow-y-auto">
-        <v-card elevation="0" class="mb-4">
-          <div>
-            <div class="p-3 flex bg-blue-500 w-full items-center">
-              <v-btn disabled dark color="success" class="mr-3">ASIGNAR JOB/S</v-btn>
-              <v-btn disabled dark color="error" class="mr-3">ACCION 2</v-btn>
+    <div>
+      <!-- PANEL ACCIONES SUPERIOR -->
+      <v-card elevation="0">
+        <v-row class="panelFuncionesCard">
+          <v-col cols="12" md="8">
+            <v-row class="buttonGroup">
+              <v-col cols="12" md="3">
+                <v-btn 
+                  class="btn"
+                  dark 
+                  color="success"
+                >
+                ACCION 1
+                </v-btn>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-btn 
+                  class="btn"
+                  dark 
+                  color="success"
+                >
+                ACCION 2
+                </v-btn>
+              </v-col>
               <v-spacer></v-spacer>
+            </v-row>
+          </v-col>
+          <v-col cols="12" md="4">
+            <v-text-field
+              class="textField"
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Buscar"
+              single-line
+              hide-details
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-card>
 
-              <v-text-field
-                v-model="search"
-                append-icon="mdi-magnify"
-                label="Buscar"
-                single-line
-                hide-details
-                class="bg-white p-2"
-              ></v-text-field>
-            </div>
-          </div>
-        </v-card>
+      <!-- DATA TABLE -->
+      <v-data-table
+        class="dataTable"
+        v-model="selected"
+        :headers="headers"
+        :items="jobs"
+        :key="jobs.job"
+        :search="search"
+        item-key="job"
+        show-select
+      >
+        <template v-slot:top>
+          <v-dialog v-model="dialogDelete" max-width="500px">
+            <v-card>
+              <h1>ATENCIÓN</h1>
+              <h3>
+                Esta acción borrará la incidencia ¿Desea continuar?
+              </h3>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn dark text @click="closeDelete">Cancel</v-btn>
+                <v-btn dark text @click="deleteItemConfirm">OK</v-btn>
+                <v-spacer></v-spacer>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </template>
 
-        <v-data-table
-          v-model="selected"
-          :headers="headers"
-          :items="jobs"
-          :key="jobs.job"
-          :search="search"
-          class="font-sans"
-          item-key="job"
-          show-select
-        >
-          <template v-slot:top>
-
-
-            <v-dialog v-model="dialogDelete" max-width="500px">
-              <v-card>
-                <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
-                <h3 class="text-center text-l">
-                  Esta acción borrará la incidencia ¿Desea continuar?
-                </h3>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn class="w-24 bg-red-500" dark text @click="closeDelete"
-                    >Cancel</v-btn
-                  >
-                  <v-btn
-                    class="w-24 bg-green-500"
-                    dark
-                    text
-                    @click="deleteItemConfirm"
-                    >OK</v-btn
-                  >
-                  <v-spacer></v-spacer>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </template>
-
-          <template v-slot:[`item.actions`]="{ item }">
-            <v-btn title="ver datos del job" icon dark class="bg-blue-500 mr-1">
-              <v-icon small @click="editItem(item)"> mdi-eye </v-icon>
-            </v-btn>
-            <v-btn title="asignarme el job" icon dark class="bg-green-500 mr-1">
-              <v-icon small @click="editItem(item)"> mdi-account-hard-hat </v-icon>
-            </v-btn>
-          </template>
-
-          <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
-          </template>
-
-          <template v-slot:[`item.estado`]="{ item }">
-            <v-chip :color="getColor(item.estado)" dark>
-              {{ item.estado }}
-            </v-chip>
-          </template>
-
-          <template v-slot:[`item.bloqueado`]="{ item }">
-            <v-icon v-if="compruebaBloqueo(item.bloqueado) == false" color="red">
-              mdi-block-helper
+        <template v-slot:[`item.actions`]="{ item }">
+          <v-btn title="ver datos del job" icon dark>
+            <v-icon small @click="editItem(item)"> mdi-eye </v-icon>
+          </v-btn>
+          <v-btn title="asignarme el job" icon dark>
+            <v-icon small @click="editItem(item)">
+              mdi-account-hard-hat
             </v-icon>
-          </template>
+          </v-btn>
+        </template>
 
-        </v-data-table>
-      </div>
+        <template v-slot:no-data>
+            <NoData :mensaje="noDataMensaje" :opcion="noDataOpcion"></NoData>
+        </template>
+
+        <template v-slot:[`item.estado`]="{ item }">
+          <v-chip :color="getColor(item.estado)" dark>
+            {{ item.estado }}
+          </v-chip>
+        </template>
+
+        <template v-slot:[`item.bloqueado`]="{ item }">
+          <v-icon v-if="checkBlocking(item.bloqueado) == false" color="red">
+            mdi-block-helper
+          </v-icon>
+        </template>
+      </v-data-table>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
-
+import { checkBlocking } from "@/assets/mixins/checkBlocking.js";
+import NoData from "@/components/common/NoData";
 
 export default {
   name: "BandejaOpEsp",
-  mixins: [getColor],
+  mixins: [getColor, checkBlocking],
+  components: {NoData},
 
   data: () => ({
     dialog: false,
@@ -106,13 +124,23 @@ export default {
     selected: [],
     search: "",
     headers: [
-      { text: "BL.",align: "start", sortable: true, value: "bloqueado"},
-      { text: "Estado", align: "start", sortable: true, value: "estado"},
-      { text: "Job", align: "start", sortable: true, value: "job"},
-      { text: "Gravedad", align: "start", sortable: true, value: "gravedad_job"},
-      { text: "Detectado en", align: "start", sortable: true, value: "deteccion_job"},
-      { text: "Perfil", align: "start", sortable: true, value: "arreglo_job"},
-      { text: "Descripción", align: "start", sortable: true, value: "resumen"}, //hay que hacer desde API un "resumen" ademas de la desc completa
+      { text: "BL.", align: "start", sortable: true, value: "bloqueado" },
+      { text: "Estado", align: "start", sortable: true, value: "estado" },
+      { text: "Job", align: "start", sortable: true, value: "job" },
+      {
+        text: "Gravedad",
+        align: "start",
+        sortable: true,
+        value: "gravedad_job",
+      },
+      {
+        text: "Detectado en",
+        align: "start",
+        sortable: true,
+        value: "deteccion_job",
+      },
+      { text: "Perfil", align: "start", sortable: true, value: "arreglo_job" },
+      { text: "Descripción", align: "start", sortable: true, value: "resumen" }, //hay que hacer desde API un "resumen" ademas de la desc completa
       { text: "Acciones", value: "actions", sortable: false },
     ],
     jobs: [],
@@ -131,6 +159,10 @@ export default {
       job_detectado: "",
       job_arreglar: "",
     },
+
+    //NO DATA SLOT
+    noDataMensaje: "Vaya... parece que no existen jobs para mostrar aquí.",
+    noDataOpcion: "Si necesitas jobs para trabajar puedes generar alguna IDV",
   }),
 
   computed: {
@@ -155,38 +187,29 @@ export default {
 
   methods: {
     dummy() {
-      console.log()
-    },
-
-    compruebaBloqueo(jobBloquea){
-      if (jobBloquea == false ){
-        //console.log(jobBloquea)
-        return true
-      } else {
-        return false
-      }
+      console.log();
     },
 
     editItem(item) {
       this.editedIndex = this.jobs.indexOf(item);
-      this.editedItem = Object.assign({}, item); 
-      console.log(this.editedItem)    
+      this.editedItem = Object.assign({}, item);
+      console.log(this.editedItem);
     },
 
     initialize() {
-      axios
-        .get(`${process.env.VUE_APP_API_ROUTE}/jobs`)
-        .then((data) => {
-          this.jobsBruto = data.data.response;
-          for (this.elemento in this.jobsBruto) {
-            //filtramos jobs, en bandeja, operadores especializados sin operador asignado
-            if (  this.jobsBruto[this.elemento].estado == "En bandeja" 
-                  && this.jobsBruto[this.elemento].tipo_bandeja == 'Operadores Especializados'
-                  && this.jobsBruto[this.elemento].nombre_operador == null) {
-              this.jobs.push(this.jobsBruto[this.elemento]);
-            } 
+      axios.get(`${process.env.VUE_APP_API_ROUTE}/jobs`).then((data) => {
+        this.jobsBruto = data.data.response;
+        for (this.elemento in this.jobsBruto) {
+          //filtramos jobs, en bandeja, operadores sin operador asignado
+          if (
+            this.jobsBruto[this.elemento].estado == "En bandeja" &&
+            this.jobsBruto[this.elemento].tipo_bandeja == "Operadores Especializados" &&
+            this.jobsBruto[this.elemento].nombre_operador == null
+          ) {
+            this.jobs.push(this.jobsBruto[this.elemento]);
           }
-        });
+        }
+      });
     },
 
     deleteItem(item) {
@@ -236,4 +259,45 @@ export default {
 .v-application--wrap {
   min-height: 1vh !important;
 }
+
+h2, h4 {
+  font-family: 300 !important;
+}
+
+.panelContainer {
+  background-color:white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
+}
+
+.panelHeader {
+  display: flex;
+}
+
+.panelHeader-title{
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+
+.panelFuncionesCard {
+  background-color: #4287f5;
+}
+
+.buttonGroup {
+  padding: 0.5rem;
+}
+
+.textField {
+  background-color: white;
+  padding: 0.5rem;
+}
+
+.noData {
+  padding: 1rem;
+}
+
+
+
 </style>

@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css">
   </head>
-  <body class="bg-blue-50">
+  <body onload="noBack();" onpageshow="if (event.persisted) noBack();" onunload="">
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
@@ -18,7 +18,9 @@
   </body>
 </html>
 
-<!-- Forbidden back-->
-<script languaje="JavaScript">
-  history.forward()
+<script type="text/javascript">
+  window.history.forward();
+  function noBack() {
+      window.history.forward();
+  }
 </script>

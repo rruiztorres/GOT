@@ -1,50 +1,61 @@
 <template>
-  <div style="width:98%;" class="m-auto rounded-md bg-white p-4 shadow-md">
-        <div class="flex">
-        <h1 class="text-xl font-bold py-4 mt-2 flex-grow">Errores sin asignar</h1>
-        <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1" class="m-auto">
+  <div class="panelContainer">
+      <div class="panelHeader">
+        <h2 class="panelHeader-title">Errores sin asignar</h2>
+        <v-spacer></v-spacer>
+        <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1">
           <v-icon x-large>mdi-help-box</v-icon>
         </v-btn>
       </div>
 
-      <div class="overflow-y-auto">
-        <v-card elevation="0" class="mb-4">
-          <div>
-            <div class="p-3 flex bg-blue-500 w-full items-center">
-              <v-btn dark color="info" class="mr-3">VER EN MAPA</v-btn>
-              <v-btn :disabled="groupActions()" dark color="error" class="mr-3">DESESTIMAR</v-btn>
-              <v-spacer></v-spacer>
-
-              <v-text-field
-                v-model="search"
-                append-icon="mdi-magnify"
-                label="Buscar"
-                single-line
-                hide-details
-                class="bg-white p-2"
-              ></v-text-field>
-            </div>
-          </div>
+      <div>
+         <!--PANEL ACCIONES SUPERIOR -->
+        <v-card elevation="0">
+          <v-row class="panelFuncionesCard">
+              <v-col cols="12" md="8">
+                <v-row class="buttonGroup">
+                  <v-col cols="12" md="3" >
+                    <v-btn 
+                      class="btn"
+                      :disabled="groupActions()" 
+                      dark color="success" 
+                      >
+                      ACCION 1
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-text-field
+                  class="textField"
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  label="Buscar"
+                  single-line
+                  hide-details
+                ></v-text-field>
+              </v-col>
+            </v-row>
         </v-card>
 
         <v-data-table
+          class="dataTable"
           v-model="selected"
           :headers="headers"
           :items="errores"
           :search="search"
-          class="font-sans"
           item-key="id_error"
           show-select>
           <template v-slot:top>
             <v-overlay :value="dialogDelete">
-                <v-card class="p-3 w-80">
-                    <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
-                    <h3 class="text-center text-l">Esta acción borrará el error seleccionado ¿Desea continuar?</h3>
+                <v-card>
+                    <h1>ATENCIÓN</h1>
+                    <h3>Esta acción borrará el error seleccionado ¿Desea continuar?</h3>
                     <v-card-actions>
-                        <div class="mt-6 flex">
-                            <v-btn class="w-24 bg-red-500" dark text @click="dialogDelete = false">CANCELAR</v-btn>
+                        <div>
+                            <v-btn dark text @click="dialogDelete = false">CANCELAR</v-btn>
                             <v-spacer></v-spacer>
-                            <v-btn class="w-24 bg-green-500" dark text>OK</v-btn>
+                            <v-btn dark text>OK</v-btn>
                         </div>
                     </v-card-actions>
                 </v-card>
@@ -52,7 +63,9 @@
           </template>
 
           <template v-slot:[`item.actions`]="{ item }">
-            <v-btn title="Editar Job" icon dark class="bg-red-500 mr-1">
+            <v-btn 
+            class="deleteButton"
+            title="Editar Job" icon dark>
               <v-icon @click="deleteItem(item)"> mdi-trash-can </v-icon>
             </v-btn>
           </template>
@@ -71,7 +84,6 @@
         <!--MENSAJES DE INFORMACION-->
         <v-overlay :value="showMessage">
           <v-alert
-            class="mx-7"
             :color="messageType"
             dark
             border="top"
@@ -252,7 +264,49 @@ export default {
 </script>
 
 <style>
-.v-application--wrap {
-  min-height: 1vh !important;
-}
+  .v-application--wrap {
+    min-height: 1vh !important;
+  }
+
+  .panelContainer {
+    background-color:white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .panelHeader {
+    display: flex;
+  }
+
+  .panelHeader-title{
+    font-weight: 500;
+    margin-bottom: 2rem;
+  }
+
+  .panelFuncionesCard {
+    background-color: #4287f5;
+  }
+
+  .dataTable {
+    margin-top: 1rem;
+  }
+
+  .buttonGroup {
+    padding: 0.5rem;
+  }
+
+  .btn {
+      width: 100%;
+      font-weight: 400;
+  }
+
+  .textField {
+    background-color: white;
+    padding: 0.5rem;
+  }
+
+  .deleteButton {
+    background-color: #ef4444; 
+  }
 </style>

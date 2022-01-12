@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-blue-800" style="height:10.05rem;">
+    <div class="loaderBack">
         <div>
             <!--Generador de Jobs-->
             <div v-if="activarMenu == 'altaJobsErrores'"><AltaJobsErrores @closed="menuDefault"></AltaJobsErrores></div>
@@ -15,7 +15,6 @@
             <!--Operador-->
             <div v-if="activarMenu == 'BandejaOp'"><BandejaOp></BandejaOp></div>
         </div>
-
     </div>
 </template>
 
@@ -24,12 +23,10 @@
     import AltaJobsErrores from '@/components/generadorJobs/altaJobsErrores';
     import GestionExpedientes from '@/components/generadorJobs/GestionExpedientes';
     import BandejaOpEsp from '@/components/operadorEsp/BandejaOpEsp';
-    import BandejaOp from '@/components/common/BandejaOp';
+    import BandejaOp from '@/components/operadores/BandejaOp';
     import BandejaMisJobs from '@/components/common/BandejaMisJobs';
     import RecuperarJobs from '@/components/generadorJobs/RecuperarJobs';
     import ErroresNoAsign from '@/components/generadorJobs/ErroresNoAsign';
-
-
 
     export default {
         name:'Loader',
@@ -53,3 +50,10 @@
         },
     }
 </script>
+
+<style scoped>
+    .loaderBack {
+        height: 10.7rem;
+        background-color: #1e40af;
+    }
+</style>

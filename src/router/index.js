@@ -14,13 +14,14 @@ const routes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    component: Dashboard
+    component: Dashboard,
   },
 ]
 
 const router = new VueRouter({
+  base: '/GOT/', // comentar en desarrollo hasta encontrar otra solucion mejor
+  //base: '/',
   mode: 'history',
-  base: process.env.BASE_URL,
   routes
 })
 

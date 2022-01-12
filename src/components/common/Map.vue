@@ -1,5 +1,5 @@
 <template>
-    <div style="height:96%">
+    <div id="map">
         <!-- MAPA -->
         <vl-map 
             :load-tiles-while-animating="true" 
@@ -124,7 +124,7 @@
                         <vl-overlay
                         :position="atribute.geometria_json.coordinates"
                         :offset="[-48, -45]">
-                            <p class="bg-white p-2 text-xs font-bold rounded-md shadow-md">
+                            <p>
                                 {{atribute.error}}
                             </p>
                         </vl-overlay>
@@ -134,27 +134,17 @@
         </vl-map>     
 
         <!--PANEL DE CONTROL -->
-        <div class="font-sans" style="float: right; height: 0rem">
+        <div style="float: right; height: 0rem">
             <div
-            class="p-2 rounded-sm"
-            style="
-            position:absolute;
-            top:2.5rem;
-            right:1.7rem;
-            margin-right: 1rem;
-            width: 16rem;
-            box-shadow: 0px 0px 5px 3px white;
-            background-color: rgba(0, 60, 136, 0.4);
-            "
+            class="toolPanelContainer"
             >
                 <v-card-actions
-                class="rounded mb-2 flex"
-                style="background-color: rgba(0, 60, 136)"
+                    class="topBarToolPanel"
                 >
-                    <div 
+                    <div
                         v-for="generalTool in generalTools" 
                         :key="generalTool.title">
-                        <v-btn dark icon>
+                        <v-btn dark small color="#003c8866" elevation="0" >
                             <v-icon>{{generalTool.icon}}</v-icon>
                         </v-btn>
                         <v-spacer></v-spacer>
@@ -170,13 +160,13 @@
 
                 <v-expand-transition>
                     <div v-show="showMapTools">
-                        <v-divider></v-divider>
-
-                        <div class="text-center rounded bg-blue-800 p-2 md-1 text-white text-l">
+                        <div class="sectionToolTitle">
                         ERRORES
                         </div>
-                        <div class="mt-2 flex">
-                            <v-btn-toggle v-model="toggleBtnError" color="blue accent-4">
+                        <div>
+                            <v-btn-toggle
+                            class="toolContainer"
+                            v-model="toggleBtnError" color="blue accent-4">
                                 <v-btn
                                 v-for="item in errorPanel"
                                 :key="item.title"
@@ -189,14 +179,13 @@
                                 </v-btn>
                             </v-btn-toggle>
                         </div>
-
-                        <v-spacer class="my-4"></v-spacer>
-
-                        <div class="text-center rounded bg-blue-800 p-2 md-1 text-white text-l">
+                        <div class="sectionToolTitle">
                         JOBS
                         </div>
-                        <div class="mt-2 flex">
-                            <v-btn-toggle v-model="toggleBtnJob" color="blue accent-4">
+                        <div>
+                            <v-btn-toggle
+                            class="toolContainer" 
+                            v-model="toggleBtnJob" color="blue accent-4">
                                 <v-btn
                                 v-for="item in jobsPanel"
                                 :key="item.title"
@@ -209,45 +198,37 @@
                             </v-btn>
                             </v-btn-toggle>
                         </div>
-                    
-                        <v-spacer class="my-8"></v-spacer>
 
-                        <div class="rounded bg-blue-800 p-2 mb-1 text-white text-l text-center">
+                        <v-divider class="endSection"></v-divider>
+
+                        <div class="sectionToolTitle">
                         CARTOGRAFÍA
                         </div>
                         <v-btn
                             v-for="service in wmtsServices"
                             :key="service.nombre"
-                            text dark class="bg-green-500 mb-1 flex-grow shadow-lg w-full"
+                            text dark
+                            class="btnLayer"
                             @click="activeMap = service"
                             >{{service.nombre}}
                         </v-btn>
-                        <v-spacer class="my-1"></v-spacer>
+
+                        <v-divider class="endSection"></v-divider>
 
                         <v-switch
-                        class="bg-white pl-6 pt-4 rounded-md shadow-md"
+                        class="switches"
                         dense
                         v-model="activarMostrarIdError"
                         :label="`Mostrar ID Error`"
                         ></v-switch>
-
-                        <v-spacer class="my-8"></v-spacer>                
                     </div>
                 </v-expand-transition>
             </div>
         </div>
 
         <!-- VENTANA INFORMACION MAPA (Centro, zoom, etc) -->
-        <v-card style="
-        top: -6.5rem;
-        margin: 1rem;
-        width:22rem;
-        box-shadow: 0px 0px 10px white;
-        background-color: rgba(0, 60, 136, 0.5);
-        font-size:80%;
-        color:white;
-        ">
-            <div class="p-2">
+        <v-card class="windowInfoMap">
+            <div>
                 Zoom: {{ zoom }}<br>
                 Centro: {{ center }}<br>
                 {{epsg}}
@@ -256,32 +237,36 @@
 
         <!--FORMULARIO ALTA JOB-->
         <template>
-            <div class="text-center">
+            <div>
             <v-dialog v-model="editJob" width="500">
                 <v-card>
-                <v-card-title dark class="text-lg text-white bg-blue-500"
+                <v-card-title
+                class="titleJobForm"
+                dark
                     >Alta de Job
                     <v-spacer></v-spacer>
                 </v-card-title>
 
-                    <div class="p-1">
+                    <div>
                         <!--TextEditor descripciones error-->
-                        <v-col class="bg-gray-200" cols="12">
+                        <v-col cols="12">
                         <v-textarea
+                            class="textAreaJob"
                             v-model="descJob"
                             dense filled auto-grow
                             label="Descripción del Job"
                         ></v-textarea>
                         </v-col>
 
-                        <v-spacer class="mt-2"></v-spacer>
+                        <v-divider></v-divider>
 
                         <v-col cols="12">
-
-                        <v-row style="margin-bottom: -2.5rem">
-                            <v-col cols="4" class="mt-3"> Job Grande: </v-col>
+                        <v-row class="formRow">
+                            <v-col 
+                            cols="4"> Job Grande: </v-col>
                             <v-col cols="8" style="padding:0rem 0.7rem 1rem; 0rem;">
                                 <v-switch
+                                class="switchBigJob"
                                 style="padding-top:0.5rem;"
                                 inset
                                 v-model="jobGrande"
@@ -289,55 +274,65 @@
                             </v-col>
                         </v-row>
 
-                        <v-row style="margin-bottom: -2.5rem">
-                            <v-col cols="4" class="mt-3"> Expediente </v-col>
+                        <v-row class="formRow">
+                            <v-col
+                            class="formRowTitle"
+                            cols="4"> Expediente </v-col>
                             <v-col cols="8">
                             <v-select
-                                dense filled class="text-m"
+                                dense filled
                                 :items="expediente"
                                 v-model="expedienteJob"
                             ></v-select>
                             </v-col>
                         </v-row>
 
-                        <v-row style="margin-bottom: -2.5rem">
-                            <v-col cols="4" class="mt-3"> Detectado en: </v-col>
+                        <v-row class="formRow">
+                            <v-col 
+                            class="formRowTitle"
+                            cols="4"> Detectado en: </v-col>
                             <v-col cols="8">
                             <v-select
-                                dense filled class="text-m"
+                                dense filled
                                 :items="deteccion"
                                 v-model="deteccionJob"
                             ></v-select>
                             </v-col>
                         </v-row>
                         
-                        <v-row style="margin-bottom: -2.5rem">
-                            <v-col cols="4" class="mt-3"> Perfil job: </v-col>
+                        <v-row class="formRow">
+                            <v-col 
+                            class="formRowTitle"
+                            cols="4"> Perfil job: </v-col>
                             <v-col cols="8">
                             <v-select
-                                dense filled class="text-m"
+                                dense filled
                                 :items="perfil"
                                 v-model="perfilJob"
                             ></v-select>
                             </v-col>
                         </v-row>
 
-                        <v-row style="margin-bottom: -2.5rem">
-                            <v-col cols="4" class="mt-3"> Gravedad: </v-col>
+                        <v-row class="formRow">
+                            <v-col 
+                            class="formRowTitle"
+                            cols="4"> Gravedad: </v-col>
                             <v-col cols="8">
                             <v-select
-                                dense filled class="text-m"
+                                dense filled
                                 :items="gravedad"
                                 v-model="gravedadJob"
                             ></v-select>
                             </v-col>
                         </v-row>
 
-                        <v-row style="margin-bottom: -2.5rem">
-                            <v-col cols="4" class="mt-3"> Asignar a: </v-col>
+                        <v-row class="formRow">
+                            <v-col 
+                            class="formRowTitle"
+                            cols="4"> Asignar a: </v-col>
                             <v-col cols="8">
                             <v-select
-                                dense filled class="text-m"
+                                dense filled
                                 :items="asignacion"
                                 v-model="asignacionJob"
                             ></v-select>
@@ -346,12 +341,14 @@
 
                         <v-row
                             v-if="asignacionJob == 'Bandeja de Jobs'"
-                            style="margin-bottom: -2.5rem"
+                            class="formRow"
                         >
-                            <v-col cols="4" class="mt-3"> Enviar a: </v-col>
+                            <v-col 
+                            class="formRowTitle"
+                            cols="4"> Enviar a: </v-col>
                             <v-col cols="8">
                             <v-select
-                                dense filled class="text-m"
+                                dense filled
                                 :items="tipoBandeja"
                                 v-model="tipoBandejaJob"
                             ></v-select>
@@ -360,12 +357,14 @@
 
                         <v-row
                             v-if="asignacionJob == 'Bandeja de Jobs'"
-                            style="margin-bottom: -2.5rem"
+                            class="formRow"
                         >
-                            <v-col cols="4" class="mt-3"> Operador: </v-col>
+                            <v-col 
+                            class="formRowTitle"
+                            cols="4"> Operador: </v-col>
                             <v-col cols="8">
                             <v-select
-                                dense filled class="text-m"
+                                dense filled
                                 :items="nombreOperador"
                                 v-model="nombreOperadorJob"
                             ></v-select>
@@ -373,9 +372,9 @@
                         </v-row>
                         </v-col>
 
-                        <v-spacer class="mt-5"></v-spacer>
-
-                        <v-card-actions>
+                        <v-card-actions
+                            class="actionForm"
+                        >
                             <v-spacer></v-spacer>
                             <v-btn color="error" dark @click="abortInsertion('jobs')"
                             >CANCELAR</v-btn>
@@ -391,17 +390,20 @@
         <!--FORMULARIO ALTA ERROR-->
         <template>
             <v-dialog v-model="editError" width="500">
-                <v-card>
+                <v-card class="containerForm">
                 <div>
-                    <v-card-title dark class="text-lg text-white bg-red-500"
+                    <v-card-title
+                    class="titleErrorForm"
+                    dark
                     >Alta de error
                     <v-spacer></v-spacer>
                     </v-card-title>
 
-                    <div class="p-1">
+                    <div>
                     <!--TextEditor descripciones error-->
-                    <v-col class="bg-gray-200" cols="12">
+                    <v-col cols="12">
                         <v-textarea
+                        class="textAreaError"
                         v-model="descError"
                         filled label="Descripción del error"
                         auto-grow
@@ -409,26 +411,29 @@
                         ></v-textarea>
                     </v-col>
 
-                    <v-divider></v-divider>
-                    <v-spacer class="mt-2"></v-spacer>
+                    <v-spacer></v-spacer>
 
                     <v-col cols="12">
-                        <v-row style="margin-bottom: -2.5rem">
-                        <v-col cols="4" class="mt-3"> Tema: </v-col>
+                        <v-row class="formRow">
+                        <v-col 
+                        class="formRowTitle"
+                        cols="4"> Tema: </v-col>
                         <v-col cols="8">
                             <v-select
-                            filled dense class="text-m"
+                            filled dense
                             :items="temaError"
                             v-model="selectTema"
                             ></v-select>
                         </v-col>
                         </v-row>
 
-                        <v-row style="margin-bottom: -2.5rem">
-                        <v-col cols="4" class="mt-3"> Tipo: </v-col>
+                        <v-row class="formRow">
+                        <v-col 
+                        class="formRowTitle"
+                        cols="4"> Tipo: </v-col>
                         <v-col cols="8">
                             <v-select
-                            filled dense class="text-m"
+                            filled dense
                             :items="tipoError"
                             v-model="selectTipoError"
                             ></v-select>
@@ -436,9 +441,11 @@
                         </v-row>
                     </v-col>
 
-                    <v-spacer class="mt-5"></v-spacer>
+                    <v-spacer></v-spacer>
 
-                    <v-card-actions>
+                    <v-card-actions
+                        class="actionForm"
+                    >
                         <v-spacer></v-spacer>
                         <v-btn color="error" dark @click="abortInsertion('errores')"
                         >CANCELAR</v-btn>
@@ -453,19 +460,25 @@
 
         <!--MENSAJES ALERTA FLOTANTES -->
         <template>
-            <v-dialog v-model="mensajeFlotante.visibilidad" max-width="49rem">
+            <v-dialog
+                v-model="mensajeFlotante.visibilidad" 
+                max-width="49rem">
                 <v-alert
+                class="alert"
                 :color="mensajeFlotante.color"
                 :type="mensajeFlotante.type"
                 prominent
-                class="mb-0"
                 >
                 <v-row no-gutters>
-                    <v-col cols="9" class="m-auto pl-2">
+                    <v-col 
+                        class="alertMessage" cols="9">
                         {{mensajeFlotante.mensaje}}
                     </v-col>
-                    <v-col cols="3">
-                        <v-btn v-if="mensajeFlotante.aceptar == true" @click="closeInfoMessage()">ENTENDIDO</v-btn>
+                    <v-col 
+                        class="alertActions" 
+                        cols="3">
+                        <v-btn
+                            v-if="mensajeFlotante.aceptar == true" @click="closeInfoMessage()">ENTENDIDO</v-btn>
                     </v-col>
                 </v-row>
                 </v-alert>
@@ -481,7 +494,7 @@
             color="#9fbce3"
             style="top: -15rem; margin: auto; max-width: 30rem"
             >
-                <v-col cols="12" class=" pt-0 pb-0 pl-4">
+                <v-col cols="12">
                     {{ayudaHerramienta.mensaje}}
                 </v-col>
             </v-alert>
@@ -489,51 +502,60 @@
 
         <!-- INFORMACION DEL JOB -->
         <v-dialog v-model="ventanaInfoJob" width="550">
-            <v-card class="p-4 shadow shadow-l">
-                <v-card-title>PROPIEDADES DEL JOB {{jobMostrarInfo.job}}</v-card-title>
-                <table class="w-full">
-                    <tr>
-                        <td class="w-1/3 border border-gray p-2"><b>JOB:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.job}}</td>
-                    </tr>
-                    <tr class="bg-gray-100">
-                        <td class="w-1/3 border border-gray p-2"><b>DESCRIPCIÓN:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.descripcion}}</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-gray p-2"><b>EXPEDIENTE:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.expediente}}</td>
-                    </tr>
-                    <tr class="bg-gray-100">
-                        <td class="border border-gray p-2"><b>DETECTADO EN:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.deteccion_job}}</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-gray p-2"><b>PERFIL:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.arreglo_job}}</td>
-                    </tr>
-                    <tr class="bg-gray-100">
-                        <td class="border border-gray p-2"><b>GRAVEDAD:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.gravedad_job}}</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-gray p-2"><b>ASIGNADO A:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.asignacion_job}}</td>
-                    </tr>
-                    <tr class="bg-gray-100">
-                        <td class="border border-gray p-2"><b>ENVIAR A:</b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.tipo_bandeja}}</td>
-                    </tr>
-                    <tr>
-                        <td class="border border-gray p-2"><b>OPERADOR: </b></td>
-                        <td class="border border-gray p-2">{{jobMostrarInfo.nombre_operador}}</td>
-                    </tr>
-                </table>
-                <v-spacer class="mb-4"></v-spacer>
-                <v-card-actions class="justify-end" style="padding:0rem;">
-                    <v-btn class="w-28" color="error" elevation="3" @click="closeWindowInfoJob()">CANCELAR</v-btn>
-                    <v-btn class="w-28" :disabled="modoMapa == 'visualizar'" color="primary" elevation="3" @click="openFormEditJob()">EDITAR</v-btn>
-                    <v-btn class="w-28" color="success" elevation="3" @click="updateEditedJob()">ACEPTAR</v-btn>
+            <v-card>
+                <v-card-title
+                    class="titleJobForm"
+                >PROPIEDADES DEL JOB {{jobMostrarInfo.job}}</v-card-title>
+                <v-simple-table>
+                    <template v-slot:default>
+                        <tbody>
+                            <tr>
+                                <td><b>JOB:</b></td>
+                                <td>{{jobMostrarInfo.job}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>DESCRIPCIÓN:</b></td>
+                                <td>{{jobMostrarInfo.descripcion}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>EXPEDIENTE:</b></td>
+                                <td>{{jobMostrarInfo.expediente}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>DETECTADO EN:</b></td>
+                                <td>{{jobMostrarInfo.deteccion_job}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>PERFIL:</b></td>
+                                <td>{{jobMostrarInfo.arreglo_job}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>GRAVEDAD:</b></td>
+                                <td>{{jobMostrarInfo.gravedad_job}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>ASIGNADO A:</b></td>
+                                <td>{{jobMostrarInfo.asignacion_job}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>ENVIAR A:</b></td>
+                                <td>{{jobMostrarInfo.tipo_bandeja}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>OPERADOR: </b></td>
+                                <td>{{jobMostrarInfo.nombre_operador}}</td>
+                            </tr>
+                        </tbody>
+                    </template>
+                </v-simple-table>
+                <v-divider></v-divider>
+                <v-card-actions
+                    class="actionForm"
+                >
+                <v-spacer></v-spacer>
+                    <v-btn color="error" elevation="3" @click="closeWindowInfoJob()">CANCELAR</v-btn>
+                    <v-btn :disabled="modoMapa == 'visualizar'" color="primary" elevation="3" @click="openFormEditJob()">EDITAR</v-btn>
+                    <v-btn color="success" elevation="3" @click="updateEditedJob()">ACEPTAR</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -549,39 +571,48 @@
 
         <!-- INFORMACION DEL ERROR -->
         <v-dialog v-model="ventanaInfoError" width="550">
-            <v-card class="p-4 shadow shadow-l">
-                <v-card-title><p>PROPIEDADES DEL ERROR <b>{{errorMostrarInfo.error}}</b></p></v-card-title>
-                <table class="w-full">
-                    <tr class="bg-gray-100">
-                        <td class="w-1/3 border border-gray p-2"><b>DESCRIPCIÓN:</b></td>
-                        <td class="border border-gray p-2">{{errorMostrarInfo.descripcion}}</td>
-                    </tr>
-                    <tr>
-                        <td class="w-1/3 border border-gray p-2"><b>TEMA:</b></td>
-                        <td class="border border-gray p-2">{{errorMostrarInfo.tema_error}}</td>
-                    </tr>
-                    <tr class="bg-gray-100">
-                        <td class="w-1/3 border border-gray p-2"><b>TIPO:</b></td>
-                        <td class="border border-gray p-2">{{errorMostrarInfo.tipo_error}}</td>
-                    </tr>
-                    <tr>
-                        <td class="w-1/3 border border-gray p-2"><b>VIA ENTRADA:</b></td>
-                        <td class="border border-gray p-2">{{errorMostrarInfo.via_ent}}</td>
-                    </tr>
-                    <tr class="bg-gray-100">
-                        <td class="w-1/3 border border-gray p-2"><b>ESTADO:</b></td>
-                        <td class="border border-gray p-2">{{errorMostrarInfo.estado}}</td>
-                    </tr>
-                    <tr>
-                        <td class="w-1/3 border border-gray p-2"><b>ASOC. A JOB:</b></td>
-                        <td class="border border-gray p-2">{{errorMostrarInfo.job}}</td>
-                    </tr>
-                </table>
-                <v-spacer class="mb-4"></v-spacer>
-                <v-card-actions class="justify-end" style="padding:0rem;">
-                    <v-btn class="w-28" color="error" elevation="3" @click="ventanaInfoError = false">CANCELAR</v-btn>
-                    <v-btn class="w-28" :disabled="modoMapa == 'visualizar'" color="primary" elevation="3" @click="openFormEditError()">EDITAR</v-btn>
-                    <v-btn class="w-28" color="success" elevation="3" @click="updateEditedError()">ACEPTAR</v-btn>
+            <v-card>
+                <v-card-title
+                    class="titleErrorForm"
+                ><p>PROPIEDADES DEL ERROR <b>{{errorMostrarInfo.error}}</b></p></v-card-title>
+                <v-simple-table>
+                    <template v-slot:default>
+                        <tbody>
+                            <tr>
+                                <td><b>DESCRIPCIÓN:</b></td>
+                                <td>{{errorMostrarInfo.descripcion}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>TEMA:</b></td>
+                                <td>{{errorMostrarInfo.tema_error}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>TIPO:</b></td>
+                                <td>{{errorMostrarInfo.tipo_error}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>VIA ENTRADA:</b></td>
+                                <td>{{errorMostrarInfo.via_ent}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>ESTADO:</b></td>
+                                <td>{{errorMostrarInfo.estado}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>ASOC. A JOB:</b></td>
+                                <td>{{errorMostrarInfo.job}}</td>
+                            </tr>
+                        </tbody>
+                    </template>
+                </v-simple-table>
+                <v-spacer></v-spacer>
+                <v-card-actions 
+                class="actionForm"
+                >
+                <v-spacer></v-spacer>
+                    <v-btn color="error" elevation="3" @click="ventanaInfoError = false">CANCELAR</v-btn>
+                    <v-btn :disabled="modoMapa == 'visualizar'" color="primary" elevation="3" @click="openFormEditError()">EDITAR</v-btn>
+                    <v-btn color="success" elevation="3" @click="updateEditedError()">ACEPTAR</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -1349,3 +1380,134 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
     }
 }
 </script>
+
+<style scoped>
+    #map {
+        height: 100%;
+    }
+
+    /* PANEL HERRAMIENTAS */
+    .toolPanelContainer {
+        position:absolute;
+        top:2.5rem;
+        right:1.7rem;
+        margin-right: 1rem;
+        width: 16rem;
+        box-shadow: 0px 0px 5px 3px white;
+        background-color: #003c8866;
+        border-radius: 3px;
+    }
+
+    .topBarToolPanel {
+        border-radius: 3px 3px 0px 0px;
+        background-color: #1e40af;
+    }
+    
+    .sectionToolTitle {
+        font-weight: 500 !important;
+        text-align: center;
+        background-color: #1e40af;
+        padding: 0.5rem;
+        margin: 0.5rem;
+        border-radius: 3px;
+        color: white;
+    }
+
+    .btnLayer {
+        font-weight: 400 !important;
+        background-color: #10b981;
+        display: block;
+        width: 91%;
+        margin: 0.5rem auto;
+    }
+
+    .toolContainer {
+        margin: 0rem 0.5rem;
+    }
+
+    .switches {
+        background-color: white;
+        padding: 1rem;
+        height: 3.5rem;
+        margin: 0.7rem;
+        border-radius: 3px;
+    }
+
+    .endSection {
+        margin-top: 1rem;
+        height: 1px;
+    }
+
+    /*VENTANA INFO MAPA*/
+    .windowInfoMap {
+        top: -6.5rem;
+        margin: 1rem;
+        width:22rem;
+        padding:0.5rem;
+        box-shadow: 0px 0px 10px white;
+        background-color: rgba(0, 60, 136, 0.5);
+        font-size:80%;
+        color:white;
+    }
+
+    /*FORMULARIOS ALTA ERROR JOB */
+    .titleErrorForm {
+        background-color: #E53935;
+        color: white;
+        font-weight: 400 !important;
+    }
+
+    .containerForm {
+        font-weight: 400 !important;
+    }
+
+    .textAreaError {
+        margin-top: 0.5rem;
+    }
+
+    .titleJobForm {
+        background-color: #039BE5;
+        color: white;
+        font-weight: 400 !important;
+    }
+
+    .formRow {
+        margin-top: 0.5rem;
+        margin-bottom: -2.5rem
+    }
+    
+    .switchBigJob {
+        margin-top: 0.2rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .actionForm {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #ECEFF1;
+    }
+
+    .textAreaJob {
+        margin-top: 0.5rem;
+    }
+
+    .formRowTitle {
+        margin-top: 0.46rem;
+    }
+
+    /*MENSAJES DE ALERTA*/
+    .alert {
+        margin-bottom: 0rem;
+    }
+
+    .alertMessage {
+        padding: 0.25rem !important;
+        margin-top: 0.25rem !important;
+    }
+
+    .alertActions {
+        height: 100%;
+        margin: auto;
+    }
+
+</style>
