@@ -1,22 +1,22 @@
 <template>
-  <div style="width:98%;" class="m-auto rounded-md bg-white p-4 shadow-md">
-      <div class="flex">
-        <h1 class="text-xl font-bold py-4 mt-2 flex-grow">Jobs en Triaje</h1>
-        <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1" class="m-auto">
+  <div class="panelContainer">
+      <div class="panelHeader">
+        <h2 class="panelHeader-title">Jobs en Triaje</h2>
+        <v-spacer></v-spacer>
+        <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1">
           <v-icon x-large>mdi-help-box</v-icon>
         </v-btn>
       </div>
 
-      <div class="overflow-y-auto">
-        
+      <div>    
         <!--PANEL ACCIONES SUPERIOR -->
-        <v-card elevation="0 mb-4">
-            <v-row class="m-0 bg-blue-500 items-center">
+        <v-card elevation="0">
+            <v-row class="panelFuncionesCard">
               <v-col cols="12" md="8">
-                <v-row>
-                  <v-col cols="12" md="3">
+                <v-row class="buttonGroup">
+                  <v-col cols="12" md="3" >
                     <v-btn 
-                      class="w-full"
+                      class="btn"
                       :disabled="groupActions()" 
                       dark color="success" 
                       @click="groupGenerate()">
@@ -25,7 +25,7 @@
                   </v-col>
                   <v-col cols="12" md="3">
                     <v-btn
-                      class="w-full"
+                      class="btn"
                       :disabled="groupActions()" 
                       dark color="#71717A" 
                       @click="groupAsignExp()">
@@ -34,7 +34,7 @@
                   </v-col>
                   <v-col cols="12" md="3">
                     <v-btn
-                      class="w-full"
+                      class="btn"
                       :disabled="groupActions()" 
                       dark color="warning">
                       DESESTIMAR
@@ -42,7 +42,7 @@
                   </v-col>
                   <v-col cols="12" md="3">       
                     <v-btn
-                      class="w-full"
+                      class="btn"
                       :disabled="groupActions()" 
                       dark color="error" 
                       @click="deleteJobs()">
@@ -53,34 +53,34 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-text-field
+                  class="textField"
                   v-model="search"
                   append-icon="mdi-magnify"
                   label="Buscar"
                   single-line
                   hide-details
-                  class="bg-white p-2"
                 ></v-text-field>
               </v-col>
             </v-row>
         </v-card>
-
         <v-data-table
+          class="dataTable"
           v-model="selected"
           :headers="headers"
           :items="jobs"
           :search="search"
           group-by="expediente"
-          class="font-sans"
           item-key="job"
           show-select>
           <template v-slot:top>
             <!-- VENTANA EDICION INCIDENCIA -->
             <v-dialog
+              style="heigth:100vh;"
               v-model="dialog"
+              persistent
               fullscreen
               hide-overlay
               transition="dialog-bottom-transition"
-              class="h-full"
             >
               <EditarJob
                 @datosActualizados="updateData"
@@ -88,49 +88,58 @@
                 :job="editedItem"
               ></EditarJob>
             </v-dialog>
-            <!-- FIN VENTANA EDICION INCIDENCIA -->
 
-            <v-dialog v-model="dialogDelete" max-width="500px">
-              <v-card>
-                <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
-                <h3 class="text-center text-l">
-                  Esta acción borrará la incidencia ¿Desea continuar?
-                </h3>
+            <!-- ALERTA BORRADO JOBS -->
+            <v-overlay :value="dialogDelete">
+              <v-card class="alertCard">
+                <h1 class="alertCardTitle">ATENCIÓN</h1>
+                <h4>Esta acción borrará el Job y todos los errores asociados.</h4>
+                <h4>El borrado es permanente y <b>no puede deshacerse</b></h4>
+                <br/>
+                <h3><b>¿Desea continuar?</b></h3>
                 <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn class="w-24 bg-red-500" dark text @click="closeDelete"
-                    >Cancel</v-btn
-                  >
-                  <v-btn
-                    class="w-24 bg-green-500"
-                    dark
-                    text
-                    @click="deleteItemConfirm"
-                    >OK</v-btn
-                  >
-                  <v-spacer></v-spacer>
+                  <div class="alertButtonGroup">
+                    <v-btn
+                      class="alertButton errorBtn"
+                      dark
+                      text
+                      @click="dialogDelete = !dialogDelete"
+                      >CANCELAR</v-btn
+                    >
+                    <v-btn
+                      class="alertButton generateBtn"
+                      dark
+                      text
+                      @click="confirmDeleteJobs()"
+                      >OK</v-btn
+                    >
+                  </div>
                 </v-card-actions>
               </v-card>
-            </v-dialog>
+            </v-overlay>
           </template>
 
           <template v-slot:[`item.actions`]="{ item }">
-            <v-btn title="Editar Job" icon dark class="bg-blue-500 mr-1">
-              <v-icon @click="editItem(item)"> mdi-lead-pencil </v-icon>
+            <v-btn
+              class="editButton"
+              elevation="2"
+              @click="editItem(item)"
+              icon dark           
+            >
+              <v-icon > mdi-lead-pencil </v-icon>
             </v-btn>
           </template>
 
           <template v-slot:no-data>
-            <div class="p-3">
+            <div>
                 <v-progress-circular
                   :size="70"
                   :width="7"
                   color="blue"
                   indeterminate
-                  class="mb-6"
                 ></v-progress-circular>
                 <br/>
-                <h2 class="text-gray-500 text-lg">Recuperando Jobs desde la base de datos ... por favor espere.</h2>
+                <h2>Recuperando Jobs desde la base de datos ... por favor espere.</h2>
             </div>
           </template>
 
@@ -144,7 +153,6 @@
         <!--MENSAJES DE INFORMACION-->
         <v-overlay :value="showMessage">
           <v-alert
-            class="mx-7"
             :color="messageType"
             dark
             border="top"
@@ -157,23 +165,22 @@
 
         <!--SELECCION DE EXPEDIENTES (asignacion masiva) TODO: sacar a componente-->
         <v-overlay :value="showExpSelect">
-          <v-card light class="bg-white rounded-md" style="width:40vw; min-width:430px;">
-            <v-card-title class="bg-blue-200">Asignación de Expediente
+          <v-card light class="asignExpContainer">
+            <v-card-title class="asignExpTitle">Asignación de Expediente
               <v-spacer></v-spacer>
               <v-card-actions>
-                <div class="w-full">
-                  <v-btn dark color="success" :disabled="expediente == null" @click="asignExpToSelect()" class="mr-3">ASIGNAR A SELECCIÓN</v-btn>
-                  <v-btn dark color="error" @click="showExpSelect = !showExpSelect" class="mr-3">CANCELAR</v-btn>
+                <div>
+                  <v-btn text dark class="errorBtn expBtn" elevation="2" @click="showExpSelect = !showExpSelect">CANCELAR</v-btn>
+                  <v-btn text dark class="generateBtn expBtn" elevation="2" :disabled="expediente == null" @click="asignExpToSelect()">ASIGNAR A SELECCIÓN</v-btn>
                 </div>
-              </v-card-actions>
+              </v-card-actions>  
             </v-card-title>
-            <v-row>
+            <v-row class="asignExpInfoContainer">
               <v-col>
                 <div>
-                  <div class="p-3">
+                  <div>
                     <v-card-text>Seleccione un expediente </v-card-text>
                     <v-select
-                    class="mx-3"
                     :items="expedientes"
                     v-model="expediente"
                     label="Expediente"
@@ -182,27 +189,40 @@
                     ></v-select>
                   </div>
                     
-                    <v-card-title class="bg-blue-200">Información</v-card-title>
-
-                    <div class="p-5" v-if="expedienteInfo[0].observaciones != null && expedienteInfo[0].fecha">
-                      <div class="text-sm text-gray-400 ml-1">Observaciones: </div>
-                      <div class="bg-gray-100 rounded-md p-2 mb-2"><p v-html="expedienteInfo[0].observaciones"></p></div>
-                      <div class="text-sm text-gray-400 ml-1">Fecha alta: </div>
-                      <div class="bg-gray-100 rounded-md p-2 mb-2"><p v-html="expedienteInfo[0].fecha"></p></div>
-                      <div class="text-sm text-gray-400 ml-1">Estado: </div>
-                      <div class="bg-gray-100 rounded-md p-2 mb-2"><p v-html="expedienteInfo[0].finalizado"></p></div>
+                    <v-card-title>Información</v-card-title>
+                    <div
+                      class="asignExpTable"
+                      v-if="expedienteInfo[0].observaciones != null && expedienteInfo[0].fecha"
+                    >
+                      <v-simple-table>
+                        <template v-slot:default>
+                          <tbody>
+                            <tr>
+                              <td class="text-left">Observaciones</td>
+                              <td><span class="asignExpObser" v-html="expedienteInfo[0].observaciones"></span></td>
+                            </tr>
+                            <tr>
+                              <td class="text-left">Fecha Alta</td>
+                              <td v-html="expedienteInfo[0].fecha"></td>
+                            </tr>
+                            <tr>
+                              <td class="text-left">Estado</td>
+                              <td v-html="expedienteInfo[0].finalizado"></td>
+                            </tr>
+                          </tbody>
+                        </template>
+                      </v-simple-table>
                     </div>
-                    <div class="p-5" v-else>
-                      <div class="text-sm text-gray-400 ml-1">Observaciones:</div>
-                      <div class="bg-gray-100 rounded-md p-2 mb-2 text-gray-400">Seleccione un expediente para ver información</div>
-                      <div class="text-sm text-gray-400 ml-1">Fecha alta: </div>
-                      <div class="bg-gray-100 rounded-md p-2 mb-2"></div>
-                      <div class="text-sm text-gray-400 ml-1">Estado: </div>
-                      <div class="bg-gray-100 rounded-md p-2 mb-2"></div>
+
+                    <div 
+                      class="asignExpTable"
+                      v-else
+                    >
+                      <div>Seleccione un expediente para ver información</div>
                     </div>
                 </div>
               </v-col>
-            </v-row>          
+            </v-row>      
           </v-card>
         </v-overlay>
 
@@ -347,6 +367,10 @@ export default {
     },
     
     deleteJobs(){
+      this.dialogDelete = true;
+    },
+
+    confirmDeleteJobs(){
       const deleteJobs = this.selected
       axios
       .delete(`${process.env.VUE_APP_API_ROUTE}/deleteJobs`, {data: deleteJobs}) 
@@ -365,11 +389,11 @@ export default {
           }
           //Deseleccionar jobs eliminados
           this.selected = []
-
         } else {
           this.showInfo(data.data.mensaje, "red");
-          setTimeout(this.closeInfo, 1500);  
+          setTimeout(this.closeInfo, 1500);        
         }
+        this.dialogDelete = false;
       })
     },
 
@@ -467,11 +491,6 @@ export default {
       this.dialogDelete = true;
     },
 
-    deleteItemConfirm() {
-      this.jobs.splice(this.editedIndex, 1);
-      this.closeDelete();
-    },
-
     close() {
       this.dialog = false;
       this.$nextTick(() => {
@@ -509,4 +528,108 @@ export default {
 .v-application--wrap {
   min-height: 1vh !important;
 }
+
+.panelContainer {
+  background-color:white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
+}
+
+.panelHeader {
+  display: flex;
+}
+
+.panelHeader-title{
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+.panelFuncionesCard {
+  background-color: #4287f5;
+}
+
+.dataTable {
+  margin-top: 1rem;
+}
+
+.buttonGroup {
+  padding: 0.5rem;
+}
+
+.btn {
+    width: 100%;
+    font-weight: 400;
+}
+
+.textField {
+  background-color: white;
+  padding: 0.5rem;
+}
+
+.editButton {
+  background-color:#4287f5;
+}
+
+/* ALERTA BORRADO */
+.alertCard {
+  text-align: center;
+  padding: 1rem;
+}
+
+.alertCardTitle {
+  margin-bottom: 0.5rem;
+}
+
+.alertCard > * {
+  font-weight: 400 !important;
+}
+
+.alertButtonGroup {
+  margin: 0 auto;
+}
+
+.alertButton {
+  width: 10rem;
+  margin: 1rem;
+}
+
+.errorBtn {
+  background-color: #ef4444;
+}
+
+.generateBtn {
+  background-color: #10b981;
+}
+
+/* SELECCION DE EXPEDIENTES */
+.asignExpContainer {
+  width:40vw; 
+  min-width:430px;
+}
+
+.asignExpTitle {
+  font-weight: 400 !important;
+  background-color: #4287f5;
+  color: white;
+}
+
+.asignExpInfoContainer {
+  padding: 1rem;
+}
+
+.expBtn {
+  margin: 0.25rem 0.25rem;
+  font-weight: 400 !important;
+}
+
+.asignExpTable {
+  padding: 0.5rem;
+  background-color:#CFD8DC;
+  border-radius: 4px;
+}
+.asignExpObser > p {
+  margin-bottom: 0rem;
+}
+
 </style>

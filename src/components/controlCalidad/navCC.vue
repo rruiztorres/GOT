@@ -1,110 +1,95 @@
 <template>
-    <div>
-      <v-list class="mb-4">
-        <div v-if="hacerMini==false">
-          <v-list-item-title class="ml-4 my-2 text-l font-bold">Gestion de Jobs</v-list-item-title>
-        </div>
-        <div v-if="hacerMini==true">
-        </div>
-          <v-list-item
-          dense
-            v-for="opcionCcalidad in cCalidad"
-            :key="opcionCcalidad.name"
-            @click="activar(opcionCcalidad.active)"
-            class="hover:bg-blue-100"
-          >
-            <v-list-item-icon>
-              <v-icon color="#1E40AF" class="mr-3">{{ opcionCcalidad.icon }}</v-icon>
-              <v-list-item-title class="text-xs text-black">{{ opcionCcalidad.name }}</v-list-item-title>
-            </v-list-item-icon>
-          </v-list-item>
-      </v-list>
-
-
-      <v-list class="mb-4">
-        <div v-if="hacerMini==false">
-          <v-list-item-title class="ml-4 my-2 text-l font-bold">Gestión IDVs</v-list-item-title>
-        </div>
-        <div v-if="hacerMini==true">
-        </div>
-
-          <v-list-item
-            dense
-            v-for="operador in operadores"
-            :key="operador.name"
-            @click="activar(operador.active)"
-            class="hover:bg-blue-100"
-          >
-            <v-list-item-icon>
-              <v-icon color="#1E40AF" class="mr-3">{{ operador.icon }}</v-icon>
-              <v-list-item-title class="text-xs text-black">{{ operador.name }}</v-list-item-title>
-            </v-list-item-icon>
-          </v-list-item>
-      </v-list>
-
-
-      <v-list class="mb-4">
-        <div v-if="hacerMini==false">
-          <v-list-item-title class="ml-4 my-2 text-l font-bold">Informes</v-list-item-title>
-        </div>
-        <div v-if="hacerMini==true">
-          
-        </div>
-        <v-list-item
+  <div>
+    <v-list 
+      dense
+      v-for="navGroup in navItems"
+      :key="navGroup.name">
+      
+      <h5 style="font-weight:400;">{{navGroup.group}}</h5>
+  
+      <v-list-item
         dense
-          v-for="informe in informes"
-          :key="informe.name"
-          class="hover:bg-blue-100"
-          @click="activar(opcionJob.active)"
-        >
-          <v-list-item-icon>
-            <v-icon color="#1E40AF" class="mr-3">{{ informe.icon }}</v-icon>
-            <v-list-item-title class="text-xs text-black">{{ informe.name }}</v-list-item-title>
-          </v-list-item-icon>
-        </v-list-item>
-      </v-list>
-  </div> 
+        v-for="opcionJob in navGroup.items"
+        :key="opcionJob.name"
+        @click="emitChangeMenu(opcionJob.active)"
+        class="itemButton"
+      >
+        <v-list-item-icon>
+          <v-icon color="#1E40AF" class="mr-3">{{ opcionJob.icon }}</v-icon>
+          <v-list-item-title class="textItemButton">{{ opcionJob.name }}</v-list-item-title>
+        </v-list-item-icon>
+      </v-list-item>
+    </v-list>
+  </div>  
 </template>
 
 <script>
+
 export default {
-  name: "NavCC",
-  props: {
-        hacerMini: {
-            type: Boolean,
-            default: false,
+    name: 'NavGJ',
+    methods: {
+      emitChangeMenu(datos) {
+        this.$emit('cambiomenu', datos);
+      },
+      changeRole(rol) {
+        this.userRole = rol;
+        localStorage.rol = rol;
+      },
+    },
+
+    watch: {
+      userRole() {},
+    },
+
+    data() {
+        return {
+          navItems:[
+            { group: 'Control de Calidad',
+              items: [
+                {name:'Nuevo Muestreo', icon:'mdi-book-search', active:''}, 
+                {name:'Jobs en CC', icon:'mdi-briefcase-search', active:''},
+                {name:'CC en curso', icon:'mdi-clipboard-pulse', active:''},
+              ]
+            },
+            { group: 'Operadores',
+              items: [
+                {name:'Estado Operadores', icon:'mdi-account-group', active:''},
+              ]
+            },
+            {
+              group: 'Informes',
+              items: [
+                {name:'Vista General', icon:'mdi-finance', active: ''},
+              ]
+            },
+          ],
+        // FIN DATA
         }
     },
-  methods: {
-    activar(datos) {
-      this.$emit("cambiomenu", datos);
-    },
-    cambiarRol(rol) {
-      this.userRole = rol;
-      localStorage.rol = rol;
-      console.log("el rol pasó a ser " + rol);
-    },
-  },
-
-  watch: {
-    userRole() {},
-  },
-
-  data() {
-    return {
-      cCalidad: [
-        { name: "Nuevo Control", icon: "mdi-book-search" },
-        { name: "Jobs en Control", icon: "mdi-briefcase-search" },
-        { name: "Controles en curso", icon: "mdi-clipboard-pulse" },
-        ],
-      operadores: [
-        { name: "Estado operadores", icon: "mdi-account-group" },
-        ],
-      informes: [
-        {name:'Vista General', icon:'mdi-finance'},
-        {name:'Mis KPI', icon:'mdi-card-account-details-star'},
-        ],
-    };
-  },
-};
+}
 </script>
+
+
+
+<style scoped>
+  .subheader {
+    border: 1px solid white
+  }
+
+  h5 {
+    font-weight: 500 !important;
+    font-size: 84%;
+    padding: 0.5rem;
+    margin-left: 0.6rem;
+    border-bottom: 0.055rem solid #e3e4e8
+  }
+
+  .itemButton:hover {
+    background-color: #dbeafe;
+  }
+
+  .textItemButton {
+    font-weight: 400 !important;
+  }
+
+</style>

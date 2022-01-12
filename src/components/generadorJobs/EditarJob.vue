@@ -1,106 +1,123 @@
 <template>
-  <div class="bg-gray-200 h-full pb-6">
+  <div>
     <!--TOOLBAR SUPERIOR -->
     <v-toolbar dark color="primary">
       <v-btn icon dark @click="checkData"><v-icon>mdi-close</v-icon></v-btn>
       <v-toolbar-title
-        >EDITANDO JOB - <b>{{ job.job }}</b></v-toolbar-title
+      class="editJobTitle"
+        >EDITANDO JOB - {{ job.job }}</v-toolbar-title
       >
-
       <v-spacer></v-spacer>
-      <v-btn class="w-24 bg-red-500 mr-5" dark text @click="closeDialog"
-        >CANCELAR</v-btn
-      >
-      <v-btn class="w-38 bg-gray-500 mr-5" dark text @click="updateDataBD"
-        >GUARDAR DATOS</v-btn
-      >
-      <v-btn
-        class="w-24 bg-green-500 mr-5"
-        dark
-        text
+        <v-btn 
+          class="editJobBtn errorBtn" 
+          dark 
+          text 
+          @click="closeDialog"
+          elevation="2"
+          >CANCELAR
+        </v-btn>
+        <v-btn 
+        class="editJobBtn saveBtn" 
+        dark 
+        text 
+        @click="updateDataBD"
+        elevation="2"
+        >GUARDAR DATOS
+        </v-btn>
+        <v-btn 
+        class="editJobBtn generateBtn" 
+        dark 
+        text 
+        elevation="2"
         @click="generateJobsErrors()"
-        >GENERAR</v-btn
-      >
+        >GENERAR
+        </v-btn>
     </v-toolbar>
 
     <!--MAIN-->
     <template>
       <v-card>
-        <v-tabs v-model="activeTab" fixed-tabs background-color="#0341a6" dark>
-          <v-tab :key="1" @click="activateMap(false)">Datos del Job</v-tab>
-          <v-tab :key="2" @click="activateMap(true)">Localización en el Mapa</v-tab>
-          <v-tab :key="3" @click="activateMap(false)">Proceso</v-tab>
-
+        <v-tabs
+        fixed-tabs 
+        background-color="#0341a6" 
+        dark
+        v-model="activeTab">
+          <v-tab 
+          class="tab"
+          :key="1" 
+          @click="activateMap(false)"
+          >Datos del Job
+          </v-tab>
+          <v-tab 
+          class="tab"
+          :key="2"
+          @click="activateMap(true)"
+          >Localización en el Mapa
+          </v-tab>
+          <v-tab
+          class="tab"
+          :key="3" 
+          @click="activateMap(false)"
+          >Proceso
+          </v-tab>
           <v-tabs-slider color="#76aff5"></v-tabs-slider>
-
+          
           <!--DATOS DEL JOB-->
-          <v-tab-item>
-            <!--Container tab -->
-            <v-card flat class="p-8">
-              <div class="min-w-1/4">
-                <v-row class="h-full mb-6">
-                  <v-col cols="12">
-                    <v-card class="mb-6">
-                      <v-card-title class="bg-blue-200">
-                      DATOS DEL JOB
-                      </v-card-title>
-                      
+          <v-tab-item>  
+            <v-card class="card" flat>
+              <div class="dataTable">
+                <h2>Jobs</h2>
+                <v-data-table
+                  :headers="jobHeaders"
+                  :items="datosJob"
+                  hide-default-footer
+                >
+                  <template v-slot:[`item.estado`]="{ item }">
+                    <v-chip :color="getColor(item.estado)" dark>
+                      {{ item.estado }}
+                    </v-chip>
+                  </template>
+                </v-data-table>
+              </div>
 
-                      <v-data-table
-                        :headers="jobHeaders"
-                        :items="datosJob"
-                        class="font-sans"
-                        hide-default-footer
-                      >
-                        <template v-slot:[`item.estado`]="{ item }">
-                          <v-chip :color="getColor(item.estado)" dark>
-                            {{ item.estado }}
-                          </v-chip>
-                        </template>
-                      </v-data-table>
-                    </v-card>
+              <div class="dataTable">
+                <h2>Errores Asociados</h2>
+                  <v-data-table
+                    calculate-widths
+                    :headers="errorHeaders"
+                    :items="errores"
+                    item-key="error"
+                    hide-default-footer
+                    >
+                    <template v-slot:[`item.estado`]="{ item }">
+                      <v-chip :color="getColor(item.estado)" dark>
+                        {{ item.estado }}
+                      </v-chip>
+                    </template>
 
-                    <v-card>
-                      <v-card-title class="bg-blue-200"
-                        >ERRORES ASOCIADOS</v-card-title
-                      >
-                      <div>
-                        <v-data-table
-                          calculate-widths
-                          :headers="errorHeaders"
-                          :items="errores"
-                          item-key="error"
-                          hide-default-footer
-                        >
-                          <template v-slot:[`item.estado`]="{ item }">
-                            <v-chip :color="getColor(item.estado)" dark>
-                              {{ item.estado }}
-                            </v-chip>
-                          </template>
+                    <template v-slot:no-data>
+                      <h1>No existen errores asociados al job</h1>
+                    </template>
 
-                          <template v-slot:no-data>
-                            <h1>No existen errores asociados al job</h1>
-                          </template>
-
-                          <template v-slot:[`item.actions`]="{ item }">
-                            <v-btn title="Eliminar Error" icon dark class="bg-red-500 mr-1">
-                              <v-icon @click="confirmDelete(item)"> mdi-trash-can </v-icon>
-                            </v-btn>
-                          </template>
-                        </v-data-table>
-                      </div>
-                    </v-card>
-                  </v-col>
-                </v-row>
-                <br />
+                    <template v-slot:[`item.actions`]="{ item }">
+                      <v-btn 
+                      class="errorBtn"
+                      title="Eliminar Error" 
+                      icon 
+                      dark>
+                        <v-icon @click="confirmDelete(item)">
+                          mdi-trash-can
+                        </v-icon>
+                      </v-btn>
+                    </template>
+                  </v-data-table>
               </div>
             </v-card>
           </v-tab-item>
 
-
           <!--LOCALIZACIÓN EN EL MAPA-->
           <v-tab-item>
-            <v-card flat class="p-8" style="height:86vh">
+            <v-card flat style="height:86vh">
               <Map
                 v-if="mapIsActive == true"
                 modoMapa="editar"
@@ -116,48 +133,78 @@
 
           <!--PROCESO-->
           <v-tab-item>
-                <Logger 
-                  :jobsRecibidos="editandoJob"
-                  :erroresRecibidos="errores"
-                ></Logger>
+            <v-card class="card" flat>
+              <Logger
+                :jobsRecibidos="editandoJob"
+                :erroresRecibidos="errores"
+              ></Logger>
+            </v-card>
           </v-tab-item>
           <!--PROCESO-->
         </v-tabs>
 
-        <!-- AVISO DATOS SIN GUARDAR (lo utilizamos también en mapa ¿sacar a componente? ) -->
+        <!-- ALERTA DATOS SIN GUARDAR (lo utilizamos también en mapa ¿sacar a componente? ) -->
         <v-overlay :value="showAlert">
-          <v-card class="p-3 w-80">
-            <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
-            <h3 class="text-center text-l">Existen datos sin guardar ¿desea cerrar sin guardar los cambios?</h3>
+            <v-card class="alertCard">
+              <h1 class="alertCardTitle">ATENCIÓN</h1>
+              <h4>
+                Existen datos sin guardar ¿desea cerrar sin guardar los cambios?
+              </h4>
               <v-card-actions>
-                <div class="mt-6 flex">
-                    <v-btn class="w-24 bg-red-500" dark text @click="showAlert = false">CANCELAR</v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn class="w-24 bg-green-500" dark text @click="closeWithoutSave()">OK</v-btn>
+                <div class="alertButtonGroup">
+                  <v-btn
+                    class="alertButton errorBtn"
+                    dark
+                    text
+                    @click="showAlert = false"
+                    >CANCELAR</v-btn
+                  >
+                  <v-btn
+                    class="alertButton generateBtn"
+                    dark
+                    text
+                    @click="closeWithoutSave()"
+                    >OK</v-btn
+                  >
                 </div>
               </v-card-actions>
-          </v-card>
-        </v-overlay>
+            </v-card>
+          </v-overlay>
 
         <!-- AVISO ELIMINAR ERRORES -->
         <v-overlay :value="showAlertError">
-          <v-card class="p-3 w-80">
-            <h1 class="p-3 text-center font-bold text-2xl">ATENCIÓN</h1>
-            <h3 class="text-center text-l">Esta acción no se puede deshacer ¿continuar con el borrado?</h3>
-              <v-card-actions>
-                <div class="mt-6 flex">
-                    <v-btn class="w-24 bg-red-500" dark text @click="showAlertError = false">CANCELAR</v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn class="w-24 bg-green-500" dark text @click="deleteError(errorBorrar)">OK</v-btn>
-                </div>
-              </v-card-actions>
+          <v-card class="alertCard">
+            <h1 class="alertCardTitle">ATENCIÓN</h1>
+            <h4>Esto borrara el error.</h4>
+            <h4>El borrado es permanente y <b>no puede deshacerse</b>.</h4>
+            <br/>
+            <h3><b>¿Desea continuar?</b></h3>
+            <v-card-actions>
+              <div class="alertButtonGroup">
+                <v-btn
+                class="alertButton errorBtn"
+                dark
+                text
+                @click="showAlertError = false"
+                >
+                CANCELAR
+                </v-btn>
+                <v-btn
+                class="alertButton generateBtn"
+                dark
+                text
+                @click="deleteError(errorBorrar)"
+                >
+                OK
+                </v-btn>
+              </div>
+            </v-card-actions>
           </v-card>
         </v-overlay>
 
         <!--MENSAJES DE INFORMACION-->
         <v-overlay :value="showMessage">
           <v-alert
-            class="mx-7"
             :color="messageType"
             dark
             border="top"
@@ -173,10 +220,10 @@
 </template>
 
 <script>
-import { getColor } from '@/assets/mixins/getColor';
-import { generarJobError } from '@/assets/mixins/generarJobError';
-import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry';
-import { stringifyErrorGeometry } from '@/assets/mixins/stringifyErrorGeometry'
+import { getColor } from "@/assets/mixins/getColor";
+import { generarJobError } from "@/assets/mixins/generarJobError";
+import { stringifyJobGeometry } from "@/assets/mixins/stringifyJobGeometry";
+import { stringifyErrorGeometry } from "@/assets/mixins/stringifyErrorGeometry";
 
 import pointInPolygon from "point-in-polygon";
 
@@ -185,7 +232,12 @@ import Map from "@/components/common/Map";
 import Logger from "@/components/common/Logger";
 
 export default {
-  mixins: [getColor, generarJobError, stringifyJobGeometry, stringifyErrorGeometry],
+  mixins: [
+    getColor,
+    generarJobError,
+    stringifyJobGeometry,
+    stringifyErrorGeometry,
+  ],
 
   props: ["job", "error", "center"],
 
@@ -215,49 +267,50 @@ export default {
         this.editandoJob = this.job;
       }
     },
-
   },
 
   methods: {
-    confirmDelete(errorBorrar){
+    confirmDelete(errorBorrar) {
       this.showAlertError = true;
       this.errorBorrar = errorBorrar;
     },
 
-    deleteError(error){
-      if (error.error != null){
+    deleteError(error) {
+      if (error.error != null) {
         axios
-        .delete(`${process.env.VUE_APP_API_ROUTE}/deleteError`,  {data: {error}})
-        .then( (data) => {
-          if (data.status == 201){
-            this.showInfo(data.data.mensaje, "green");
-            setTimeout(this.closeInfo, 1000);
+          .delete(`${process.env.VUE_APP_API_ROUTE}/deleteError`, {
+            data: { error },
+          })
+          .then((data) => {
+            if (data.status == 201) {
+              this.showInfo(data.data.mensaje, "green");
+              setTimeout(this.closeInfo, 1000);
 
-            //Actualizar array errores
-            for (this.index in this.errores){
-              if (this.errores[this.index].error == error.error){
-                this.errores.splice(this.index,1)
+              //Actualizar array errores
+              for (this.index in this.errores) {
+                if (this.errores[this.index].error == error.error) {
+                  this.errores.splice(this.index, 1);
+                }
               }
+            } else {
+              this.showInfo(data.data.mensaje, "red");
+              setTimeout(this.closeInfo, 2000);
             }
-          } else {
-            this.showInfo(data.data.mensaje, "red");
-            setTimeout(this.closeInfo, 2000);
-          }
-        })
+          });
       } else {
         this.showInfo("Error eliminado correctamente", "green");
         setTimeout(this.closeInfo, 2000);
         //Actualizar array errores
-        for (this.index in this.errores){
-          if (this.errores[this.index].error == error.error){
-            this.errores.splice(this.index,1)
+        for (this.index in this.errores) {
+          if (this.errores[this.index].error == error.error) {
+            this.errores.splice(this.index, 1);
           }
         }
       }
       this.showAlertError = false;
     },
 
-    closeWithoutSave(){
+    closeWithoutSave() {
       this.showAlert = false;
       //Borramos ediciones sin guardar
       this.editandoJob = this.job;
@@ -269,34 +322,34 @@ export default {
       this.jobEditar = item;
     },
 
-    closeEditJob(data){
+    closeEditJob(data) {
       this.showEditJob = data;
     },
 
-    checkData(){
-      if (this.edicionSinGuardar == true){
+    checkData() {
+      if (this.edicionSinGuardar == true) {
         this.showAlert = true;
       } else {
         this.closeDialog();
       }
     },
 
-    updateEditedJob(job){
-        this.updateJob = job[0]
-        this.editandoJob.expediente = this.updateJob.expediente;
-        this.editandoJob.arreglo_job = this.updateJob.arreglo_job;
-        this.editandoJob.deteccion_job = this.updateJob.deteccion_job;
-        this.editandoJob.gravedad_job = this.updateJob.gravedad_job;
-        this.editandoJob.asignacion_job = this.updateJob.asignacion_job;
-        this.editandoJob.nombre_operador = this.updateJob.nombre_operador;
-        this.editandoJob.descripcion = this.updateJob.descripcion;
-        this.editandoJob.geometria_json = this.updateJob.geometria_json;
+    updateEditedJob(job) {
+      this.updateJob = job[0];
+      this.editandoJob.expediente = this.updateJob.expediente;
+      this.editandoJob.arreglo_job = this.updateJob.arreglo_job;
+      this.editandoJob.deteccion_job = this.updateJob.deteccion_job;
+      this.editandoJob.gravedad_job = this.updateJob.gravedad_job;
+      this.editandoJob.asignacion_job = this.updateJob.asignacion_job;
+      this.editandoJob.nombre_operador = this.updateJob.nombre_operador;
+      this.editandoJob.descripcion = this.updateJob.descripcion;
+      this.editandoJob.geometria_json = this.updateJob.geometria_json;
     },
 
     generateJobsErrors() {
       //TODO: Comprobar que las ediciones se han guardado.
-      if (this.edicionSinGuardar == false){
-        this.resultado = this.generarJobError([this.editandoJob],[]);
+      if (this.edicionSinGuardar == false) {
+        this.resultado = this.generarJobError([this.editandoJob], []);
         if (this.resultado.procesadoOK == false) {
           this.showInfo(this.resultado.mensaje, "red");
           setTimeout(this.closeInfo, 2000);
@@ -304,10 +357,10 @@ export default {
           this.showInfo(this.resultado.mensaje, "green");
           setTimeout(this.closeInfo, 2000);
           setTimeout(this.closeDialog, 2200);
-        } 
+        }
       } else {
-          this.showInfo("Guarde los datos antes de generar el job", "red");
-          setTimeout(this.closeInfo, 2000);
+        this.showInfo("Guarde los datos antes de generar el job", "red");
+        setTimeout(this.closeInfo, 2000);
       }
     },
 
@@ -323,10 +376,12 @@ export default {
 
     datosJobToDataTable() {
       //caso edicion devuelve arrays hay que convertir a objeto
-      if (this.editandoJob.length > 0){
+      if (this.editandoJob.length > 0) {
         this.editandoJob = this.editandoJob[0];
         //añadimos atributos
-        this.editandoJob.geometria = this.stringifyJobGeometry(this.editandoJob.geometria_json);
+        this.editandoJob.geometria = this.stringifyJobGeometry(
+          this.editandoJob.geometria_json
+        );
       }
       this.datosJob = [this.editandoJob];
     },
@@ -342,8 +397,10 @@ export default {
       this.errores = errores;
       this.edicionSinGuardar = true;
 
-      for (this.index in errores){
-        this.errores[this.index].geometria = this.stringifyErrorGeometry(errores[this.index].geometria_json)
+      for (this.index in errores) {
+        this.errores[this.index].geometria = this.stringifyErrorGeometry(
+          errores[this.index].geometria_json
+        );
       }
     },
 
@@ -372,12 +429,12 @@ export default {
           this.erroresBruto = data.data.errores;
           for (this.elemento in this.erroresBruto) {
             this.errores.push(this.erroresBruto[this.elemento]);
-            this.errores[this.elemento].job = this.job.id_job
+            this.errores[this.elemento].job = this.job.id_job;
           }
         })
         .catch((data) => {
           console.log(data);
-      });
+        });
     },
 
     closeDialog() {
@@ -390,18 +447,15 @@ export default {
       this.erroresBruto = [];
     },
 
-    errorInJob(polygon, point){
+    errorInJob(polygon, point) {
       //Evalua si un punto de error está dentro de un job
       this.polygon = [polygon];
-      this.point = [
-        point.coordinates[0],
-        point.coordinates[1],
-      ];
+      this.point = [point.coordinates[0], point.coordinates[1]];
       this.inside = pointInPolygon(this.point, this.polygon[0]);
       return this.inside;
     },
 
-    updateDataBD(){
+    updateDataBD() {
       this.continue = true;
       this.errorDetectFuera = false;
       this.arrayPut = [];
@@ -411,22 +465,25 @@ export default {
       this.ejecucionPutJob = true;
 
       this.log = {
-          idEventoLogger: 6, //JOB MODIFICADO
-          procesoJob: 'GOT',
-          usuario: localStorage.usuario,
-          observaciones: '',
-          departamento: '',
-          resultadoCC: '',
-      }
+        idEventoLogger: 6, //JOB MODIFICADO
+        procesoJob: "GOT",
+        usuario: localStorage.usuario,
+        observaciones: "",
+        departamento: "",
+        resultadoCC: "",
+      };
 
       //Actualizamos datos de job
       if (this.edicionSinGuardar == true) {
         axios
-        .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, [this.datosJob, this.log])
+          .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, [
+            this.datosJob,
+            this.log,
+          ])
           .then((data) => {
-              if (data.status !== 201) {
-                this.ejecucionPutJob = false;
-              }
+            if (data.status !== 201) {
+              this.ejecucionPutJob = false;
+            }
           })
           .catch((data) => {
             console.log(data);
@@ -434,76 +491,89 @@ export default {
       }
 
       //Comprobar si existe algún error fuera del job
-      for (this.index in this.errores){   
-        this.errorDentro = this.errorInJob(this.editandoJob.geometria_json.coordinates[0], this.errores[this.index].geometria_json)
-        if (this.errorDentro == false){
+      for (this.index in this.errores) {
+        this.errorDentro = this.errorInJob(
+          this.editandoJob.geometria_json.coordinates[0],
+          this.errores[this.index].geometria_json
+        );
+        if (this.errorDentro == false) {
           this.continue = false;
           this.errorDetectFuera = true;
         }
       }
 
       //Identificamos si son errores para actualizar o insertar
-      if (this.continue == true){
-        for (this.index in this.errores){
-          if (this.errores[this.index].error == null){
-            this.errores[this.index].job = this.job.id_job
-            this.arrayPost.push(this.errores[this.index])
+      if (this.continue == true) {
+        for (this.index in this.errores) {
+          if (this.errores[this.index].error == null) {
+            this.errores[this.index].job = this.job.id_job;
+            this.arrayPost.push(this.errores[this.index]);
           } else {
-            this.arrayPut.push(this.errores[this.index])
+            this.arrayPut.push(this.errores[this.index]);
           }
         }
       }
 
       //Hacemos insercion de errores
-      if (this.continue == true){
+      if (this.continue == true) {
         axios
-        .post(`${process.env.VUE_APP_API_ROUTE}/postError`, this.arrayPost)
-        .then((data) => {
-          if (data.status == 201){
-            //Actualizar numeros serie errores guardados
-            for (this.index in this.errores){
-              for (this.indexCreados in data.data.errores){
-                if (data.data.errores[this.indexCreados].id == this.errores[this.index].id){
-                  this.errores[this.index].error = data.data.errores[this.indexCreados].error
+          .post(`${process.env.VUE_APP_API_ROUTE}/postError`, this.arrayPost)
+          .then((data) => {
+            if (data.status == 201) {
+              //Actualizar numeros serie errores guardados
+              for (this.index in this.errores) {
+                for (this.indexCreados in data.data.errores) {
+                  if (
+                    data.data.errores[this.indexCreados].id ==
+                    this.errores[this.index].id
+                  ) {
+                    this.errores[this.index].error =
+                      data.data.errores[this.indexCreados].error;
+                  }
                 }
               }
+            } else {
+              this.ejecucionPostError = false;
             }
-          } else {
-            this.ejecucionPostError = false; 
-          }
-        })
+          });
 
         //Hacemos update de errores
         axios
-        .put(`${process.env.VUE_APP_API_ROUTE}/updateError`, this.arrayPut)
-        .then((data) => {
-          if (data.status !== 201){
-            this.ejecucionPutError = false; 
-          }
-        })
+          .put(`${process.env.VUE_APP_API_ROUTE}/updateError`, this.arrayPut)
+          .then((data) => {
+            if (data.status !== 201) {
+              this.ejecucionPutError = false;
+            }
+          });
       }
 
       //Respuesta a usuario
-      if (this.ejecucionPostError == true && this.ejecucionPutError == true && this.ejecucionPutJob == true){
-        if (this.errorDetectFuera == false){
+      if (
+        this.ejecucionPostError == true &&
+        this.ejecucionPutError == true &&
+        this.ejecucionPutJob == true
+      ) {
+        if (this.errorDetectFuera == false) {
           this.$emit("datosActualizados", true);
           this.edicionSinGuardar = false;
           this.showInfo("Datos actualizados correctamente", "green");
           setTimeout(this.closeInfo, 1500);
         } else {
-          this.showInfo("No pueden existir errores fuera del job, por favor revise los datos", "red");
+          this.showInfo(
+            "No pueden existir errores fuera del job, por favor revise los datos",
+            "red"
+          );
           setTimeout(this.closeInfo, 1500);
         }
       } else {
-        this.showInfo("Ocurrió un error inesperado, por favor revise los datos", "red");
+        this.showInfo(
+          "Ocurrió un error inesperado, por favor revise los datos",
+          "red"
+        );
         setTimeout(this.closeInfo, 1500);
       }
-    }
-
-    
+    },
   },
-
- 
 
   data() {
     return {
@@ -557,3 +627,48 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.card {
+  height: 87vh;
+  padding: 0.5rem;
+}
+
+.editJobTitle, .editJobBtn, .tab, h2 {
+  font-weight: 400 !important;
+}
+
+.editJobBtn{
+  margin: 0.5rem;
+}
+
+.errorBtn {
+  background-color: #ef4444;
+}
+
+.saveBtn {
+  background-color: #6b7280;
+}
+
+.generateBtn {
+  background-color: #10b981;
+}
+
+.dataTable {
+  margin: 1rem 1rem 2rem 1rem;
+  padding: 1rem;
+  background-color: #eceff1;
+  border-radius: 3px;
+}
+
+/* ALERTA DATOS SIN GUARDAR */
+.alertButtonGroup {
+  margin: 0 auto;
+}
+
+.alertButton {
+  width: 10rem;
+  margin: 1rem;
+}
+
+</style>

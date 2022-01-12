@@ -1,5 +1,5 @@
 <template>
-  <v-app class="font-sans">
+  <v-app id="gotApp">
     <v-navigation-drawer v-model="drawer" app floating color="#EFF6FF">
       <Navigation @cambiomenu="cambiarMenu"> </Navigation>
     </v-navigation-drawer>
@@ -7,24 +7,23 @@
     <!-- HEADER -->
     <v-app-bar app dark color="#1e40af" elevation="0">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      <!--<v-toolbar-title>GOT</v-toolbar-title>-->
       <v-spacer></v-spacer>
       <a href="https://www.ign.es" target="blank">
-        <img
-          class="border border-white h-10 mr-1"
-          src="@/assets/img/logo_web_IGN_CNIG.png"
-        />
+        <img class="logoHeader" src="@/assets/img/logo_web_IGN_CNIG.png">
       </a>
     </v-app-bar>
 
     <!-- LOADER -->
-    <v-main> 
+    <v-main>
+      <div class="loaderDecorator">
         <Loader
         @cambiomenu="cambiarMenu"
         :activarMenu="newMenu"
         :userRole="userRole"
+        class="loader"
         >
         </Loader>
+      </div>
     </v-main>
   </v-app>
 </template>
@@ -43,6 +42,10 @@ export default {
   components: {
     Navigation,
     Loader,
+  },
+
+  beforeCreate(){
+    window.history.forward();
   },
 
   created() {
@@ -78,4 +81,22 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  .loader {
+    padding: 1rem;
+  }
+
+  .logoHeader {
+    border: 1px solid white;
+    height: 80%;
+    margin-top: 8px;
+  }
+
+  .loaderDecorator {
+    background-color: #EFF6FF;
+    height: 93.2vh;
+  }
+
+</style>
 

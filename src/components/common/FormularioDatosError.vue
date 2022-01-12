@@ -1,19 +1,18 @@
-<!--
-Ventana de seleccion de atributos de error en modo edición
--->
-
 <template>
-    <v-card light width="500">
+    <v-card class="containerForm">
         <div>
-            <v-card-title dark class="text-lg text-white bg-red-500"
+            <v-card-title 
+            dark 
+            class="titleErrorForm"
             >Editar Atributos de Error
             <v-spacer></v-spacer>
             </v-card-title>
 
-            <div class="p-1">
+            <div>
             <!--TextEditor descripciones error-->
-            <v-col class="bg-gray-200" cols="12">
+            <v-col>
                 <v-textarea
+                class="textAreaError"
                 v-model="descripcion"
                 filled label="Descripción del error"
                 auto-grow
@@ -25,8 +24,10 @@ Ventana de seleccion de atributos de error en modo edición
             <v-spacer class="mt-2"></v-spacer>
 
             <v-col cols="12">
-                <v-row style="margin-bottom: -2.5rem">
-                <v-col cols="4" class="mt-3"> Tema: </v-col>
+                <v-row class="formRow">
+                <v-col 
+                class="formRowTitle"
+                cols="4"> Tema: </v-col>
                 <v-col cols="8">
                     <v-select
                     filled dense class="text-m"
@@ -36,11 +37,13 @@ Ventana de seleccion de atributos de error en modo edición
                 </v-col>
                 </v-row>
 
-                <v-row style="margin-bottom: -2.5rem">
-                <v-col cols="4" class="mt-3"> Tipo: </v-col>
+                <v-row class="formRow">
+                <v-col 
+                class="formRowTitle"
+                cols="4"> Tipo: </v-col>
                 <v-col cols="8">
                     <v-select
-                    filled dense class="text-m"
+                    filled dense
                     :items="arrayTipoError"
                     v-model="seleccionTipoError"
                     ></v-select>
@@ -48,9 +51,11 @@ Ventana de seleccion de atributos de error en modo edición
                 </v-row>
             </v-col>
 
-            <v-spacer class="mt-5"></v-spacer>
+            <v-spacer></v-spacer>
 
-            <v-card-actions>
+            <v-card-actions
+                class="actionForm"
+            >
                 <v-spacer></v-spacer>
                 <v-btn color="error" dark @click="closeEditError()"
                 >CANCELAR</v-btn>
@@ -128,3 +133,35 @@ import { makeArrayFromApi } from '@/assets/mixins/makeArrayFromApi.js';
     }
 
 </script>
+
+<style scoped>
+    .titleErrorForm {
+        background-color: #E53935;
+        color: white;
+        font-weight: 400 !important;
+    }
+
+    .containerForm {
+        font-weight: 400 !important;
+    }
+
+    .textAreaError {
+        margin-top: 0.5rem;
+    }
+
+    .formRow {
+        margin-top: 0.5rem;
+        margin-bottom: -2.5rem
+    } 
+
+    .actionForm {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #ECEFF1;
+    }
+
+
+    .formRowTitle {
+        margin-top: 0.46rem;
+    }
+</style>

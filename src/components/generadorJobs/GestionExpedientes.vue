@@ -1,24 +1,28 @@
 <template>
-  <div style="width:98%;" class="m-auto rounded-md bg-white p-4 shadow-md">
-    <h1 class="text-xl font-bold py-4 mt-2">
-      Gestión de Expedientes
-    </h1>
+  <div class="panelContainer">
+    <div class="panelHeader">
+      <h2 class="panelHeader-title">Gestión de Expedientes</h2>
+      <v-spacer></v-spacer>
+      <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1">
+        <v-icon x-large>mdi-help-box</v-icon>
+      </v-btn>
+    </div>
 
-    <div class="overflow-y-auto" style="height:88vh;">
+    <div>
       <!--PANEL ACCIONES SUPERIOR -->
-      <v-card elevation="0" class="mb-4">
-        <v-row class="m-0 bg-blue-500 items-center">
+      <v-card elevation="0">
+        <v-row class="panelFuncionesCard">
           <v-col cols="12" md="6">
-            <v-row>
+            <v-row class="buttonGroup">
               <v-col cols="12" md="4">
                 <v-btn
-                  class="w-full"
+                  class="btn"
                   :disabled="selected.length != 0"
                   dark
                   color="success"
                   @click="showWindowNewExp = !showWindowNewExp"
                 >
-                  <v-icon class="mr-1">
+                  <v-icon>
                     mdi-plus
                   </v-icon>
 
@@ -27,7 +31,7 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-btn
-                  class="w-full"
+                  class="btn"
                   :disabled="selected.length == 0"
                   dark
                   color="success"
@@ -38,7 +42,7 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-btn
-                  class="w-full"
+                  class="btn"
                   :disabled="selected.length == 0"
                   dark
                   color="warning"
@@ -51,31 +55,31 @@
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
+              class="textField"
               v-model="search"
               append-icon="mdi-magnify"
               label="Buscar"
               single-line
               hide-details
-              class="bg-white p-2"
             ></v-text-field>
           </v-col>
         </v-row>
       </v-card>
 
       <v-data-table
+        class="dataTable"
         v-model="selected"
         :headers="headers"
         :items="expedientes"
         item-key="expediente"
         :search="search"
-        class="font-sans"
         show-select
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <v-btn title="editar" icon dark class="bg-blue-500 mr-1"
+          <v-btn title="editar" icon dark
             ><v-icon @click="dummy(item)"> mdi-lead-pencil </v-icon></v-btn
           >
-          <v-btn title="ver estado" icon dark class="bg-green-500"
+          <v-btn title="ver estado" icon dark
             ><v-icon @click="dummy(item)"> mdi-chart-areaspline </v-icon></v-btn
           >
         </template>
@@ -102,23 +106,26 @@
 
     <!-- MENSAJES DE ALERTA FLOTANTES -->
     <template>
-        <v-dialog v-model="mensajeFlotante.visibilidad" max-width="49rem">
-            <v-alert
-            :color="mensajeFlotante.color"
-            :type="mensajeFlotante.type"
-            prominent
-            class="mb-0"
-            >
-            <v-row no-gutters>
-                <v-col cols="9" class="m-auto pl-2">
-                    {{mensajeFlotante.mensaje}}
-                </v-col>
-                <v-col cols="3">
-                    <v-btn v-if="mensajeFlotante.aceptar == true" @click="closeInfoMessage()">ENTENDIDO</v-btn>
-                </v-col>
-            </v-row>
-            </v-alert>        
-        </v-dialog>
+      <v-dialog v-model="mensajeFlotante.visibilidad" max-width="49rem">
+        <v-alert
+          :color="mensajeFlotante.color"
+          :type="mensajeFlotante.type"
+          prominent
+        >
+          <v-row no-gutters>
+            <v-col cols="9">
+              {{ mensajeFlotante.mensaje }}
+            </v-col>
+            <v-col cols="3">
+              <v-btn
+                v-if="mensajeFlotante.aceptar == true"
+                @click="closeInfoMessage()"
+                >ENTENDIDO</v-btn
+              >
+            </v-col>
+          </v-row>
+        </v-alert>
+      </v-dialog>
     </template>
   </div>
 </template>
@@ -185,12 +192,12 @@ export default {
     showWindowNewExp: false,
 
     //MENSAJES FLOTANTES
-    mensajeFlotante:  {
-        visibilidad: false,
-        color: "green",             
-        type: "success",            
-        mensaje: "introduzca texto",
-        aceptar: true,  
+    mensajeFlotante: {
+      visibilidad: false,
+      color: "green",
+      type: "success",
+      mensaje: "introduzca texto",
+      aceptar: true,
     },
   }),
 
@@ -199,40 +206,48 @@ export default {
   },
 
   methods: {
-    closeInfoMessage(){
-        this.mensajeFlotante.visibilidad = false;
+    closeInfoMessage() {
+      this.mensajeFlotante.visibilidad = false;
     },
 
-    throwMessage(color, tipo, mensaje, aceptar){
-        this.mensajeFlotante.visibilidad = true;
-        this.mensajeFlotante.color = color;                 //colores: red, green, orange, yellow, purple
-        this.mensajeFlotante.type = tipo;                   //type: success, info, warning, error
-        this.mensajeFlotante.mensaje = mensaje;
-        this.mensajeFlotante.aceptar = aceptar;             //Muestra el boton de "entendido"
+    throwMessage(color, tipo, mensaje, aceptar) {
+      this.mensajeFlotante.visibilidad = true;
+      this.mensajeFlotante.color = color; //colores: red, green, orange, yellow, purple
+      this.mensajeFlotante.type = tipo; //type: success, info, warning, error
+      this.mensajeFlotante.mensaje = mensaje;
+      this.mensajeFlotante.aceptar = aceptar; //Muestra el boton de "entendido"
     },
 
-    closeExpediente(){
+    closeExpediente() {
       let proceso = 0;
 
-      for (this.index in this.selected){
+      for (this.index in this.selected) {
         //TODO: Formateo de datos no necesario cuando actualicemos tabla
         this.selected[this.index].finalizado = true;
         this.selected[this.index].fechaInicio = this.selected[this.index].fecha;
-       
+
         axios
-        .put(`${process.env.VUE_APP_API_ROUTE}/updateExpediente`, this.selected[this.index])
-        .then((data) =>{
-          if (data.status != 201){
-            proceso = 1
-          }
-        })
-      } 
+          .put(
+            `${process.env.VUE_APP_API_ROUTE}/updateExpediente`,
+            this.selected[this.index]
+          )
+          .then((data) => {
+            if (data.status != 201) {
+              proceso = 1;
+            }
+          });
+      }
       //Comprobar ejecución
-      if (proceso == 0){
-        this.selected[this.index].finalizado = 'Cerrado'
-        this.throwMessage("green", "success", "Expedientes actualizados con éxito", false)
-        setTimeout(this.closeInfoMessage, 1500)
-      }        
+      if (proceso == 0) {
+        this.selected[this.index].finalizado = "Cerrado";
+        this.throwMessage(
+          "green",
+          "success",
+          "Expedientes actualizados con éxito",
+          false
+        );
+        setTimeout(this.closeInfoMessage, 1500);
+      }
     },
 
     updateStoredExp(update) {
@@ -281,4 +296,43 @@ export default {
 .v-application--wrap {
   min-height: 1vh !important;
 }
+
+.panelContainer {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
+}
+
+.panelHeader {
+  display: flex;
+}
+
+.panelHeader-title {
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+.panelFuncionesCard {
+  background-color: #4287f5;
+}
+
+.dataTable {
+  margin-top: 1rem;
+}
+
+.buttonGroup {
+  padding: 0.5rem;
+}
+
+.btn {
+  width: 100%;
+  font-weight: 400;
+}
+
+.textField {
+  background-color: white;
+  padding: 0.5rem;
+}
+
 </style>

@@ -1,360 +1,59 @@
 <template>
-  <div class="home">
-    <div class="font-sans text-gray-800 antialiased">
-      <nav
-        class="top-0 absolute z-50 w-full flex flex-wrap items-center justify-between px-2 py-3"
-      >
-        <div
-          class="
-            container
-            px-4
-            mx-auto
-            flex flex-wrap
-            items-center
-            justify-between
-          "
-        >
-          <div
-            class="
-              w-full
-              relative
-              flex
-              justify-between
-              lg:w-auto
-              lg:static
-              lg:block
-              lg:justify-start
-            "
-          >
-            <button
-              class="
-                cursor-pointer
-                text-xl
-                leading-none
-                px-3
-                py-1
-                border border-solid border-transparent
-                rounded
-                bg-transparent
-                block
-                lg:hidden
-                outline-none
-                focus:outline-none
-              "
-              type="button"
-              onclick="toggleNavbar('example-collapse-navbar')"
-            >
-              <i class="text-white fas fa-bars"></i>
-            </button>
+  <v-app id="gotApp">
+    <v-main>
+      <div class="wrapper fadeInDown float">
+        <div id="formContent">
+
+          <!-- Logo -->
+          <div class="fadeIn first logo">
+            <h1>GOT</h1>
+            <h4>Gestor de órdenes de trabajo entorno BDIG</h4>
+            <img class="imgLogo" src="@/assets/img/logo_web_IGN_CNIG.png" id="icon" alt="User Icon" />
           </div>
 
-          <div
-            class="
-              lg:flex
-              flex-grow
-              items-center
-              bg-white
-              lg:bg-transparent
-              lg:shadow-none
-              hidden
-            "
-            id="example-collapse-navbar"
+          <!-- Login -->
+          <v-text-field 
+            filled 
+            class="fadeIn second inputText" 
+            placeholder="Nombre de usuario" 
+            v-model="usuario"
           >
-            <ul class="flex flex-col lg:flex-row list-none lg:ml-auto">
-              <li class="flex items-center">
-                <button
-                  class="
-                    bg-white
-                    text-gray-800
-                    active:bg-gray-100
-                    text-xs
-                    font-bold
-                    uppercase
-                    px-4
-                    py-2
-                    rounded
-                    shadow
-                    hover:shadow-md
-                    outline-none
-                    focus:outline-none
-                    lg:mr-1
-                    lg:mb-0
-                    ml-3
-                    mb-3
-                  "
-                  type="button"
-                >
-                  <i class="fas fa-arrow-alt-circle-down"></i> GOT API REST
-                </button>
-              </li>
-            </ul>
+          </v-text-field>
+          <v-text-field 
+            filled 
+            class="fadeIn third inputText" 
+            placeholder="Password" 
+            v-model="password"
+            :type="showPassword()"
+            ></v-text-field>
+          <v-switch
+            v-model="activateShowPassword"
+            class="inputText switcher"
+            inset
+            dense
+            label="Mostrar Contraseña"
+          ></v-switch>
+          <v-btn large class="fadeIn fourth logInButton" color="info" @click="login">LOG IN</v-btn>
+
+          <!-- Alertas -->
+          <v-alert
+            v-if="error_msg"
+            border="bottom"
+            color="red darken-1"
+            dark
+          >
+            {{error_msg}}
+          </v-alert>
+
+          <!-- Recordar Password -->
+          <div id="formFooter">
+            <a class="underlineHover">Contraseña olvidada?</a>
           </div>
+
         </div>
-      </nav>
-
-      <main>
-        <section class="absolute w-full h-full">
-          <div class="bg-gray-900 absolute top-0 w-full h-full">
-            <!--sin imagen fondo -->
-            <!--<div class="bg-login-back bg-cover absolute top-0 w-full h-full">-->
-            <!--con imagen fondo-->
-            <!--background login -->
-          </div>
-          <div class="container mx-auto px-4 h-full">
-            <div class="flex content-center items-center justify-center h-full">
-              <div class="w-full lg:w-4/12 px-4">
-                <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-gray-300 border-0">
-                  <div class="rounded-t mb-0 px-6 py-6">
-                    <div class="text-center mb-3">
-                      <h1 class="text-gray-500 text-3xl">GOT</h1>
-                      <h2 class="text-gray-500 text-sm">Gestor de órdenes de trabajo entorno BDIG</h2>
-                    </div>
-                    <div class="btn-wrapper text-center">
-                      <!--logo-->
-                      <img class="w-4/5 m-auto" src="../assets/img/logo_web_IGN_CNIG.png" />
-                    </div>
-                    <hr class="mt-6 border-b-1 border-gray-400" />
-                  </div>
-
-                  <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
-                    <form v-on:submit.prevent="login">
-                      <div class="relative w-full mb-3">
-                        <label class="block uppercase text-gray-700 text-xs font-bold mb-2" for="grid-password">
-                          Usuario
-                        </label>
-                        <input
-                          autocomplete="username"
-                          v-model="usuario"
-                          type="text"
-                          class="border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
-                          placeholder="Usuario"
-                          required
-                        />
-                      </div>
-
-                      <div class="relative w-full mb-3">
-                        <label
-                          class="
-                            block
-                            uppercase
-                            text-gray-700 text-xs
-                            font-bold
-                            mb-2
-                          "
-                          for="grid-password"
-                        >
-                          Password
-                        </label>
-                        <input
-                          autocomplete="current-password"
-                          v-model="password"
-                          type="password"
-                          class="
-                            border-0
-                            px-3
-                            py-3
-                            placeholder-gray-400
-                            text-gray-700
-                            bg-white
-                            rounded
-                            text-sm
-                            shadow
-                            focus:outline-none
-                            focus:ring
-                            w-full
-                          "
-                          placeholder="Password"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label class="inline-flex items-center cursor-pointer">
-                          <input
-                            id="customCheckLogin"
-                            type="checkbox"
-                            class="
-                              form-checkbox
-                              border-0
-                              rounded
-                              text-gray-800
-                              ml-1
-                              w-5
-                              h-5
-                            "
-                          />
-                          <span
-                            class="ml-2 text-sm font-semibold text-gray-700"
-                          >
-                            Recuerdame
-                          </span>
-                        </label>
-                      </div>
-
-                      <div class="text-center mt-6 text-white">
-                        <input
-                          class="
-                            bg-gray-900
-                            active:bg-gray-700
-                            text-sm
-                            font-bold
-                            uppercase
-                            px-6
-                            py-3
-                            rounded
-                            shadow
-                            hover:shadow-lg
-                            outline-none
-                            focus:outline-none
-                            mr-1
-                            mb-1
-                            w-full
-                          "
-                          type="submit"
-                          value="LOGIN"
-                        />
-                      </div>
-
-                      <!-- ERRORES -->
-
-                      <div v-if="error" role="alert">
-                        <div
-                          class="
-                            bg-red-500
-                            text-white
-                            font-bold
-                            rounded-t
-                            px-4
-                            py-2
-                          "
-                        >
-                          ¡Error!
-                        </div>
-                        <div
-                          class="
-                            border border-t-0 border-red-400
-                            rounded-b
-                            bg-red-100
-                            px-4
-                            py-3
-                            text-red-700
-                          "
-                        >
-                          {{ error_msg }}
-                        </div>
-                      </div>
-                      <div v-if="errorAPI !== ''" role="alert">
-                        <div
-                          class="
-                            bg-red-500
-                            text-white
-                            font-bold
-                            rounded-t
-                            px-4
-                            py-2
-                          "
-                        >
-                          ¡Error!
-                        </div>
-                        <div
-                          class="
-                            border border-t-0 border-red-400
-                            rounded-b
-                            bg-red-100
-                            px-4
-                            py-3
-                            text-red-700
-                          "
-                        >
-                          Fallo de conexion con API REST
-                        </div>
-                      </div>
-                    </form>
-                    <div></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <footer class="absolute w-full bottom-0 bg-gray-900 pb-6">
-            <div class="container mx-auto px-4">
-              <hr class="mb-6 border-b-1 border-gray-700" />
-              <div
-                class="
-                  flex flex-wrap
-                  items-center
-                  md:justify-between
-                  justify-center
-                "
-              >
-                <div class="w-full md:w-4/12 px-4">
-                  <div class="text-sm text-white font-semibold py-1">
-                    CC BY-NC-SA-ND 4.0
-                    <a
-                      href="https://www.ign.es"
-                      class="
-                        text-white
-                        hover:text-gray-400
-                        text-sm
-                        font-semibold
-                        py-1
-                      "
-                    >
-                      Instituto Geográfico Nacional</a
-                    >
-                  </div>
-                </div>
-                <div class="w-full md:w-8/12 px-4">
-                  <ul
-                    class="
-                      flex flex-wrap
-                      list-none
-                      md:justify-end
-                      justify-center
-                    "
-                  >
-                    <li>
-                      <a
-                        href="#"
-                        class="
-                          text-white
-                          hover:text-gray-400
-                          text-sm
-                          font-semibold
-                          block
-                          py-1
-                          px-3
-                        "
-                      >
-                        Proyecto BDIG
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        class="
-                          text-white
-                          hover:text-gray-400
-                          text-sm
-                          font-semibold
-                          block
-                          py-1
-                          px-3
-                        "
-                      >
-                        Acerca de
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </footer>
-        </section>
-      </main>
-    </div>
-  </div>
+      </div>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
@@ -371,6 +70,13 @@ export default {
       error: false,
       error_msg: "",
       errorAPI: "",
+
+      rules: {
+        usrNameRules: [],
+        passRules: [],
+      },
+
+      activateShowPassword: false,
     };
   },
 
@@ -384,15 +90,18 @@ export default {
         .get(`${process.env.VUE_APP_API_ROUTE}/conexion`)
         .then((data) => {
           if (data.status == 200) {
-            console.log("API REST Listo");
+            console.log("GOT API/REST lista, esperando peticiones");
           }
         })
-        .catch((errorAPI) => {
-          this.errorAPI = errorAPI;
-      });
+        .catch((error) => {
+          this.error = error,
+          this.error_msg = "Conexión Fallida con API/REST, contacte con soporte."
+        })
     },
 
     login() {
+      this.error_msg = null;
+
       let usrlogin = {
         usuario: this.usuario,
         password: md5(this.password),
@@ -410,11 +119,247 @@ export default {
             }
           })
         .catch(error => {
-
           this.error = error.response.data.error;
           this.error_msg = error.response.data.error_msg;
         })
     },
+
+    showPassword(){
+      if (this.activateShowPassword == true){
+        return "text"
+      } else {
+        return "password"
+      }
+    }
   },
 };
 </script>
+
+<style scoped>
+
+body {
+  height: 100vh;
+}
+
+a {
+  color: #92badd;
+  display:inline-block;
+  text-decoration: none;
+}
+
+h1 {
+  font-size: 3.5rem;
+}
+
+h1, h4 {
+  font-weight: 300 !important;
+}
+
+h2 {
+  text-align: center;
+  display:inline-block;
+  margin: 40px 8px 10px 8px; 
+}
+
+#gotApp {
+  background: linear-gradient(to bottom, #00216d, #39ace7);
+  height: 100vh;
+}
+
+
+.backImage {
+  width: 100vw !important;
+}
+
+.logo {
+  margin: 2rem 0rem 1rem 0rem;
+  color: gray;
+  font-weight:500;
+}
+
+.logo>img {
+  margin-top: 1rem;
+}
+
+/* STRUCTURE */
+.wrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column; 
+  justify-content: center;
+  width: 100%;
+  min-height: 100%;
+  padding: 20px;
+}
+
+.logInButton {
+  margin: 1rem auto;
+  display: block;
+  width: 93%;
+}
+
+.logInButton>input{
+  display: block;
+  width: 85%;
+}
+
+#formContent {
+  -webkit-border-radius: 10px 10px 10px 10px;
+  border-radius: 10px 10px 10px 10px;
+  background: #fff;
+  padding: 30px;
+  width: 90%;
+  max-width: 450px;
+  position: relative;
+  padding: 0px;
+  -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+#formFooter {
+  background-color: #f6f6f6;
+  border-top: 1px solid #dce8f1;
+  padding: 25px;
+  text-align: center;
+  -webkit-border-radius: 0 0 10px 10px;
+  border-radius: 0 0 10px 10px;
+}
+
+.inputText {
+  padding: 0rem 1rem !important;
+}
+
+/* TABS */
+
+h2.inactive {
+  color: #cccccc;
+}
+
+h2.active {
+  color: #0d0d0d;
+  border-bottom: 2px solid #5fbae9;
+}
+
+/* ANIMATIONS */
+
+/* Simple CSS3 Fade-in-down Animation */
+.fadeInDown {
+  -webkit-animation-name: fadeInDown;
+  animation-name: fadeInDown;
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+@-webkit-keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+/* Simple CSS3 Fade-in Animation */
+@-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.fadeIn {
+  opacity:0;
+  -webkit-animation:fadeIn ease-in 1;
+  -moz-animation:fadeIn ease-in 1;
+  animation:fadeIn ease-in 1;
+
+  -webkit-animation-fill-mode:forwards;
+  -moz-animation-fill-mode:forwards;
+  animation-fill-mode:forwards;
+
+  -webkit-animation-duration:1s;
+  -moz-animation-duration:1s;
+  animation-duration:1s;
+}
+
+.fadeIn.first {
+  -webkit-animation-delay: 0.4s;
+  -moz-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+}
+
+.fadeIn.second {
+  -webkit-animation-delay: 0.6s;
+  -moz-animation-delay: 0.6s;
+  animation-delay: 0.6s;
+}
+
+.fadeIn.third {
+  -webkit-animation-delay: 0.8s;
+  -moz-animation-delay: 0.8s;
+  animation-delay: 0.8s;
+}
+
+.fadeIn.fourth {
+  -webkit-animation-delay: 1s;
+  -moz-animation-delay: 1s;
+  animation-delay: 1s;
+}
+
+/* Simple CSS3 Fade-in Animation */
+.underlineHover:after {
+  display: block;
+  left: 0;
+  bottom: -10px;
+  width: 0;
+  height: 2px;
+  background-color: #56baed;
+  content: "";
+  transition: width 0.2s;
+}
+
+.underlineHover:hover {
+  color: #0d0d0d;
+}
+
+.underlineHover:hover:after{
+  width: 100%;
+}
+
+
+/* OTHERS */
+
+*:focus {
+    outline: none;
+} 
+
+#icon {
+  width:60%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.switcher {
+  margin-top: -1rem;
+}
+
+</style>

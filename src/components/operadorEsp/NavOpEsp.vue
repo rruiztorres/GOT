@@ -1,122 +1,94 @@
 <template>
   <div>
-    <v-list class="mb-4">
-      <div v-if="hacerMini == false">
-        <v-list-item-title class="ml-4 my-2 text-l font-bold"
-          >Bandejas de Jobs</v-list-item-title
-        >
-      </div>
-      <div v-if="hacerMini == true"></div>
+    <v-list 
+      dense
+      v-for="navGroup in navItems"
+      :key="navGroup.name">
+      
+      <h5 style="font-weight:400;">{{navGroup.group}}</h5>
+  
       <v-list-item
         dense
-        v-for="opcionJob in gestJobs"
+        v-for="opcionJob in navGroup.items"
         :key="opcionJob.name"
-        @click="activar(opcionJob.active)"
-        class="hover:bg-blue-100"
+        @click="emitChangeMenu(opcionJob.active)"
+        class="itemButton"
       >
         <v-list-item-icon>
           <v-icon color="#1E40AF" class="mr-3">{{ opcionJob.icon }}</v-icon>
-          <v-list-item-title
-            class="text-xs text-black"
-            >{{ opcionJob.name }}</v-list-item-title
-          >
-          <!-- -->
+          <v-list-item-title class="textItemButton">{{ opcionJob.name }}</v-list-item-title>
         </v-list-item-icon>
       </v-list-item>
     </v-list>
-
-    <v-list class="mb-4">
-      <div v-if="hacerMini == false">
-        <v-list-item-title class="ml-4 my-2 text-l font-bold"
-          >Gestión IDVs</v-list-item-title
-        >
-      </div>
-      <div v-if="hacerMini == true"></div>
-
-      <v-list-item
-        dense
-        v-for="opcionIDV in idvs"
-        :key="opcionIDV.name"
-        @click="activar(opcionIDV.active)"
-        class="hover:bg-blue-100"
-      >
-        <v-list-item-icon>
-          <v-icon color="#1E40AF" class="mr-3">{{ opcionIDV.icon }}</v-icon>
-          <v-list-item-title class="text-xs text-black">{{
-            opcionIDV.name
-          }}</v-list-item-title>
-        </v-list-item-icon>
-      </v-list-item>
-    </v-list>
-
-    <v-list class="mb-4">
-      <div v-if="hacerMini == false">
-        <v-list-item-title class="ml-4 my-2 text-l font-bold"
-          >Informes</v-list-item-title
-        >
-      </div>
-      <div v-if="hacerMini == true"></div>
-      <v-list-item
-        dense
-        v-for="informe in informes"
-        :key="informe.name"
-        class="hover:bg-blue-100"
-        @click="activar(opcionJob.active)"
-      >
-        <v-list-item-icon>
-          <v-icon color="#1E40AF" class="mr-3">{{ informe.icon }}</v-icon>
-          <v-list-item-title class="text-xs text-black">{{
-            informe.name
-          }}</v-list-item-title>
-        </v-list-item-icon>
-      </v-list-item>
-    </v-list>
-  </div>
+  </div>  
 </template>
 
 <script>
 export default {
   name: "NavGJ",
-  props: {
-    hacerMini: {
-      type: Boolean,
-      default: false,
-    },
-    numJobsBdjaOpEsp: {
-      default: 0,
-    }
-  },
   methods: {
-    activar(datos) {
-      this.$emit("cambiomenu", datos);
+      emitChangeMenu(datos) {
+        this.$emit('cambiomenu', datos);
+      },
+      changeRole(rol) {
+        this.userRole = rol;
+        localStorage.rol = rol;
+      },
     },
-    cambiarRol(rol) {
-      this.userRole = rol;
-      localStorage.rol = rol;
-      console.log("el rol pasó a ser " + rol);
+
+    watch: {
+      userRole() {},
     },
-  },
 
-  watch: {
-    userRole() {},
-  },
+    data() {
+        return {
+          navItems:[
+            { group: 'Jobs',
+              items: [
+                {name:'Mis Jobs', icon:'mdi-briefcase-account', active:'BandejaMisJobs'}, 
+                {name:'Bandeja Operador Esp.', icon:'mdi-inbox-multiple', active:'BandejaOpEsp'},
+                {name:'Bandeja Operador', icon:'mdi-inbox', active:'BandejaOp'},
+              ]
+            },
+            { group: "IDV",
+              items: [
+                {name:'Nueva IDV', icon:'mdi-briefcase-account', active:''},
+                {name:"IDV's en edición", icon:'mdi-briefcase-account', active:''},
 
-  data() {
-    return {
-      gestJobs: [
-        { name: "Mis Jobs", icon: "mdi-briefcase-account", active: "BandejaMisJobs"},
-        { name: "Bandeja Operador Esp.", icon: "mdi-inbox-multiple", active: "BandejaOpEsp"},
-        { name: "Bandeja Operador", icon: "mdi-inbox", number: 780, active: "BandejaOp" },
-      ],
-      idvs: [
-        { name: "Generar IDV", icon: "mdi-briefcase-account" },
-        { name: "IDV's en edición", icon: "mdi-briefcase-account" },
-      ],
-      informes: [
-        { name: "Vista General", icon: "mdi-finance" },
-        { name: "Mis KPI", icon: "mdi-card-account-details-star" },
-      ],
-    };
-  },
+              ]
+            },
+            {
+              group: 'Informes',
+              items: [
+                {name:'Vista General', icon:'mdi-finance', active:''},
+              ]
+            },
+          ],
+        // FIN DATA
+        }
+    },
 };
 </script>
+
+<style scoped>
+  .subheader {
+    border: 1px solid white
+  }
+
+  h5 {
+    font-weight: 500 !important;
+    font-size: 84%;
+    padding: 0.5rem;
+    margin-left: 0.6rem;
+    border-bottom: 0.055rem solid #e3e4e8
+  }
+
+  .itemButton:hover {
+    background-color: #dbeafe;
+  }
+
+  .textItemButton {
+    font-weight: 400 !important;
+  }
+
+</style>

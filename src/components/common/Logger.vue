@@ -1,126 +1,117 @@
 <template>
-  <v-container>
-    <!--LOG DEL JOB-->
-    <v-row>
-      <v-col cols="12" md="4">
-        <v-card style="max-height:84vh;" class="overflow-y-auto">
-          <v-card-title class="bg-blue-200">LOG DEL JOB</v-card-title>
-          <v-list three-line class="pt-0">
-            <template v-for="item in log">
-              <v-list-item :key="item.hora" :class="item.class">
-                <v-list-item-avatar>
-                  <v-icon
-                    :title="item.procDesc"
-                    :class="item.claseProceso"
-                    dark
-                  >
-                    {{ item.icon }}
-                  </v-icon>
-                </v-list-item-avatar>
+  <v-row>
+    <v-col cols="12" md="4">
 
-                <v-list-item-content>
-                  <v-list-item-subtitle
-                    v-html="`${item.fecha} - ${item.hora}`"
-                  ></v-list-item-subtitle>
-                  <v-list-item-title v-html="item.title"></v-list-item-title>
-                  <v-list-item-subtitle
-                    v-html="item.subtitle"
-                  ></v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </template>
-          </v-list>
-        </v-card>
-      </v-col>
+      <!-- LOG DEL JOB -->
+      <v-card class="card">
+        <v-card-title class="processTitle">LOG DEL JOB</v-card-title>
+        <v-list three-line>
+          <template v-for="item in log">
+            <v-list-item :key="item.hora" :class="item.class">
+              <v-list-item-avatar>
+                <v-icon :title="item.procDesc" :class="item.claseProceso" dark>
+                  {{ item.icon }}
+                </v-icon>
+              </v-list-item-avatar>
 
-      <!--ACCIONES DISPONIBLES-->
-      <v-col cols="12" md="3">
-        <!-- Las card las podemos sacar a componente?-->
-        <v-card style="max-height:84vh;" class="overflow-y-auto">
-          <v-card-title class="bg-blue-200">ACCIONES DISPONIBLES</v-card-title>
-          <v-card-actions>
-            <div class="w-full p-6">
-                <v-btn block color="error" class="mb-3" @click="dummy()">Pausar Job</v-btn>
-                <v-btn block color="primary" class="mb-3" @click="dummy()">Otra cosa</v-btn>
-                <v-btn block color="primary" class="mb-3" @click="dummy()">Otra cosa</v-btn>
-                <v-btn block :loading="buttonLoading" color="success" class="mb-3" @click="buttonLoading = !buttonLoading">
-                    <v-icon dark class="mr-4">mdi-robot-industrial</v-icon>
-                    Solicitar Versión
-                </v-btn>
-            </div>
-          </v-card-actions>
-        </v-card>
-      </v-col>
+              <v-list-item-content>
+                <v-list-item-subtitle
+                  v-html="`${item.fecha} - ${item.hora}`"
+                ></v-list-item-subtitle>
+                <v-list-item-title v-html="item.title"></v-list-item-title>
+                <v-list-item-subtitle
+                  v-html="item.subtitle"
+                ></v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </template>
+        </v-list>
+      </v-card>
+    </v-col>
 
-      <!--RESUMEN JOB-->
-      <v-col cols="12" md="5">
-        <!-- Las card las podemos sacar a componente?-->
-        <v-card style="max-height:84vh;" class="overflow-y-auto">
-          <v-card-title
-            class="bg-blue-200"
-            title="No se puede finalizar un job con errores pendientes de solución"
-          >
-            ESTADO
-            <v-spacer></v-spacer>
-            <v-btn disabled class="bg-green-500" dark text>
-              GESTIONAR SOLUCIÓN</v-btn
+    <!-- ACCIONES DISPONIBLES -->
+    <v-col cols="12" md="3">
+      <!-- Las card las podemos sacar a componente?-->
+      <v-card class="card">
+        <v-card-title class="processTitle">ACCIONES DISPONIBLES</v-card-title>
+          <div class="actionBtnGroup">
+            <v-btn class="actionBtn" block color="error" @click="dummy()">Pausar Job</v-btn>
+            <v-btn class="actionBtn" block color="primary" @click="dummy()">Otra cosa</v-btn>
+            <v-btn class="actionBtn" block color="primary" @click="dummy()">Otra cosa</v-btn>
+            <v-btn
+              block
+              :loading="buttonLoading"
+              color="success"
+              @click="buttonLoading = !buttonLoading"
             >
-          </v-card-title>
-          <div class="p-3">
-            <v-row>
-              <v-col cols="12">
-                <v-card>
-                  <div class="bg-gray-200 w-full p-1">
-                    <h2 class="ml-2">Job</h2>
-                  </div>
-                  <v-data-table
-                    :headers="jobHeaders"
-                    :items="[job]"
-                    class="font-sans"
-                    hide-default-footer
-                  >
-                    <template v-slot:[`item.estado`]="{ item }">
-                      <v-chip :color="getColor(item.estado)" dark>
-                        {{ item.estado }}
-                      </v-chip>
-                    </template>
-                  </v-data-table>
-                </v-card>
-              </v-col>
-            </v-row>
-
-            <v-row>
-              <v-col cols="12">
-                <v-card>
-                  <div class="bg-gray-200 w-full p-1">
-                    <h2 class="ml-2">Errores</h2>
-                  </div>
-                  <v-data-table
-                    :headers="errorHeaders"
-                    :items="errores"
-                    class="font-sans"
-                    hide-default-footer
-                  >
-                    <template v-slot:[`item.estado`]="{ item }">
-                      <v-chip :color="getColor(item.estado)" dark>
-                        {{ item.estado }}
-                      </v-chip>
-                    </template>
-                  </v-data-table>
-                </v-card>
-              </v-col>
-            </v-row>
+              <v-icon dark>mdi-robot-industrial</v-icon>
+              Solicitar Versión
+            </v-btn>
           </div>
+      </v-card>
+    </v-col>
 
-          <v-card-actions>
-            <v-alert dense outlined type="error" class="w-full">
-              El job aun tiene errores pendientes de solución
-            </v-alert>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+    <!-- RESUMEN JOB -->
+    <v-col cols="12" md="5">
+      <!-- Las card las podemos sacar a componente?-->
+      <v-card class="card">
+        <v-card-title class="processTitle">
+          ESTADO
+          <v-spacer></v-spacer>
+          <v-btn elevation="2" class="processBtn" dark text>
+            GESTIONAR SOLUCIÓN</v-btn
+          >
+        </v-card-title>
+        <div class="cardContainer">
+          <v-row>
+            <v-col cols="12">
+              <v-card class="card cardContainer cardBgGray">
+                <div>
+                  <h2>Job</h2>
+                </div>
+                <v-data-table
+                  :headers="jobHeaders"
+                  :items="[job]"
+                  hide-default-footer
+                >
+                  <template v-slot:[`item.estado`]="{ item }">
+                    <v-chip :color="getColor(item.estado)" dark>
+                      {{ item.estado }}
+                    </v-chip>
+                  </template>
+                </v-data-table>
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="12">
+              <v-card class="card cardContainer cardBgGray">
+                <div class="errorsTitle">
+                  <h2>Errores</h2>
+                  <v-spacer></v-spacer>
+                  <v-alert dense outlined class="alertErrors" type="error">
+                    El job aun tiene errores pendientes de solución
+                  </v-alert>
+                </div>
+                <v-data-table
+                  :headers="errorHeaders"
+                  :items="errores"
+                  hide-default-footer
+                >
+                  <template v-slot:[`item.estado`]="{ item }">
+                    <v-chip :color="getColor(item.estado)" dark>
+                      {{ item.estado }}
+                    </v-chip>
+                  </template>
+                </v-data-table>
+              </v-card>
+            </v-col>
+          </v-row>
+        </div>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -131,7 +122,7 @@ import { getColor } from "@/assets/mixins/getColor";
 export default {
   name: "Logger",
 
-  props: ["jobsRecibidos", "erroresRecibidos" ,"actualizarInfo"],
+  props: ["jobsRecibidos", "erroresRecibidos", "actualizarInfo"],
 
   mixins: [getLogIcons, getColor],
 
@@ -145,8 +136,8 @@ export default {
     },
 
     returnInfo() {
-        return this.actualizarInfo;
-    }
+      return this.actualizarInfo;
+    },
   },
 
   created() {
@@ -155,45 +146,43 @@ export default {
   },
 
   watch: {
-    jobsRecibidos() {      
+    jobsRecibidos() {
+      this.initialize();
+    },
+
+    actualizarInfo() {
+      console.log("actualizar es->", this.actualizarInfo);
+      if (this.actualizarInfo == true) {
+        console.log("ejecuto initialize por actualizacion info");
         this.initialize();
+      }
     },
 
-    actualizarInfo(){
-        console.log("actualizar es->", this.actualizarInfo)
-        if(this.actualizarInfo == true){
-            console.log("ejecuto initialize por actualizacion info")
-            this.initialize();
-        }
+    log() {
+      console.log("el log cambio");
     },
-
-    log(){
-        console.log("el log cambio")
-    }
-
   },
 
   methods: {
     initialize() {
-        //Reinicio de variables
-        if (this.jobsRecibidos != undefined) {
+      //Reinicio de variables
+      if (this.jobsRecibidos != undefined) {
         this.job = this.jobsRecibidos;
-        }
+      }
 
-        if (this.erroresRecibidos != undefined) {
+      if (this.erroresRecibidos != undefined) {
         this.errores = this.erroresRecibidos;
-        }
+      }
 
-        this.log = [];
+      this.log = [];
 
-        axios
+      axios
         .get(`${process.env.VUE_APP_API_ROUTE}/getLogByJob/` + this.job.job)
         .then((data) => {
-            if (data.status == 201) {
+          if (data.status == 201) {
             this.returnFormatLog(data.data.log);
-            }
-        }); 
-        
+          }
+        });
     },
 
     returnFormatLog(log) {
@@ -235,3 +224,55 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.card {
+  border: 1px solid white;
+  max-height: 84vh;
+  overflow-y: auto;
+}
+
+h2 {
+  font-weight: 400 !important;
+}
+
+.processTitle {
+  background-color: #bfdbfe;
+  font-weight: 400 !important;
+}
+
+.processBtn {
+  background-color: green;
+  font-weight: 400 !important;
+}
+
+.actionBtnGroup {
+  padding: 1rem;
+}
+
+.actionBtn {
+  font-weight: 400 !important;
+  margin-bottom: 0.5rem;
+}
+
+.cardContainer {
+  padding: 1rem;
+}
+
+.cardBgGray {
+  background-color: #eceff1;
+}
+
+.alertErrors {
+  margin: 0rem 0rem 0.5rem 0rem !important;
+  font-weight: 400 !important;
+}
+
+.alertContainer {
+  margin-top: 0.5rem;
+}
+
+.errorsTitle {
+  display: flex;
+}
+</style>
