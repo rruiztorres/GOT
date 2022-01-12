@@ -96,10 +96,7 @@
           </template>
 
           <template v-slot:no-data>
-            <div >
-              <h1>VAYA...</h1>
-              <h1>Parece que no existen jobs que puedan recuperarse</h1>
-            </div>
+            <NoData :mensaje="noDataMensaje" :opcion="noDataOpcion"></NoData>
           </template>
 
           <template v-slot:[`item.estado`]="{ item }">
@@ -129,6 +126,7 @@
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import VerIncidencia from "@/components/common/VerIncidencia";
+import NoData from "@/components/common/NoData";
 
 
 export default {
@@ -136,6 +134,7 @@ export default {
   mixins: [getColor],
   components: {
     VerIncidencia,
+    NoData,
   },
 
   data: () => ({
@@ -171,6 +170,10 @@ export default {
     showMessage: false,
     message: '',
     messageType: '',
+
+    //NO DATA SLOT
+    noDataMensaje: 'Vaya... parece que no hay Jobs que puedan recuperarse',
+    noDataOpcion: 'Si existe algún problemá técnico puedes contactar con un administrador',
   }),
 
   computed: {

@@ -72,7 +72,7 @@
         </template>
 
         <template v-slot:no-data>
-          <v-btn color="primary" @click="initialize">Reset</v-btn>
+          <NoData :mensaje="noDataMensaje" :opcion="noDataOpcion"></NoData>
         </template>
 
         <template v-slot:[`item.estado`]="{ item }">
@@ -95,10 +95,12 @@
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import { checkBlocking } from "@/assets/mixins/checkBlocking.js";
+import NoData from "@/components/common/NoData";
 
 export default {
   name: "BandejaOpEsp",
   mixins: [getColor, checkBlocking],
+  components: { NoData, },
 
   data: () => ({
     dialog: false,
@@ -141,6 +143,10 @@ export default {
       job_detectado: "",
       job_arreglar: "",
     },
+
+    //NO DATA SLOT
+    noDataMensaje:'Parece que no tienes ningún Job asignado aun...' ,
+    noDataOpcion: 'Echa un vistazo por si hubiera algún job en bandeja que puedas ejecutar',
   }),
 
   computed: {
