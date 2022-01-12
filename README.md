@@ -14,13 +14,13 @@
     <img src="https://img.shields.io/badge/npm-v8.3.0-blue">
   </a>
   <a title="Language" href="https://vuejs.org/" target="_blank">
-    <img src="https://img.shields.io/badge/Lang-vuejs 2-brightgreen">
+    <img src="https://img.shields.io/badge/Lang-Vuejs 2-brightgreen">
   </a>  
   <a title="Language" href="https://vuetifyjs.com/en/" target="_blank">
     <img src="https://img.shields.io/badge/Lang-Vuetify-brightgreen">
   </a> 
-  <a title="Language" href="https://tailwindcss.com/" target="_blank">
-    <img src="https://img.shields.io/badge/Lang-Tailwind css-brightgreen">
+  <a title="Language" href="https://www.w3.org/Style/CSS/" target="_blank">
+    <img src="https://img.shields.io/badge/Lang-CSS3-brightgreen">
   </a>
   <a title="GNU GPL v3" href="LICENSE.md">
     <img src="https://img.shields.io/badge/License-GPLv3-red.svg">
