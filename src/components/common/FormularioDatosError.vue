@@ -15,6 +15,8 @@
                 class="textAreaError"
                 v-model="descripcion"
                 filled label="Descripción del error"
+                counter
+                :rules="[errorRules.required, errorRules.counter]"
                 auto-grow
                 value=""
                 ></v-textarea>
@@ -57,9 +59,18 @@
                 class="actionForm"
             >
                 <v-spacer></v-spacer>
-                <v-btn color="error" dark @click="closeEditError()"
+                <v-btn
+                class="button"
+                color="error" 
+                dark 
+                @click="closeEditError()"
                 >CANCELAR</v-btn>
-                <v-btn color="success" dark @click="storeErrorData()"
+                <v-btn
+                :disabled="disableAceptarError || descripcion.length == 0"
+                color="success" 
+                :dark="!disableAceptarError"
+                class="button" 
+                @click="storeErrorData()"
                 >ACEPTAR</v-btn>
             </v-card-actions>
             </div>
@@ -85,6 +96,16 @@ import { makeArrayFromApi } from '@/assets/mixins/makeArrayFromApi.js';
         computed: {
             returnError(){
             return this.error;
+            },
+        },
+
+        watch:{
+            descripcion(){
+                if(this.descripcion.length >= 255 || this.descripcion.length == 0){
+                    this.disableAceptarError = true;
+                } else {
+                    this.disableAceptarError = false;
+                }
             },
         },
 
@@ -123,11 +144,17 @@ import { makeArrayFromApi } from '@/assets/mixins/makeArrayFromApi.js';
 
         data(){
             return{
-                descripcion: '',              //Descripcion del error -> recibimos en prop
+                descripcion: '',            //Descripcion del error -> recibimos en prop
                 arrayTemaError:[],          //Array temas error -> obtenidos en getErrorParameters
                 seleccionTemaError: [],     //Seleccion tema error -> valor por defecto y seleccion de tema en el array
                 arrayTipoError: [],         //Array tipos error -> obtenidos en getErrorParameters
                 seleccionTipoError: [],     //Seleccion tipo error -> valor por defecto y seleccion de tipo en el array
+
+                errorRules: {
+                required: value => !!value || 'Este campo es obligatorio.',
+                counter: value => value.length <= 255 || 'Máximo 255 caracteres'
+                },
+                disableAceptarError: false,
             }
         }
     }
@@ -160,8 +187,11 @@ import { makeArrayFromApi } from '@/assets/mixins/makeArrayFromApi.js';
         background-color: #ECEFF1;
     }
 
-
     .formRowTitle {
         margin-top: 0.46rem;
+    }
+
+    .button {
+        font-weight: 400 !important;
     }
 </style>

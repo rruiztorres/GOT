@@ -122,6 +122,7 @@
                         v-if="atribute.error != null"
                     >
                         <vl-overlay
+                        class="showIdErrorContainer"
                         :position="atribute.geometria_json.coordinates"
                         :offset="[-48, -45]">
                             <p>
@@ -251,9 +252,11 @@
                         <!--TextEditor descripciones error-->
                         <v-col cols="12">
                         <v-textarea
+                            counter
                             class="textAreaJob"
                             v-model="descJob"
                             dense filled auto-grow
+                            :rules="[jobRules.required, jobRules.counter]"
                             label="Descripción del Job"
                         ></v-textarea>
                         </v-col>
@@ -264,10 +267,9 @@
                         <v-row class="formRow">
                             <v-col 
                             cols="4"> Job Grande: </v-col>
-                            <v-col cols="8" style="padding:0rem 0.7rem 1rem; 0rem;">
+                            <v-col cols="8" class="vColJobGran">
                                 <v-switch
                                 class="switchBigJob"
-                                style="padding-top:0.5rem;"
                                 inset
                                 v-model="jobGrande"
                                 ></v-switch>
@@ -376,9 +378,18 @@
                             class="actionForm"
                         >
                             <v-spacer></v-spacer>
-                            <v-btn color="error" dark @click="abortInsertion('jobs')"
+                            <v-btn
+                            class="button" 
+                            color="error" 
+                            dark 
+                            @click="abortInsertion('jobs')"
                             >CANCELAR</v-btn>
-                            <v-btn color="success" dark @click="storeAttrbJobs"
+                            <v-btn 
+                            class="button"
+                            :disabled="disableAceptarJob || descJob == null"
+                            color="success" 
+                            :dark="!disableAceptarJob"
+                            @click="storeAttrbJobs"
                             >ACEPTAR</v-btn>
                         </v-card-actions>
                     </div>
@@ -405,6 +416,8 @@
                         <v-textarea
                         class="textAreaError"
                         v-model="descError"
+                        counter
+                        :rules="[errorRules.required, errorRules.counter]"
                         filled label="Descripción del error"
                         auto-grow
                         value=""
@@ -447,9 +460,18 @@
                         class="actionForm"
                     >
                         <v-spacer></v-spacer>
-                        <v-btn color="error" dark @click="abortInsertion('errores')"
+                        <v-btn 
+                        class="button"
+                        color="error" 
+                        dark
+                        @click="abortInsertion('errores')"
                         >CANCELAR</v-btn>
-                        <v-btn color="success" dark @click="storeAttrbErrors"
+                        <v-btn
+                        class="button"
+                        :disabled="disableAceptarError || descError == null"
+                        color="success" 
+                        :dark="!disableAceptarError"
+                        @click="storeAttrbErrors"
                         >ACEPTAR</v-btn>
                     </v-card-actions>
                     </div>
@@ -553,9 +575,31 @@
                     class="actionForm"
                 >
                 <v-spacer></v-spacer>
-                    <v-btn color="error" elevation="3" @click="closeWindowInfoJob()">CANCELAR</v-btn>
-                    <v-btn :disabled="modoMapa == 'visualizar'" color="primary" elevation="3" @click="openFormEditJob()">EDITAR</v-btn>
-                    <v-btn color="success" elevation="3" @click="updateEditedJob()">ACEPTAR</v-btn>
+                    <v-btn
+                    class="button"
+                    color="error" 
+                    elevation="3" 
+                    @click="closeWindowInfoJob()"
+                    >
+                    CANCELAR
+                    </v-btn>
+                    <v-btn
+                    class="button" 
+                    :disabled="modoMapa == 'visualizar'" 
+                    color="primary" 
+                    elevation="3" 
+                    @click="openFormEditJob()"
+                    >
+                    EDITAR
+                    </v-btn>
+                    <v-btn
+                    class="button" 
+                    color="success" 
+                    elevation="3" 
+                    @click="updateEditedJob()"
+                    >
+                    ACEPTAR
+                    </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -610,9 +654,31 @@
                 class="actionForm"
                 >
                 <v-spacer></v-spacer>
-                    <v-btn color="error" elevation="3" @click="ventanaInfoError = false">CANCELAR</v-btn>
-                    <v-btn :disabled="modoMapa == 'visualizar'" color="primary" elevation="3" @click="openFormEditError()">EDITAR</v-btn>
-                    <v-btn color="success" elevation="3" @click="updateEditedError()">ACEPTAR</v-btn>
+                    <v-btn
+                    class="button" 
+                    color="error" 
+                    elevation="3" 
+                    @click="ventanaInfoError = false"
+                    >
+                    CANCELAR
+                    </v-btn>
+                    <v-btn
+                    class="button" 
+                    :disabled="modoMapa == 'visualizar'" 
+                    color="primary" 
+                    elevation="3" 
+                    @click="openFormEditError()"
+                    >
+                    EDITAR
+                    </v-btn>
+                    <v-btn
+                    class="button"
+                    color="success" 
+                    elevation="3" 
+                    @click="updateEditedError()"
+                    >
+                    ACEPTAR
+                    </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -686,6 +752,22 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
         },
 
         watch:{
+            descError(){
+                if(this.descError.length >= 255 || this.descError.length == 0){
+                    this.disableAceptarError = true;
+                } else {
+                    this.disableAceptarError = false;
+                }
+            },
+
+            descJob(){
+                if(this.descJob.length >= 255 || this.descJob.length == 0){
+                    this.disableAceptarJob = true;
+                } else {
+                    this.disableAceptarJob = false;
+                }
+            },
+
             jobs(){
                 if(this.jobs.length != 0 && this.toolActive == 'drawJobs'){
                     this.editJob = true
@@ -1327,7 +1409,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
             //FORMULARIO ALTA JOB   
             editJob: false,             //Visibilidad ventana editar atributos
-            descJob: '',                //TextArea Descripcion Job
+            descJob: null,                //TextArea Descripcion Job
             jobGrande: false,           //Valor
             expediente:[],
             expedienteJob:[],
@@ -1343,14 +1425,24 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             tipoBandejaJob: [],
             nombreOperador: [],         //Array desde BD llenar en initialize
             nombreOperadorJob: [],
+            jobRules: {
+                required: value => !!value || 'Este campo es obligatorio.',
+                counter: value => value.length <= 255 || 'Máximo 255 caracteres'
+            },
+            disableAceptarJob: true,
 
             //FORMULARIO ALTA ERROR
             editError: false,
-            descError: '',
+            descError: null,
             temaError:[],
             selectTema: [],
             tipoError: [],
             selectTipoError: [],
+            errorRules: {
+                required: value => !!value || 'Este campo es obligatorio.',
+                counter: value => value.length <= 255 || 'Máximo 255 caracteres'
+            },
+            disableAceptarError: true,
             
 
             //MENSAJES FLOTANTES         
@@ -1462,7 +1554,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
     }
 
     .textAreaError {
-        margin-top: 0.5rem;
+        margin: 0.5rem 0rem -1.8rem 0rem;
     }
 
     .titleJobForm {
@@ -1479,6 +1571,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
     .switchBigJob {
         margin-top: 0.2rem;
         margin-bottom: 0.2rem;
+        padding-top: 0.5rem;
     }
 
     .actionForm {
@@ -1488,11 +1581,19 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
     }
 
     .textAreaJob {
-        margin-top: 0.5rem;
+        margin: 0.5rem 0rem -1rem 0rem;
     }
 
     .formRowTitle {
         margin-top: 0.46rem;
+    }
+
+    .button {
+        font-weight: 400 !important;
+    }
+
+    .vColJobGran {
+        padding: 0rem 0.7rem 1rem 0.8rem;
     }
 
     /*MENSAJES DE ALERTA*/
@@ -1508,6 +1609,16 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
     .alertActions {
         height: 100%;
         margin: auto;
+    }
+
+    /*MOSTRAR ID ERROR EN MAPA */
+    .showIdErrorContainer {
+        font-size:90%;
+        height: 2rem;
+        padding: 0.35rem 0.5rem 0rem 0.5rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0px 1px 5px 2px gray;
     }
 
 </style>

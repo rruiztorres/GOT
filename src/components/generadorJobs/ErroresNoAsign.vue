@@ -71,7 +71,7 @@
           </template>
 
           <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
+            <NoData :mensaje="noDataMensaje" :opcion="noDataOpcion"></NoData>
           </template>
 
           <template v-slot:[`item.estado`]="{ item }">
@@ -102,11 +102,13 @@
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import { generarJobError } from '@/assets/mixins/generarJobError';
+import NoData from "@/components/common/NoData";
 
 
 export default {
   name: "ErroresNoAsign",
   mixins: [getColor, generarJobError],
+  components: {NoData,},
 
   data: () => ({
     dialog: false,
@@ -146,6 +148,10 @@ export default {
     showMessage: false,
     message: '',
     messageType: '',
+
+    //NO DATA SLOT
+    noDataMensaje: 'En estos momentos no existen Errores sin asignar',
+    noDataOpcion: 'Puedes encontrar nuevos errores haciendo una revisión visual en Alta de Jobs / Errores',
   }),
 
   computed: {

@@ -131,16 +131,7 @@
           </template>
 
           <template v-slot:no-data>
-            <div>
-                <v-progress-circular
-                  :size="70"
-                  :width="7"
-                  color="blue"
-                  indeterminate
-                ></v-progress-circular>
-                <br/>
-                <h2>Recuperando Jobs desde la base de datos ... por favor espere.</h2>
-            </div>
+            <NoData :mensaje="noDataMensaje" :opcion="noDataOpcion"></NoData>
           </template>
 
           <template v-slot:[`item.estado`]="{ item }">
@@ -235,7 +226,8 @@ import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import { generarJobError } from '@/assets/mixins/generarJobError';
 import EditarJob from '@/components/generadorJobs/EditarJob.vue';
-import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry';
+import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry'
+import NoData from "@/components/common/NoData";
 
 
 export default {
@@ -243,6 +235,7 @@ export default {
   mixins: [getColor, generarJobError, stringifyJobGeometry],
   components: {
     EditarJob,
+    NoData,
   },
 
   data: () => ({
@@ -294,6 +287,10 @@ export default {
       observaciones: null,
       finalizado: null,
     }],
+
+     //NO DATA SLOT
+    noDataMensaje: 'En estos momentos no existen Jobs que requieran triaje.',
+    noDataOpcion: 'Echa un vistazo a los errores sin asignar por si puedes generar nuevos Jobs.',
   }),
 
   watch: {
