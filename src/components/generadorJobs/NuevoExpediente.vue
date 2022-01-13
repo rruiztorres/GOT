@@ -8,7 +8,12 @@
           <v-btn class="newExpBtn" color="error" dark @click="closeExpediente"
             >CANCELAR</v-btn
           >
-          <v-btn class="newExpBtn" color="success" dark @click="saveExpediente"
+          <v-btn 
+          :disabled="returnObservacionesLength() > 255"
+          class="newExpBtn" 
+          color="success" 
+          dark 
+          @click="saveExpediente"
             >ACEPTAR</v-btn
           >
         </v-card-actions>
@@ -33,6 +38,10 @@
             <div>
               <TextEditor @editor="storeObservationsExp"></TextEditor>
             </div>
+            <div class="obsLengthContainer">
+              <h5 v-if="returnObservacionesLength()<=255" class="obsLengthOK">{{returnObservacionesLength()}}</h5>
+              <h5 v-else class="obsLengthERR">{{returnObservacionesLength()}}</h5>
+            </div>
           </v-col>
         </v-row>
 
@@ -54,7 +63,7 @@
                   locale="es-ES"
                   :first-day-of-week="1"
                   :show-current="false"
-                  width="318"
+                  class="widthCal"
                   color="green"
                   v-model="fechaInicio"
                 ></v-date-picker>
@@ -79,7 +88,7 @@
               locale="es-ES"
               :first-day-of-week="1"
               :show-current="false"
-              width="318"
+              class="widthCal"
               color="red"
               v-model="fechaFin"
             ></v-date-picker>
@@ -130,10 +139,25 @@ export default {
     this.retrieveExpFromBD();
   },
 
+  watch:{
+    observaciones(){
+      console.log(this.observaciones)
+      if(this.observaciones.length > 255){
+        //
+      }
+    }
+  },
+
   methods: {
     initializeParameters() {
-      this.nExp = "";
+      this.nExp = null;
       this.storeObservationsExp("");
+    },
+
+    returnObservacionesLength(){
+      let longitudCadena = this.observaciones.replace(/<[^>]*>/g, '')
+      longitudCadena = longitudCadena.length;
+      return longitudCadena;
     },
 
     closeExpediente() {
@@ -229,7 +253,7 @@ export default {
 
       fechaFin: "",
 
-      observaciones: "",
+      observaciones: null,
       nExp: "",
       expedientesBD: [],
 
@@ -245,7 +269,7 @@ export default {
       modal: false,
 
       rules: {
-        required: (value) => !!value || "Obligatorio.",
+        required: (value) => !!value || "Este campo es obligatorio.",
         formNumExp: (value) =>
           value.length == 13 || "El formato debe ser AAAA_00000000",
       },
@@ -257,7 +281,7 @@ export default {
 <style scoped>
 .newExpContainer {
   width: 80vw;
-  max-width: 715px;
+  max-width: 735px;
   max-height: 95vh;
   overflow-y: auto;
 }
@@ -317,4 +341,24 @@ h3 {
 .oblText {
   margin-top: 1rem;
 }
+
+.obsLengthOK {
+  display: block;
+  text-align: right;
+  font-weight: 400 !important;
+  margin-right: 0.5rem;
+}
+
+.obsLengthERR {
+  display: block;
+  text-align: right;
+  font-weight: 400 !important;
+  margin-right: 0.5rem;
+  color:red;
+}
+
+.widthCal {
+  width: 100vh;
+}
+
 </style>
