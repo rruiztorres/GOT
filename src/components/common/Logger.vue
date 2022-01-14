@@ -7,7 +7,7 @@
         <v-card-title class="processTitle">LOG DEL JOB</v-card-title>
         <v-list three-line>
           <template v-for="item in log">
-            <v-list-item :key="item.hora" :class="item.class">
+            <v-list-item :key="item.id_log" :class="item.class">
               <v-list-item-avatar>
                 <v-icon :title="item.procDesc" :class="item.claseProceso" dark>
                   {{ item.icon }}
@@ -90,9 +90,11 @@
                 <div class="errorsTitle">
                   <h2>Errores</h2>
                   <v-spacer></v-spacer>
-                  <v-alert dense outlined class="alertErrors" type="error">
-                    El job aun tiene errores pendientes de solución
-                  </v-alert>
+                  <div v-if="errores.length != 0">
+                    <v-alert dense outlined class="alertErrors" type="error">
+                      El job aun tiene errores pendientes de solución
+                    </v-alert>
+                  </div>
                 </div>
                 <v-data-table
                   :headers="errorHeaders"
@@ -103,6 +105,10 @@
                     <v-chip :color="getColor(item.estado)" dark>
                       {{ item.estado }}
                     </v-chip>
+                  </template>
+
+                  <template v-slot:no-data>
+                    Este job no contiene errores asociados
                   </template>
                 </v-data-table>
               </v-card>
@@ -151,15 +157,9 @@ export default {
     },
 
     actualizarInfo() {
-      console.log("actualizar es->", this.actualizarInfo);
       if (this.actualizarInfo == true) {
-        console.log("ejecuto initialize por actualizacion info");
         this.initialize();
       }
-    },
-
-    log() {
-      console.log("el log cambio");
     },
   },
 
@@ -189,6 +189,7 @@ export default {
       for (this.index in log) {
         this.arrayFecha = log[this.index].fecha.split("T");
         this.logNewEntry = {
+          id: log[this.index].id_log,
           claseProceso: "green",
           class: "",
           icon: this.getLogIcons(log[this.index].codigo),
@@ -274,5 +275,6 @@ h2 {
 
 .errorsTitle {
   display: flex;
+  height: 2.8rem;
 }
 </style>
