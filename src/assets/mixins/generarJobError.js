@@ -72,7 +72,7 @@ export const generarJobError = {
                     for (this.errorIndex in errores){
                         //Definimos objeto error
                         this.actualizarError = {
-                            nuevoEstado: "Pendiente_solución",
+                            nuevoEstado: "Pendiente solución",
                             id_error: errores[this.errorIndex].id_error,
                         };
 
@@ -85,7 +85,6 @@ export const generarJobError = {
                             return enviarDatos;
                         } else {
                             //Grabar en base de datos
-                            console.log("estoy enviando error aqui", this.actualizarError)
                             axios
                             .put(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosError`, this.actualizarError)
                             .then(() => {

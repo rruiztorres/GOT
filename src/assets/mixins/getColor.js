@@ -12,7 +12,7 @@ export const getColor = {
             else if (estado == 'Solucionada') return '#009933';             //verde
 
             else if (estado == 'Marcado') return '#d0e4f5';                 //azul claro
-            else if (estado == 'Pendiente solucion') return '#ffcc00';      //amarillo
+            else if (estado == 'Pendiente solución') return '#ffcc00';      //amarillo
             else if (estado == 'Solucionado') return '#009933';             //verde
             else if (estado == 'Desestimado') return '#0066ff';             //azul
             else if (estado == 'Devuelto') return '#f54b42';                //rojo

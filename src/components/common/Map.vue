@@ -1409,7 +1409,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
             //FORMULARIO ALTA JOB   
             editJob: false,             //Visibilidad ventana editar atributos
-            descJob: null,                //TextArea Descripcion Job
+            descJob: '',              //TextArea Descripcion Job
             jobGrande: false,           //Valor
             expediente:[],
             expedienteJob:[],
@@ -1433,7 +1433,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
             //FORMULARIO ALTA ERROR
             editError: false,
-            descError: null,
+            descError: '',
             temaError:[],
             selectTema: [],
             tipoError: [],

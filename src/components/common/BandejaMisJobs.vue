@@ -15,13 +15,12 @@
           <v-col cols="12" md="8">
             <v-row class="buttonGroup">
               <v-col cols="12" md="3">
-                <v-btn class="btn" dark color="success">
-                  ACCION 1
-                </v-btn>
-              </v-col>
-              <v-col cols="12" md="3">
-                <v-btn class="btn" dark color="success">
-                  ACCION 2
+                <v-btn
+                :disabled="true" 
+                class="btn" 
+                dark 
+                color="success">
+                  DEVOLVER JOBS
                 </v-btn>
               </v-col>
               <v-spacer></v-spacer>
@@ -51,23 +50,41 @@
         item-key="job"
         show-select
       >
+        <template v-slot:top>
+          <v-dialog
+            style="heigth:100vh;"
+            v-model="dialog"
+            persistent
+            fullscreen
+            hide-overlay
+            transition="dialog-bottom-transition"
+          >
+            <VerJob 
+            :job="editedItem"
+            @dialog="dialogClose"
+            ></VerJob>
+          </v-dialog>
+        </template>
 
         <template v-slot:[`item.actions`]="{ item }">
           <v-btn
+            title="Ver Job"
             class="editButton"
             elevation="2"
             @click="editItem(item)"
-            icon dark           
+            icon
+            dark           
           >
-            <v-icon > mdi-lead-pencil </v-icon>
+            <v-icon > mdi-briefcase-eye </v-icon>
           </v-btn>
           <v-btn
-            class="editButton"
+            title="Devolver A Bandeja"
+            class="returnButton"
             elevation="2"
-            @click="editItem(item)"
+            @click="justifyReturnJob(item)"
             icon dark           
           >
-            <v-icon > mdi-lead-pencil </v-icon>
+            <v-icon > mdi-thumb-down </v-icon>
           </v-btn>
         </template>
 
@@ -87,6 +104,63 @@
           </v-icon>
         </template>
       </v-data-table>
+
+        <!-- VENTANA JUSTIFICACIÓN DEVOLVER JOB-->
+        <v-overlay 
+          v-if="jobReturned != null"
+          :value="showWindowReturnJob">
+          <v-card 
+          light class="returnJobWindow">
+            <v-card-title
+                class="returnJobWindowTitle"
+                dark
+                    >Devolver Job {{jobReturned.job}}
+                    <v-spacer></v-spacer>
+                </v-card-title>
+            <div class="returnJobWindowWrapper">  
+              <v-card-text>Por favor, <b>indique el motivo</b> por el cual desea devolver el Job.</v-card-text>
+              <v-textarea
+                class="textAreaJob"
+                filled
+                auto-grow
+                :rules="[rules.required, rules.counter]"
+                counter 
+                v-model="justificacionJobDevuelto"
+              ></v-textarea>
+            </div>
+              <v-card-actions class="returnJobWindowActions">
+                <v-spacer></v-spacer>
+                  <v-btn
+                    class="button" 
+                    color="error" 
+                    @click="showWindowReturnJob = !showWindowReturnJob"
+                  >
+                  CANCELAR
+                  </v-btn>
+                  <v-btn
+                    class="button" 
+                    :disabled="justificacionJobDevuelto=='' || justificacionJobDevuelto.length >= 120"
+                    color="success" 
+                    @click="returnJob(jobReturned)"
+                  >
+                  ACEPTAR
+                  </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-overlay>
+
+        <!--MENSAJES DE INFORMACION-->
+        <v-overlay :value="showMessage">
+          <v-alert
+            :color="messageType"
+            dark
+            border="top"
+            icon="mdi-alert-circle-outline"
+            transition="scale-transition"
+          >
+            {{ message }}
+          </v-alert>
+        </v-overlay>
     </div>
   </div>
 </template>
@@ -95,12 +169,13 @@
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import { checkBlocking } from "@/assets/mixins/checkBlocking.js";
+import VerJob from "@/components/common/VerJob";
 import NoData from "@/components/common/NoData";
 
 export default {
   name: "BandejaOpEsp",
   mixins: [getColor, checkBlocking],
-  components: { NoData, },
+  components: { NoData, VerJob },
 
   data: () => ({
     dialog: false,
@@ -147,6 +222,18 @@ export default {
     //NO DATA SLOT
     noDataMensaje:'Parece que no tienes ningún Job asignado aun...' ,
     noDataOpcion: 'Echa un vistazo por si hubiera algún job en bandeja que puedas ejecutar',
+
+    //DEVOLVER JOB
+    showWindowReturnJob: false,
+    justificacionJobDevuelto: '',
+    jobReturned: null,
+    rules: {
+      required: value => !!value || 'Este campo es obligatorio.',
+      counter: value => value.length <= 120 || 'Máximo 120 caracteres'
+    },
+
+    //MENSAJES INFORMACIÓN
+    showMessage: false,
   }),
 
   computed: {
@@ -174,10 +261,51 @@ export default {
       console.log();
     },
 
+    justifyReturnJob(job){
+      this.showWindowReturnJob = true;
+      this.jobReturned = job;
+    },
+
+    returnJob(job){
+      job.nuevoEstado = 'En bandeja';
+      job.nombre_operador = null;
+      
+      //OBJECTO LOG
+      this.log = {
+        idEventoLogger: 12, //JOB DEVUELTO A BANDEJA GENÉRICA
+        procesoJob: 'GOT',
+        usuario: localStorage.usuario,
+        observaciones: this.justificacionJobDevuelto,
+        departamento: '',
+        resultadoCC: '',
+      }
+      
+      axios
+      .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, [job, this.log])
+      .then((data) => {
+        if(data.status == 201){
+          this.showWindowReturnJob = false;
+          for (this.index in this.jobs){
+            if (this.jobs[this.index].job == data.data.jobActualizado){
+              this.jobs.splice(this.index, 1)
+              this.message = `El Job ${data.data.jobActualizado} se ha devuelto a la bandeja ${job.tipo_bandeja}`
+              this.messageType = 'success';
+              this.showMessage = true;
+              setTimeout(this.closeInfoMsg, 2000);
+            }
+          }
+        }
+      })
+    },
+
+    closeInfoMsg(){
+      this.showMessage = false;
+    },
+
     editItem(item) {
       this.editedIndex = this.jobs.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      console.log(this.editedItem);
+      this.dialog = true;
     },
 
     initialize() {
@@ -277,4 +405,32 @@ export default {
   background-color:#4287f5;
   margin-right: 0.25rem;
 }
+
+.returnButton {
+  background-color: #ef4444;
+  margin-right: 0.25rem;
+}
+
+.returnJobWindow {
+ margin: auto 1rem;
+}
+
+.returnJobWindowTitle{
+  background-color: #039BE5;
+  color: white;
+  font-weight: 400 !important;
+}
+
+.returnJobWindowWrapper{
+  padding: 0.5rem;
+}
+
+.returnJobWindowActions {
+  background-color: #CFD8DC;
+}
+
+.button {
+  font-weight: 400 !important;
+}
+
 </style>

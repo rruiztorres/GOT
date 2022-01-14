@@ -73,7 +73,7 @@
           item-key="job"
           show-select>
           <template v-slot:top>
-            <!-- VENTANA EDICION INCIDENCIA -->
+            <!-- VENTANA EDICION JOB -->
             <v-dialog
               style="heigth:100vh;"
               v-model="dialog"

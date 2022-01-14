@@ -1,13 +1,17 @@
 <template>
   <div class="panelContainer">
+    <!-- HEADER -->
     <div class="panelHeader">
-      <h2 class="panelHeader-title">Bandeja de Jobs (Operadores)</h2>
+      <h2 class="panelHeader-title">
+        Bandeja de Jobs (Operadores)
+      </h2>
       <v-spacer></v-spacer>
       <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1">
         <v-icon x-large>mdi-help-box</v-icon>
       </v-btn>
     </div>
 
+    <!-- CONTAINER -->
     <div>
       <!-- PANEL ACCIONES SUPERIOR -->
       <v-card elevation="0">
@@ -15,21 +19,13 @@
           <v-col cols="12" md="8">
             <v-row class="buttonGroup">
               <v-col cols="12" md="3">
-                <v-btn 
-                  class="btn"
-                  dark 
-                  color="success"
-                >
-                ACCION 1
+                <v-btn class="btn" dark color="success">
+                  ASIGNARME JOBS
                 </v-btn>
               </v-col>
               <v-col cols="12" md="3">
-                <v-btn 
-                  class="btn"
-                  dark 
-                  color="success"
-                >
-                ACCION 2
+                <v-btn class="btn" dark color="error">
+                  DEVOLVER JOBS
                 </v-btn>
               </v-col>
               <v-spacer></v-spacer>
@@ -59,50 +55,66 @@
         item-key="job"
         show-select
       >
+
+        <!-- VENTANA DATOS JOB, LOCALIZACION EN MAPA, PROCESO -->
         <template v-slot:top>
-          <v-dialog v-model="dialogDelete" max-width="500px">
-            <v-card>
-              <h1>ATENCIÓN</h1>
-              <h3>
-                Esta acción borrará la incidencia ¿Desea continuar?
-              </h3>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn dark text @click="closeDelete">Cancel</v-btn>
-                <v-btn dark text @click="deleteItemConfirm">OK</v-btn>
-                <v-spacer></v-spacer>
-              </v-card-actions>
-            </v-card>
+          <v-dialog
+            style="heigth:100vh;"
+            v-model="dialog"
+            persistent
+            fullscreen
+            hide-overlay
+            transition="dialog-bottom-transition"
+          >
+            <VerJob :job="editedItem" @dialog="dialogClose"></VerJob>
           </v-dialog>
         </template>
 
+        <!-- ACCIONES -->
         <template v-slot:[`item.actions`]="{ item }">
-          <v-btn title="ver datos del job" icon dark>
-            <v-icon small @click="editItem(item)"> mdi-eye </v-icon>
+          <v-btn title="Ver Job" 
+            icon dark class="editButton" @click="editItem(item)">
+            <v-icon> mdi-briefcase-eye </v-icon>
           </v-btn>
-          <v-btn title="asignarme el job" icon dark>
-            <v-icon small @click="editItem(item)">
-              mdi-account-hard-hat
-            </v-icon>
+          <v-btn title="asignarme el job" 
+            icon dark class="generateBtn" @click="asignJob(item)">
+            <v-icon>mdi-thumb-up</v-icon>
           </v-btn>
         </template>
 
+        <!-- NO DATA -->
         <template v-slot:no-data>
           <NoData :mensaje="noDataMensaje" :opcion="noDataOpcion"></NoData>
         </template>
 
+        <!-- COLORES ESTADO  -->
         <template v-slot:[`item.estado`]="{ item }">
           <v-chip :color="getColor(item.estado)" dark>
             {{ item.estado }}
           </v-chip>
         </template>
 
+        <!-- ICONOS BLOQUEO  -->
         <template v-slot:[`item.bloqueado`]="{ item }">
           <v-icon v-if="checkBlocking(item.bloqueado) == false" color="red">
             mdi-block-helper
           </v-icon>
         </template>
       </v-data-table>
+
+      <!-- MENSAJES DE INFORMACIÓN -->
+      <!--MENSAJES DE INFORMACION-->
+      <v-overlay :value="showMessage">
+        <v-alert
+          :color="messageType"
+          dark
+          border="top"
+          icon="mdi-alert-circle-outline"
+          transition="scale-transition"
+        >
+          {{ message }}
+        </v-alert>
+      </v-overlay>
     </div>
   </div>
 </template>
@@ -112,12 +124,12 @@ import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import { checkBlocking } from "@/assets/mixins/checkBlocking.js";
 import NoData from "@/components/common/NoData";
-
+import VerJob from "@/components/common/VerJob";
 
 export default {
   name: "BandejaOpEsp",
   mixins: [getColor, checkBlocking],
-  components: {NoData},
+  components: { NoData, VerJob },
 
   data: () => ({
     dialog: false,
@@ -161,8 +173,14 @@ export default {
       job_arreglar: "",
     },
 
+    //NO DATA SLOT
     noDataMensaje: "Vaya... parece que no existen jobs para mostrar aquí.",
     noDataOpcion: "Si necesitas jobs para trabajar puedes generar alguna IDV",
+
+    //MENSAJES INFORMACIÓN
+    showMessage: false,
+    message: '',
+    messageType: '',
   }),
 
   computed: {
@@ -190,20 +208,56 @@ export default {
       console.log();
     },
 
+    asignJob(job){
+      job.nuevoEstado = 'En bandeja_op';
+      job.nombre_operador = localStorage.usuario;
+      
+      //OBJECTO LOG
+      this.log = {
+          idEventoLogger: 11, //JOB SELECCIONADO PARA TRABAJAR
+          procesoJob: 'GOT',
+          usuario: localStorage.usuario,
+          observaciones: '',
+          departamento: '',
+          resultadoCC: '',
+      }
+
+      axios
+      .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, [job, this.log])
+      .then((data) => {
+        for (this.index in this.jobs){
+          if (this.jobs[this.index].job == data.data.jobActualizado){
+            this.jobs.splice(this.index, 1)
+            this.message = `Te has asignado correctamente el job ${data.data.jobActualizado}`
+            this.messageType = 'success';
+            this.showMessage = true;
+            setTimeout(this.closeInfoMsg, 2000);
+          }
+        }
+      })
+    },
+
+    closeInfoMsg(){
+      this.showMessage = false;
+    },
+
     editItem(item) {
       this.editedIndex = this.jobs.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      console.log(this.editedItem);
+      this.dialog = true;
     },
 
     initialize() {
-      axios.get(`${process.env.VUE_APP_API_ROUTE}/jobs`).then((data) => {
+      axios
+      .get(`${process.env.VUE_APP_API_ROUTE}/jobs`)
+      .then((data) => {
         this.jobsBruto = data.data.response;
         for (this.elemento in this.jobsBruto) {
           //filtramos jobs, en bandeja, operadores sin operador asignado
           if (
             this.jobsBruto[this.elemento].estado == "En bandeja" &&
-            this.jobsBruto[this.elemento].tipo_bandeja == "Operadores" &&
+            this.jobsBruto[this.elemento].tipo_bandeja ==
+              "Operadores" &&
             this.jobsBruto[this.elemento].nombre_operador == null
           ) {
             this.jobs.push(this.jobsBruto[this.elemento]);
@@ -260,8 +314,13 @@ export default {
   min-height: 1vh !important;
 }
 
+h2,
+h4 {
+  font-family: 300 !important;
+}
+
 .panelContainer {
-  background-color:white;
+  background-color: white;
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
@@ -271,11 +330,10 @@ export default {
   display: flex;
 }
 
-.panelHeader-title{
+.panelHeader-title {
   font-weight: 500;
   margin-bottom: 2rem;
 }
-
 
 .panelFuncionesCard {
   background-color: #4287f5;
@@ -290,6 +348,12 @@ export default {
   padding: 0.5rem;
 }
 
+.noData {
+  padding: 1rem;
+}
 
-
+.saveButton {
+  background-color: #4287f5;
+  margin-right: 0.25rem;
+}
 </style>
