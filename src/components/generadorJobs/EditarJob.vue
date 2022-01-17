@@ -45,19 +45,19 @@
           <v-tab 
           class="tab"
           :key="1" 
-          @click="activateMap(false)"
+          @click="activateMap(false), activateLogger(false)"
           >Datos del Job
           </v-tab>
           <v-tab 
           class="tab"
           :key="2"
-          @click="activateMap(true)"
+          @click="activateMap(true), activateLogger(false)"
           >Localización en el Mapa
           </v-tab>
           <v-tab
           class="tab"
           :key="3" 
-          @click="activateMap(false)"
+          @click="activateMap(false), activateLogger(true)"
           >Proceso
           </v-tab>
           <v-tabs-slider color="#76aff5"></v-tabs-slider>
@@ -135,6 +135,7 @@
           <v-tab-item>
             <v-card class="card" flat>
               <Logger
+                v-if="loggerIsActive == true"
                 :jobsRecibidos="editandoJob"
                 :erroresRecibidos="errores"
               ></Logger>
@@ -408,6 +409,10 @@ export default {
       this.mapIsActive = active;
     },
 
+    activateLogger(active) {
+      this.loggerIsActive = active;
+    },
+
     initialize() {
       //Enviamos señal sin cambio a map
       this.activeTab = 0;
@@ -439,6 +444,7 @@ export default {
 
     closeDialog() {
       this.activateMap(false);
+      this.activateLogger(false);
       this.dialog = false;
       this.$emit("dialog", this.dialog);
 

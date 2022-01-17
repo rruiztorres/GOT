@@ -46,7 +46,7 @@ export default {
             { group: 'Jobs',
               items: [
                 {name:'Mis Jobs', icon:'mdi-briefcase-account', active:'BandejaMisJobs'}, 
-                {name:'Bandeja Operador Esp.', icon:'mdi-inbox-multiple', active:'BandejaOpEsp'},
+                {name:'Bandeja Operador Esp.', icon:'mdi-inbox-outline', active:'BandejaOpEsp'},
                 {name:'Bandeja Operador', icon:'mdi-inbox', active:'BandejaOp'},
               ]
             },

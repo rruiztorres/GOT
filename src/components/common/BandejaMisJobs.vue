@@ -234,6 +234,8 @@ export default {
 
     //MENSAJES INFORMACIÓN
     showMessage: false,
+    messageType: '',
+    message: '',
   }),
 
   computed: {

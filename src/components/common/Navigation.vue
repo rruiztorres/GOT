@@ -165,16 +165,15 @@ export default {
 </script>
 
 <style scoped>
-  .menuAvatarContainer {
-    height: 7rem;
+  .menuAvatarContainer { 
     padding-top: 1.5rem;
   }
 
   .menuAvatarContainer > img {
-    width: 6rem;
+    height: 5.5rem;
+    width: 5.6rem;
     display: block;
     margin: 0 auto;
-    height: 100%;
     border-radius: 100%;
     border: 2px solid white;
   }

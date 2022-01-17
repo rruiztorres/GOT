@@ -23,11 +23,6 @@
                   ASIGNARME JOBS
                 </v-btn>
               </v-col>
-              <v-col cols="12" md="3">
-                <v-btn class="btn" dark color="error">
-                  DEVOLVER JOBS
-                </v-btn>
-              </v-col>
               <v-spacer></v-spacer>
             </v-row>
           </v-col>
