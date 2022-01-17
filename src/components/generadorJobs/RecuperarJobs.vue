@@ -16,7 +16,8 @@
               <v-col cols="12" md="6">
                 <v-row class="buttonGroup">
                   <v-col cols="12" md="5">
-                    <v-btn 
+                    <v-btn
+                      class="button"
                       :disabled="groupActions()" 
                       dark color="success" 
                       @click="recuperarTriaje()">
@@ -24,7 +25,8 @@
                     </v-btn>
                   </v-col>
                   <v-col cols="12" md="5">
-                    <v-btn 
+                    <v-btn
+                      class="button"
                       :disabled="groupActions()" 
                       dark color="error" >
                       RECHAZAR JOBS

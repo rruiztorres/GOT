@@ -22,6 +22,9 @@
                 <v-list-item-subtitle
                   v-html="item.subtitle"
                 ></v-list-item-subtitle>
+                <v-list-item-subtitle
+                  v-html="item.procDesc"
+                ></v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </template>
@@ -31,22 +34,10 @@
 
     <!-- ACCIONES DISPONIBLES -->
     <v-col cols="12" md="3">
-      <!-- Las card las podemos sacar a componente?-->
       <v-card class="card">
         <v-card-title class="processTitle">ACCIONES DISPONIBLES</v-card-title>
-          <div class="actionBtnGroup">
-            <v-btn class="actionBtn" block color="error" @click="dummy()">Pausar Job</v-btn>
-            <v-btn class="actionBtn" block color="primary" @click="dummy()">Otra cosa</v-btn>
-            <v-btn class="actionBtn" block color="primary" @click="dummy()">Otra cosa</v-btn>
-            <v-btn
-              block
-              :loading="buttonLoading"
-              color="success"
-              @click="buttonLoading = !buttonLoading"
-            >
-              <v-icon dark>mdi-robot-industrial</v-icon>
-              Solicitar Versión
-            </v-btn>
+          <div v-if="cargarAccion == true">
+            <AccionesDisponibles :log="log" :job="jobsRecibidos"></AccionesDisponibles>
           </div>
       </v-card>
     </v-col>
@@ -123,14 +114,16 @@
 <script>
 import axios from "axios";
 import { getLogIcons } from "@/assets/mixins/getLogIcons";
+import { getLogIconColors } from "@/assets/mixins/getLogIconColors"
 import { getColor } from "@/assets/mixins/getColor";
+import AccionesDisponibles from "@/components/common/AccionesDisponibles";
 
 export default {
   name: "Logger",
 
   props: ["jobsRecibidos", "erroresRecibidos", "actualizarInfo"],
-
-  mixins: [getLogIcons, getColor],
+  mixins: [getLogIcons, getColor, getLogIconColors],
+  components: {AccionesDisponibles,},
 
   computed: {
     returnJob() {
@@ -190,24 +183,28 @@ export default {
         this.arrayFecha = log[this.index].fecha.split("T");
         this.logNewEntry = {
           id: log[this.index].id_log,
-          claseProceso: "green",
+          claseProceso: this.getLogIconColors(log[this.index].codigo),
           class: "",
           icon: this.getLogIcons(log[this.index].codigo),
           procDesc: log[this.index].codigo,
           fecha: this.arrayFecha[0],
-          hora: this.arrayFecha[1].slice(0, -1),
+          hora: this.arrayFecha[1].slice(0, -5),
           title: log[this.index].evento,
           subtitle: log[this.index].descripcion,
         };
         this.log.push(this.logNewEntry);
       }
+      //Evita que se carguen datos en acciones antes de estar disponibles
+      this.cargarAccion = true;
     },
   },
 
   data() {
     return {
       buttonLoading: false,
-      log: [],
+      log: undefined,
+      cargarAccion: false,
+      ultimaAccion: undefined,
 
       jobHeaders: [
         { text: "Estado", value: "estado" },
