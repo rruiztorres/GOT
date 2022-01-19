@@ -325,10 +325,8 @@ export default {
                   data.data.errores[this.asignIndex].idInterno ==
                     this.errores[this.index].id
                 ) {
-                  this.errores[this.index].asocJob =
-                    data.data.errores[this.asignIndex].job;
-                  this.errores[this.index].idError =
-                    data.data.errores[this.asignIndex].idError;
+                  this.errores[this.index].asocJob = data.data.errores[this.asignIndex].job;
+                  this.errores[this.index].idError = data.data.errores[this.asignIndex].codigoError;
                 }
               }
             }

@@ -18,9 +18,19 @@
                     <v-btn 
                       class="btn"
                       :disabled="groupActions()" 
-                      dark color="success" 
+                      dark color="success"
+                      @click="showMap = !showMap"
                       >
-                      ACCION 1
+                      VER EN MAPA
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12" md="3" >
+                    <v-btn 
+                      class="btn"
+                      :disabled="groupActions()" 
+                      dark color="error" 
+                      >
+                      DESESTIMAR
                     </v-btn>
                   </v-col>
                 </v-row>
@@ -45,6 +55,7 @@
           :items="errores"
           :search="search"
           item-key="id_error"
+          group-by="via_ent"
           show-select>
           <template v-slot:top>
             <v-overlay :value="dialogDelete">
@@ -62,14 +73,6 @@
             </v-overlay>
           </template>
 
-          <template v-slot:[`item.actions`]="{ item }">
-            <v-btn 
-            class="deleteButton"
-            title="Editar Job" icon dark>
-              <v-icon @click="deleteItem(item)"> mdi-trash-can </v-icon>
-            </v-btn>
-          </template>
-
           <template v-slot:no-data>
             <NoData :mensaje="noDataMensaje" :opcion="noDataOpcion"></NoData>
           </template>
@@ -80,6 +83,24 @@
             </v-chip>
           </template>
         </v-data-table>
+
+        <!-- ALTA JOBS/ERRORES -->
+        <v-dialog
+            v-if="showMap == true"
+            style="heigth:100vh;"
+            v-model="showMap"
+            persistent
+            fullscreen
+            hide-overlay
+            transition="dialog-bottom-transition"
+        >
+          <AsignarErrores
+          :job="undefined"
+          :errores="selected"
+          @closeDialog="closeAsignar"
+          @deleteErrores="updateTableErrors"
+          ></AsignarErrores>
+        </v-dialog>
 
         <!--MENSAJES DE INFORMACION-->
         <v-overlay :value="showMessage">
@@ -103,12 +124,13 @@ import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import { generarJobError } from '@/assets/mixins/generarJobError';
 import NoData from "@/components/common/NoData";
+import AsignarErrores from "@/components/common/AsignarErrores";
 
 
 export default {
   name: "ErroresNoAsign",
   mixins: [getColor, generarJobError],
-  components: {NoData,},
+  components: {NoData, AsignarErrores},
 
   data: () => ({
     dialog: false,
@@ -122,7 +144,6 @@ export default {
         { text: "Descripción", align: "start", sortable: true, value: "descripcion"},
         { text: "Via de Entrada", align: "start", sortable: true, value: "via_ent"},
         { text: "Fecha de inserción", align: "start", sortable: true, value: ""},
-        { text: "Acciones", value: "actions", sortable: false },
     ],
     errores: [],
     editedIndex: -1,
@@ -149,6 +170,9 @@ export default {
     message: '',
     messageType: '',
 
+    //MAP
+    showMap: false,
+
     //NO DATA SLOT
     noDataMensaje: 'En estos momentos no existen Errores sin asignar',
     noDataOpcion: 'Puedes encontrar nuevos errores haciendo una revisión visual en Alta de Jobs / Errores',
@@ -173,6 +197,22 @@ export default {
   },
 
   methods: {
+    updateTableErrors(data){
+      for(this.index in this.errores){
+        for(this.indexData in data){
+          if(this.errores[this.index].id_error == data[this.indexData].id_error){
+            this.errores.splice(this.index,1)
+          }
+        }
+      }
+    },
+
+    closeAsignar(data){
+      if (data == true){
+        this.showMap = false;
+        this.selected = [];
+      }
+    },
 
     showInfo(message, type) {
       this.showMessage = true;
