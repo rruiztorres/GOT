@@ -139,18 +139,8 @@ export default {
     this.retrieveExpFromBD();
   },
 
-  watch:{
-    observaciones(){
-      console.log(this.observaciones)
-      if(this.observaciones.length > 255){
-        //
-      }
-    }
-  },
-
   methods: {
     initializeParameters() {
-      this.nExp = null;
       this.storeObservationsExp("");
     },
 
@@ -253,7 +243,7 @@ export default {
 
       fechaFin: "",
 
-      observaciones: null,
+      observaciones: "",
       nExp: "",
       expedientesBD: [],
 
@@ -271,7 +261,7 @@ export default {
       rules: {
         required: (value) => !!value || "Este campo es obligatorio.",
         formNumExp: (value) =>
-          value.length == 13 || "El formato debe ser AAAA_00000000",
+          value.length == 13 && value != "" || "El formato debe ser AAAA_00000000",
       },
     };
   },

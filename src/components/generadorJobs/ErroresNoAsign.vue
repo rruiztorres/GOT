@@ -29,6 +29,7 @@
                       class="btn"
                       :disabled="groupActions()" 
                       dark color="error" 
+                      @click="dialogJustify = true"
                       >
                       DESESTIMAR
                     </v-btn>
@@ -84,7 +85,7 @@
           </template>
         </v-data-table>
 
-        <!-- ALTA JOBS/ERRORES -->
+        <!-- VER EN MAPA -->
         <v-dialog
             v-if="showMap == true"
             style="heigth:100vh;"
@@ -93,7 +94,7 @@
             fullscreen
             hide-overlay
             transition="dialog-bottom-transition"
-        >
+          >
           <AsignarErrores
           :job="undefined"
           :errores="selected"
@@ -115,6 +116,44 @@
           </v-alert>
         </v-overlay>
 
+        <!-- DESESTIMAR ERRORES -->
+        <v-overlay :value="showJustifyWindow">
+            <JustificarAccion
+              title="Desestimar Errores"
+              text="Indique el motivo por el cual desea desestimar el error:"
+              @close="getJustification"
+            >
+
+            </JustificarAccion>
+        </v-overlay>
+
+        <v-overlay :value="dialogJustify">
+          <v-card class="alertCard">
+            <h1 class="alertCardTitle">ATENCIÓN</h1>
+            <h4>Esta acción desestimará los errores seleccionados</h4>
+            <h4>La desestimación es permanente y <b>no puede deshacerse</b></h4>
+            <br/>
+            <h3><b>¿Desea continuar?</b></h3>
+            <v-card-actions>
+              <div class="alertButtonGroup">
+                <v-btn
+                  class="alertButton errorBtn"
+                  dark
+                  text
+                  @click="dialogJustify = false"
+                  >CANCELAR</v-btn
+                >
+                <v-btn
+                  class="alertButton generateBtn"
+                  dark
+                  text
+                  @click="justifyDesestimate"
+                  >OK</v-btn
+                >
+              </div>
+            </v-card-actions>
+          </v-card>
+        </v-overlay>
       </div>
   </div>
 </template>
@@ -123,14 +162,17 @@
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import { generarJobError } from '@/assets/mixins/generarJobError';
+import { desestimarErrores } from '@/assets/mixins/desestimarErrores';
+
 import NoData from "@/components/common/NoData";
 import AsignarErrores from "@/components/common/AsignarErrores";
+import JustificarAccion from "@/components/common/JustificarAccion";
 
 
 export default {
   name: "ErroresNoAsign",
-  mixins: [getColor, generarJobError],
-  components: {NoData, AsignarErrores},
+  mixins: [getColor, generarJobError, desestimarErrores],
+  components: { NoData, AsignarErrores, JustificarAccion },
 
   data: () => ({
     dialog: false,
@@ -176,6 +218,10 @@ export default {
     //NO DATA SLOT
     noDataMensaje: 'En estos momentos no existen Errores sin asignar',
     noDataOpcion: 'Puedes encontrar nuevos errores haciendo una revisión visual en Alta de Jobs / Errores',
+
+    //DESESTIMAR ERRORES
+    showJustifyWindow: false,
+    dialogJustify: false,
   }),
 
   computed: {
@@ -197,7 +243,34 @@ export default {
   },
 
   methods: {
-    updateTableErrors(data){
+    justifyDesestimate(){
+      this.dialogJustify = false;
+      this.showJustifyWindow = true;
+    },
+
+    getJustification(data){
+      if (data != ''){
+        this.justificacion = data;
+        this.ejecucion = this.desestimarErrores(this.selected, this.justificacion)
+        if (this.ejecucion === 0){
+          for (this.index in this.errores){
+            for (this.indexSelect in this.selected){
+              if (this.errores[this.index].id_error === this.selected[this.indexSelect].id_error){
+                this.errores.splice(this.index, 1)
+              }
+            }
+          }
+          this.showJustifyWindow = false;
+          this.selected = [];
+          this.showInfo('Los errores seleccionados se han desestimado correctamente', 'success')
+          setTimeout(this.closeInfo(), 2000);
+        }
+      } else{
+        this.showJustifyWindow = false;
+      }
+    },
+
+    updateTableErrors(data){     
       for(this.index in this.errores){
         for(this.indexData in data){
           if(this.errores[this.index].id_error == data[this.indexData].id_error){
@@ -263,17 +336,6 @@ export default {
       this.editedIndex = this.errores.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-    },
-
-    deleteItem(item) {
-      this.editedIndex = this.errores.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
-    },
-
-    deleteItemConfirm() {
-      this.errores.splice(this.editedIndex, 1);
-      this.closeDelete();
     },
 
     close() {
