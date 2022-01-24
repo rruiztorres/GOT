@@ -85,7 +85,7 @@
         </template>
 
         <template v-slot:no-data>
-          <v-btn color="primary" @click="initialize">Reset</v-btn>
+          <NoData :mensaje="noDataMensaje" :opcion="noDataOpcion"></NoData>
         </template>
 
         <template v-slot:[`item.finalizado`]="{ item }">
@@ -134,11 +134,12 @@
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import NuevoExpediente from "@/components/generadorJobs/NuevoExpediente";
+import NoData from "@/components/common/NoData";
 
 export default {
   name: "GestionExpedientes",
   mixins: [getColor],
-  components: { NuevoExpediente },
+  components: { NuevoExpediente, NoData, },
 
   data: () => ({
     dialog: false,
@@ -199,6 +200,10 @@ export default {
       mensaje: "introduzca texto",
       aceptar: true,
     },
+
+    //NO DATA
+    noDataMensaje: 'Parece que aun no tienes expedientes creados',
+    noDataOpcion: 'Si deseas crear un nuevo expediente haz clic en el botón verde "NUEVO EXP." ',
   }),
 
   created() {

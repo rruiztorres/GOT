@@ -105,49 +105,16 @@
         </template>
       </v-data-table>
 
-        <!-- VENTANA JUSTIFICACIÓN DEVOLVER JOB-->
+        <!-- VENTANA JUSTIFICACIÓN DEVOLVER JOB -->
         <v-overlay 
           v-if="jobReturned != null"
-          :value="showWindowReturnJob">
-          <v-card 
-          light class="returnJobWindow">
-            <v-card-title
-                class="returnJobWindowTitle"
-                dark
-                    >Devolver Job {{jobReturned.job}}
-                    <v-spacer></v-spacer>
-                </v-card-title>
-            <div class="returnJobWindowWrapper">  
-              <v-card-text>Por favor, <b>indique el motivo</b> por el cual desea devolver el Job.</v-card-text>
-              <v-textarea
-                class="textAreaJob"
-                filled
-                auto-grow
-                :rules="[rules.required, rules.counter]"
-                counter 
-                v-model="justificacionJobDevuelto"
-              ></v-textarea>
-            </div>
-              <v-card-actions class="returnJobWindowActions">
-                <v-spacer></v-spacer>
-                  <v-btn
-                    class="button" 
-                    color="error" 
-                    @click="showWindowReturnJob = !showWindowReturnJob"
-                  >
-                  CANCELAR
-                  </v-btn>
-                  <v-btn
-                    class="button" 
-                    :disabled="justificacionJobDevuelto=='' || justificacionJobDevuelto.length >= 120"
-                    color="success" 
-                    @click="returnJob(jobReturned)"
-                  >
-                  ACEPTAR
-                  </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-overlay>
+          :value="showWindowJustify">       
+          <JustificarAccion 
+            title="Devolver Job a bandeja"
+            text="Indique el motivo por el cual desea devolver el Job:"
+            @close="getJustifyReturnJob"          
+          ></JustificarAccion>
+        </v-overlay> 
 
         <!--MENSAJES DE INFORMACION-->
         <v-overlay :value="showMessage">
@@ -171,11 +138,12 @@ import { getColor } from "@/assets/mixins/getColor.js";
 import { checkBlocking } from "@/assets/mixins/checkBlocking.js";
 import VerJob from "@/components/common/VerJob";
 import NoData from "@/components/common/NoData";
+import JustificarAccion from "@/components/common/JustificarAccion";
 
 export default {
   name: "BandejaOpEsp",
   mixins: [getColor, checkBlocking],
-  components: { NoData, VerJob },
+  components: { NoData, VerJob, JustificarAccion },
 
   data: () => ({
     dialog: false,
@@ -224,6 +192,7 @@ export default {
     noDataOpcion: 'Echa un vistazo por si hubiera algún job en bandeja que puedas ejecutar',
 
     //DEVOLVER JOB
+    showWindowJustify: false,
     showWindowReturnJob: false,
     justificacionJobDevuelto: '',
     jobReturned: null,
@@ -264,8 +233,16 @@ export default {
     },
 
     justifyReturnJob(job){
-      this.showWindowReturnJob = true;
+      this.showWindowJustify = true;
       this.jobReturned = job;
+    },
+
+    getJustifyReturnJob(data){
+      this.showWindowJustify = false;
+      if (data !== ''){
+        this.justificacionJobDevuelto = data;
+        this.returnJob(this.jobReturned);
+      }
     },
 
     returnJob(job){
@@ -411,24 +388,6 @@ export default {
 .returnButton {
   background-color: #ef4444;
   margin-right: 0.25rem;
-}
-
-.returnJobWindow {
- margin: auto 1rem;
-}
-
-.returnJobWindowTitle{
-  background-color: #039BE5;
-  color: white;
-  font-weight: 400 !important;
-}
-
-.returnJobWindowWrapper{
-  padding: 0.5rem;
-}
-
-.returnJobWindowActions {
-  background-color: #CFD8DC;
 }
 
 .button {

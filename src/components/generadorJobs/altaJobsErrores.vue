@@ -403,6 +403,7 @@ export default {
 
 .cardJob {
   height: 86vh;
+  overflow-y: auto;
 }
 
 .cardJob > * > h2 {

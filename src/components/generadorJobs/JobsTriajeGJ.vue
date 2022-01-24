@@ -36,7 +36,9 @@
                     <v-btn
                       class="btn"
                       :disabled="groupActions()" 
-                      dark color="warning">
+                      dark color="warning"
+                      @click="groupDesestimar()"
+                      >
                       DESESTIMAR
                     </v-btn>
                   </v-col>
@@ -117,6 +119,46 @@
                 </v-card-actions>
               </v-card>
             </v-overlay>
+
+            <!-- ALERTA DESESTIMAR JOBS -->
+            <v-overlay :value="dialogDesestimar">
+              <v-card class="alertCard">
+                <h1 class="alertCardTitle">ATENCIÓN</h1>
+                <h4>Esta acción desestimará el job y los errores asociados</h4>
+                <h4>La desestimación es permanente y <b>no puede deshacerse</b></h4>
+                <br/>
+                <h3><b>¿Desea continuar?</b></h3>
+                <v-card-actions>
+                  <div class="alertButtonGroup">
+                    <v-btn
+                      class="alertButton errorBtn"
+                      dark
+                      text
+                      @click="dialogDesestimar = !dialogDesestimar"
+                      >CANCELAR</v-btn
+                    >
+                    <v-btn
+                      class="alertButton generateBtn"
+                      dark
+                      text
+                      @click="showWindowJustify = true"
+                      >OK</v-btn
+                    >
+                  </div>
+                </v-card-actions>
+              </v-card>
+            </v-overlay>
+
+            <!-- VENTANA JUSTIFICACIÓN DEVOLVER JOB-->
+            <v-overlay 
+              :value="showWindowJustify">
+              <JustificarAccion
+                title="Desestimar Job/s"
+                text="Indique el motivo por el cual desea desestimar"
+                @close="getJustification"
+              ></JustificarAccion>
+            </v-overlay>
+
           </template>
 
           <template v-slot:[`item.actions`]="{ item }">
@@ -223,24 +265,31 @@
 
 <script>
 import axios from "axios";
+
 import { getColor } from "@/assets/mixins/getColor.js";
 import { generarJobError } from '@/assets/mixins/generarJobError';
-import EditarJob from '@/components/generadorJobs/EditarJob.vue';
-import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry'
+import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry';
+import { desestimarJobs } from "@/assets/mixins/desestimarJobs";
+
 import NoData from "@/components/common/NoData";
+import EditarJob from '@/components/generadorJobs/EditarJob';
+import JustificarAccion from '@/components/common/JustificarAccion';
 
 
 export default {
   name: "JobsTriajeGJ",
-  mixins: [getColor, generarJobError, stringifyJobGeometry],
+  mixins: [getColor, generarJobError, stringifyJobGeometry, desestimarJobs],
   components: {
     EditarJob,
     NoData,
+    JustificarAccion,
   },
 
   data: () => ({
     dialog: false,
     dialogDelete: false,
+    dialogDesestimar: false,
+    justificacionJobDesestimado: '',
     selected: [],
     search: "",
     headers: [
@@ -277,6 +326,12 @@ export default {
     showMessage: false,
     message: '',
     messageType: '',
+
+    showWindowJustify: false,
+    rules: {
+      required: value => !!value || 'Este campo es obligatorio.',
+      counter: value => value.length <= 120 || 'Máximo 120 caracteres'
+    },
 
     //MANEJO EXPEDIENTES
     showExpSelect: false,
@@ -324,6 +379,38 @@ export default {
   },
 
   methods: {
+    groupDesestimar(){
+      this.dialogDesestimar = true;
+    },
+
+    getJustification(data){
+      if(data != ''){
+        this.observaciones = data;
+        this.desestimateJobs(this.observaciones)
+      } else {
+        this.dialogDesestimar = false;
+        this.showWindowJustify = false;
+        this.selected = [];
+      }
+    },
+
+    desestimateJobs(observaciones){
+        this.dialogDesestimar = false;
+        this.showWindowJustify = false;
+        this.ejecucion = this.desestimarJobs(this.selected, observaciones)
+        if (this.ejecucion == 0){
+          for (this.index in this.jobs){
+            for (this.indexSelection in this.selected){
+              if (this.selected[this.indexSelection].id_job == this.jobs[this.index].id_job){
+                this.jobs.splice(this.index, 1);
+              }
+            }
+          }
+          this.showInfo("Los jobs seleccionados se han desestimado correctamente", "green");
+          setTimeout(this.closeInfo, 1500);
+        }
+    },
+
     asignExpToSelect(){
       //Asigna el expediente a la seleccion de jobs actual   
       for (this.index in this.selected){

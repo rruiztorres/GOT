@@ -22,9 +22,6 @@
                 <v-list-item-subtitle
                   v-html="item.subtitle"
                 ></v-list-item-subtitle>
-                <v-list-item-subtitle
-                  v-html="item.procDesc"
-                ></v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </template>
@@ -37,7 +34,7 @@
       <v-card class="card">
         <v-card-title class="processTitle">ACCIONES DISPONIBLES</v-card-title>
           <div v-if="cargarAccion == true">
-            <AccionesDisponibles :log="log" :job="jobsRecibidos"></AccionesDisponibles>
+            <AccionesDisponibles :log="log" :job="jobsRecibidos" @updateLog="updateLog"></AccionesDisponibles>
           </div>
       </v-card>
     </v-col>
@@ -159,7 +156,7 @@ export default {
   methods: {
     initialize() {
       //Reinicio de variables
-      if (this.jobsRecibidos != undefined) {
+      if (this.jobsRecibidos != undefined) {      
         this.job = this.jobsRecibidos;
       }
 
@@ -176,6 +173,25 @@ export default {
             this.returnFormatLog(data.data.log);
           }
         });
+    },
+
+    updateLog(data){
+      if(data === true){
+        this.initialize();
+        //update job
+        axios
+        .get(`${process.env.VUE_APP_API_ROUTE}/getJobById/` + this.jobsRecibidos.job)
+        .then((data) => {
+          this.job = data.data.job
+        })
+
+        //update errores
+        axios
+        .get(`${process.env.VUE_APP_API_ROUTE}/error/` + this.jobsRecibidos.job)
+        .then((data) => {
+         this.errores = data.data.errores
+        })
+      }
     },
 
     returnFormatLog(log) {
@@ -205,6 +221,7 @@ export default {
       log: undefined,
       cargarAccion: false,
       ultimaAccion: undefined,
+      job: null,
 
       jobHeaders: [
         { text: "Estado", value: "estado" },

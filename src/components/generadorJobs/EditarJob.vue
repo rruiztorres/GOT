@@ -96,7 +96,7 @@
                     </template>
 
                     <template v-slot:no-data>
-                      <h1>No existen errores asociados al job</h1>
+                      <h2 class="errorNoData">No existen errores asociados al job</h2>
                     </template>
 
                     <template v-slot:[`item.actions`]="{ item }">
@@ -675,6 +675,10 @@ export default {
 .alertButton {
   width: 10rem;
   margin: 1rem;
+}
+
+.errorNoData {
+  font-weight: 400 !important;
 }
 
 </style>
