@@ -76,10 +76,10 @@
         show-select
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <v-btn title="editar" icon dark
+          <v-btn title="editar" icon dark class="editButton"
             ><v-icon @click="dummy(item)"> mdi-lead-pencil </v-icon></v-btn
           >
-          <v-btn title="ver estado" icon dark
+          <v-btn title="ver estado" icon dark class="infoButton"
             ><v-icon @click="dummy(item)"> mdi-chart-areaspline </v-icon></v-btn
           >
         </template>
@@ -340,4 +340,7 @@ export default {
   padding: 0.5rem;
 }
 
+.infoButton {
+  background-color: #EF6C00;
+}
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="actionBtnGroup">
+    <div class="actionsWrapper">
         <!-- JOB SELECCIONADO PARA TRABAJAR || JOB GENERADO DIRECTO A OPERADOR -->
         <div v-if="accion =='JST' || accion =='JGE' && job.nombre_operador != null">
             <v-btn class="actionBtn" block color="success" @click="dummy(job)">Empezar a Trabajar en el Job</v-btn>
@@ -8,7 +8,7 @@
 
         <!-- JOB GENERADO A BANDEJA GENÉRICA -->
         <div v-else-if="accion =='JGE' || accion == 'JBG'">
-            <v-btn class="actionBtn" block color="success">Asignarse el Job</v-btn>
+            <v-btn class="actionBtn" block color="success" @click="asignJob">Asignarse el Job</v-btn>
         </div>
 
         <!-- JOB EN TRIAJE || INSERCIÓN JOB MANUAL DESDE GOT -->
@@ -62,6 +62,7 @@ import axios from "axios";
 
 //mixins
 import {desestimarJobs} from "@/assets/mixins/desestimarJobs";
+import {asignarmeJob} from "@/assets/mixins/asignarmeJob";
 
 //components
 import JustificarAccion from "@/components/common/JustificarAccion";
@@ -71,7 +72,7 @@ import JustificarAccion from "@/components/common/JustificarAccion";
     export default {
         name: "AccionesDisponibles",
         props: ["job"],
-        mixins: [desestimarJobs,],
+        mixins: [desestimarJobs, asignarmeJob],
         components: {JustificarAccion,},
         
         data(){
@@ -81,8 +82,8 @@ import JustificarAccion from "@/components/common/JustificarAccion";
                 log:'',
                 loadAction: false,
                 showMessage: false,
-                messageType: null,
-                message: null,
+                messageType: "success",
+                message: "Accion realizada correctamente",
             }
         },
 
@@ -96,6 +97,13 @@ import JustificarAccion from "@/components/common/JustificarAccion";
         methods:{
             dummy(job){
                 console.log("estoy ejecutando un proceso en el job", job.job)
+            },
+
+            asignJob(){
+                this.ejecucion = this.asignarmeJob(this.job)
+                if (this.ejecucion == true){
+                    this.updateAction();
+                }
             },
 
             closeInfo(){
@@ -112,9 +120,8 @@ import JustificarAccion from "@/components/common/JustificarAccion";
                 this.getLastAction();
                 this.$emit('updateLog', true);
                 this.loadAction = false;
-                this.showInfo("Accion realizada correctamente", "success")
+                this.showInfo(this.message, this.messageType)
                 setTimeout(this.closeInfo, 1500)
-
             },
 
             justifyDesestimate(data){
@@ -123,7 +130,7 @@ import JustificarAccion from "@/components/common/JustificarAccion";
                     this.desestimarJobs([this.job], this.justificacion)
                     this.showDesestimarWindow = false;
                     this.loadAction = true;
-                    setTimeout(this.updateAction, 2000);
+                    setTimeout(this.updateAction, 500);
                     //this.$emit('updateLog', true)
                 } else {
                     this.showDesestimarWindow = false;
@@ -148,6 +155,10 @@ import JustificarAccion from "@/components/common/JustificarAccion";
     .actionBtn {
         font-weight: 400 !important;
         margin: 0rem 0.5rem 0.5rem 0rem;
+    }
+    
+    .actionsWrapper {
+        padding: 0.5rem;
     }
 
 </style>

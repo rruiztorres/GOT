@@ -416,7 +416,7 @@ export default {
       for (this.index in this.selected){
         this.selected[this.index].geometria = this.stringifyJobGeometry(this.selected[this.index].geometria_json);
         this.selected[this.index].expediente = this.expediente;
-        
+
         axios
         .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, [this.selected[this.index]])
         .then((data)=>{

@@ -75,14 +75,8 @@
           <v-row>
             <v-col cols="12">
               <v-card class="card cardContainer cardBgGray">
-                <div class="errorsTitle">
+                <div>
                   <h2>Errores</h2>
-                  <v-spacer></v-spacer>
-                  <div v-if="errores.length != 0">
-                    <v-alert dense outlined class="alertErrors" type="error">
-                      El job aun tiene errores pendientes de solución
-                    </v-alert>
-                  </div>
                 </div>
                 <v-data-table
                   :headers="errorHeaders"
@@ -186,11 +180,14 @@ export default {
         })
 
         //update errores
-        axios
-        .get(`${process.env.VUE_APP_API_ROUTE}/error/` + this.jobsRecibidos.job)
-        .then((data) => {
-         this.errores = data.data.errores
-        })
+        if (this.errores != []){
+          axios
+          .get(`${process.env.VUE_APP_API_ROUTE}/error/` + this.jobsRecibidos.job)
+          .then((data) => {
+          this.errores = data.data.errores
+          })
+        }
+        
       }
     },
 
@@ -288,7 +285,8 @@ h2 {
 }
 
 .errorsTitle {
-  display: flex;
-  height: 2.8rem;
+  font-weight: 400 !important;
+  display: block;
+  margin: auto 0;
 }
 </style>
