@@ -203,7 +203,7 @@
                         <v-divider class="endSection"></v-divider>
 
                         <div class="sectionToolTitle">
-                        CARTOGRAFÍA
+                        CAPAS
                         </div>
                         <v-btn
                             v-for="service in wmtsServices"

@@ -138,6 +138,7 @@
                 v-if="loggerIsActive == true"
                 :jobsRecibidos="editandoJob"
                 :erroresRecibidos="errores"
+                @updateJobErrores="updateDataFromLogger"
               ></Logger>
             </v-card>
           </v-tab-item>
@@ -240,7 +241,7 @@ export default {
     stringifyErrorGeometry,
   ],
 
-  props: ["job", "error", "center"],
+  props: ["job"],
 
   computed: {
     returnJob() {
@@ -271,6 +272,11 @@ export default {
   },
 
   methods: {
+    updateDataFromLogger(data){
+      data.job.estado = data.job.nuevoEstado;
+      this.storeJobs(data.job)
+    },
+
     confirmDelete(errorBorrar) {
       this.showAlertError = true;
       this.errorBorrar = errorBorrar;
@@ -336,7 +342,7 @@ export default {
     },
 
     updateEditedJob(job) {
-      this.updateJob = job[0];
+      this.updateJob = job;
       this.editandoJob.expediente = this.updateJob.expediente;
       this.editandoJob.arreglo_job = this.updateJob.arreglo_job;
       this.editandoJob.deteccion_job = this.updateJob.deteccion_job;
@@ -638,6 +644,8 @@ export default {
 .card {
   height: 87vh;
   padding: 0.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .editJobTitle, .editJobBtn, .tab, h2 {

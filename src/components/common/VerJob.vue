@@ -39,7 +39,10 @@
           
           <!--DATOS DEL JOB-->
           <v-tab-item>  
-            <v-card class="card" flat>
+            <v-card 
+            class="card" 
+            flat 
+            >
               <div class="dataTable">
                 <h2>Jobs</h2>
                 <v-data-table
@@ -110,6 +113,7 @@
                 v-if="loggerIsActive == true"
                 :jobsRecibidos="editandoJob"
                 :erroresRecibidos="errores"
+                @updateJobErrores="updateData"
               ></Logger>
             </v-card>
           </v-tab-item>
@@ -241,6 +245,14 @@ export default {
   },
 
   methods: {
+    updateData(data){
+      data.job.estado = data.job.nuevoEstado;
+      this.editandoJob = data.job;
+      this.datosJobToDataTable();
+      this.errores = data.errores
+      this.$emit("updateData", true)
+    },
+
     datosJobToDataTable() {
       //caso edicion devuelve arrays hay que convertir a objeto
       if (this.editandoJob.length > 0) {
@@ -351,6 +363,7 @@ export default {
 
       //LOGGER
       loggerIsActive: false,
+
     };
   },
 };

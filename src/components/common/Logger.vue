@@ -1,7 +1,6 @@
 <template>
   <v-row>
     <v-col cols="12" md="4">
-
       <!-- LOG DEL JOB -->
       <v-card class="card">
         <v-card-title class="processTitle">LOG DEL JOB</v-card-title>
@@ -33,9 +32,13 @@
     <v-col cols="12" md="3">
       <v-card class="card">
         <v-card-title class="processTitle">ACCIONES DISPONIBLES</v-card-title>
-          <div v-if="cargarAccion == true">
-            <AccionesDisponibles :log="log" :job="jobsRecibidos" @updateLog="updateLog"></AccionesDisponibles>
-          </div>
+        <div v-if="cargarAccion == true">
+          <AccionesDisponibles
+            :job="jobsRecibidos"
+            :errores="erroresRecibidos"
+            @updateLog="updateLog"
+          ></AccionesDisponibles>
+        </div>
       </v-card>
     </v-col>
 
@@ -43,13 +46,7 @@
     <v-col cols="12" md="5">
       <!-- Las card las podemos sacar a componente?-->
       <v-card class="card">
-        <v-card-title class="processTitle">
-          ESTADO
-          <v-spacer></v-spacer>
-          <v-btn elevation="2" class="processBtn" dark text>
-            GESTIONAR SOLUCIÓN</v-btn
-          >
-        </v-card-title>
+        <v-card-title class="processTitle">ESTADO</v-card-title>
         <div class="cardContainer">
           <v-row>
             <v-col cols="12">
@@ -75,8 +72,8 @@
           <v-row>
             <v-col cols="12">
               <v-card class="card cardContainer cardBgGray">
-                <div>
-                  <h2>Errores</h2>
+                <div class="cardTitleWrapper">
+                    <h2 class="cardTitle">Errores</h2>
                 </div>
                 <v-data-table
                   :headers="errorHeaders"
@@ -105,7 +102,7 @@
 <script>
 import axios from "axios";
 import { getLogIcons } from "@/assets/mixins/getLogIcons";
-import { getLogIconColors } from "@/assets/mixins/getLogIconColors"
+import { getLogIconColors } from "@/assets/mixins/getLogIconColors";
 import { getColor } from "@/assets/mixins/getColor";
 import AccionesDisponibles from "@/components/common/AccionesDisponibles";
 
@@ -114,7 +111,7 @@ export default {
 
   props: ["jobsRecibidos", "erroresRecibidos", "actualizarInfo"],
   mixins: [getLogIcons, getColor, getLogIconColors],
-  components: {AccionesDisponibles,},
+  components: { AccionesDisponibles },
 
   computed: {
     returnJob() {
@@ -148,9 +145,10 @@ export default {
   },
 
   methods: {
+
     initialize() {
       //Reinicio de variables
-      if (this.jobsRecibidos != undefined) {      
+      if (this.jobsRecibidos != undefined) {
         this.job = this.jobsRecibidos;
       }
 
@@ -169,25 +167,41 @@ export default {
         });
     },
 
-    updateLog(data){
-      if(data === true){
+    closeGestionarWindow(data){
+      if (data === true){
+        this.showGestionarWindow = false
+      }
+    },
+
+    updateLog(data) {
+      if (data.ejecucion === true) {
         this.initialize();
         //update job
         axios
-        .get(`${process.env.VUE_APP_API_ROUTE}/getJobById/` + this.jobsRecibidos.job)
-        .then((data) => {
-          this.job = data.data.job
-        })
+          .get(
+            `${process.env.VUE_APP_API_ROUTE}/getJobById/` +
+              this.jobsRecibidos.job
+          )
+          .then((data) => {
+            this.job = data.data.job;
+          });
 
         //update errores
-        if (this.errores != []){
+        if (this.errores != []) {
           axios
-          .get(`${process.env.VUE_APP_API_ROUTE}/error/` + this.jobsRecibidos.job)
-          .then((data) => {
-          this.errores = data.data.errores
-          })
+            .get(
+              `${process.env.VUE_APP_API_ROUTE}/error/` + this.jobsRecibidos.job
+            )
+            .then((data) => {
+              this.errores = data.data.errores;
+            });
         }
-        
+
+        //update ver job
+        this.$emit("updateJobErrores", {
+          job: this.job,
+          errores: this.errores,
+        });
       }
     },
 
@@ -219,6 +233,7 @@ export default {
       cargarAccion: false,
       ultimaAccion: undefined,
       job: null,
+      showGestionarWindow: false,
 
       jobHeaders: [
         { text: "Estado", value: "estado" },
@@ -240,12 +255,21 @@ export default {
 <style scoped>
 .card {
   border: 1px solid white;
-  max-height: 84vh;
+  max-height: 83vh;
   overflow-y: auto;
+}
+
+.cardTitleWrapper {
+  display: flex;
+}
+
+.cardTitle {
+  flex-grow: 1;
 }
 
 h2 {
   font-weight: 400 !important;
+  margin-bottom: 0.5rem;
 }
 
 .processTitle {
@@ -254,7 +278,6 @@ h2 {
 }
 
 .processBtn {
-  background-color: green;
   font-weight: 400 !important;
 }
 
