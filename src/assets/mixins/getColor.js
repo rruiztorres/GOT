@@ -14,8 +14,12 @@ export const getColor = {
             else if (estado == 'Marcado') return '#d0e4f5';                 //azul claro
             else if (estado == 'Pendiente solución') return '#ffcc00';      //amarillo
             else if (estado == 'Solucionado') return '#009933';             //verde
-            else if (estado == 'Desestimado') return '#0066ff';             //azul
-            else if (estado == 'Devuelto') return '#f54b42';                //rojo
+            else if (estado == 'Desestimado') return '#0066ff';             //azul    
+            else if (estado == 'Error versión') return '#f54b42';           //rojo
+            else if (estado == 'Versión generada') return '#009933';        //verde
+            else if (estado == 'Ejecución') return '#ffcc00';               //amarillo
+            else if (estado == 'Conciliado') return '#009933';        //verde
+            
 
 
             //EXPEDIENTES

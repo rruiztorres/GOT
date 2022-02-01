@@ -14,6 +14,10 @@
             <div v-if="activarMenu == 'BandejaMisJobs'"><BandejaMisJobs></BandejaMisJobs></div>
             <!--Operador-->
             <div v-if="activarMenu == 'BandejaOp'"><BandejaOp></BandejaOp></div>
+            
+            <!--Soporte BDIG -->
+            <div v-if="activarMenu == 'BandejaErrCrear'"><BandejaErrCrear></BandejaErrCrear></div>
+            <div v-if="activarMenu == 'BandejaErrFin'"><BandejaErrFin></BandejaErrFin></div>
         </div>
     </div>
 </template>
@@ -27,7 +31,9 @@
     import BandejaMisJobs from '@/components/common/BandejaMisJobs';
     import RecuperarJobs from '@/components/generadorJobs/RecuperarJobs';
     import ErroresNoAsign from '@/components/generadorJobs/ErroresNoAsign';
-
+    import BandejaErrCrear from "@/components/soporteBDIG/BandejaErrCrear";
+    import BandejaErrFin from "@/components/soporteBDIG/BandejaErrFin";
+    
     export default {
         name:'Loader',
         components: {
@@ -39,6 +45,8 @@
             BandejaMisJobs,
             RecuperarJobs,
             ErroresNoAsign,
+            BandejaErrCrear,
+            BandejaErrFin,
         },
 
         props: ['activarMenu'],

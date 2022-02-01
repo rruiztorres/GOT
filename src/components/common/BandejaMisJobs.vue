@@ -15,13 +15,7 @@
           <v-col cols="12" md="8">
             <v-row class="buttonGroup">
               <v-col cols="12" md="3">
-                <v-btn
-                :disabled="true" 
-                class="btn" 
-                dark 
-                color="success">
-                  DEVOLVER JOBS
-                </v-btn>
+                <!-- -->
               </v-col>
               <v-spacer></v-spacer>
             </v-row>
@@ -49,6 +43,7 @@
         :search="search"
         item-key="job"
         show-select
+        :sort-by.sync="sortBy"
       >
         <template v-slot:top>
           <v-dialog
@@ -78,6 +73,9 @@
             <v-icon > mdi-briefcase-eye </v-icon>
           </v-btn>
           <v-btn
+            v-if="  item.estado != 'Ejecución' && 
+                    item.estado != 'Pausa' && 
+                    item.estado != 'Versión generada'"
             title="Devolver A Bandeja"
             class="returnButton"
             elevation="2"
@@ -136,13 +134,14 @@
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import { checkBlocking } from "@/assets/mixins/checkBlocking.js";
+import { returnJob } from "@/assets/mixins/proceso/returnJob";
 import VerJob from "@/components/common/VerJob";
 import NoData from "@/components/common/NoData";
 import JustificarAccion from "@/components/common/JustificarAccion";
 
 export default {
   name: "BandejaOpEsp",
-  mixins: [getColor, checkBlocking],
+  mixins: [getColor, checkBlocking, returnJob,],
   components: { NoData, VerJob, JustificarAccion },
 
   data: () => ({
@@ -150,25 +149,24 @@ export default {
     dialogDelete: false,
     selected: [],
     search: "",
+    sortBy: 'estado',
     headers: [
-      { text: "BL.", align: "start", sortable: true, value: "bloqueado" },
-      { text: "Estado", align: "start", sortable: true, value: "estado" },
-      { text: "Job", align: "start", sortable: true, value: "job" },
+      { text: "BL.", align: "start", value: "bloqueado" },
+      { text: "Estado", align: "start", value: "estado" },
+      { text: "Job", align: "start", value: "job" },
       {
         text: "Gravedad",
         align: "start",
-        sortable: true,
         value: "gravedad_job",
       },
       {
         text: "Detectado en",
         align: "start",
-        sortable: true,
         value: "deteccion_job",
       },
-      { text: "Perfil", align: "start", sortable: true, value: "arreglo_job" },
-      { text: "Descripción", align: "start", sortable: true, value: "resumen" }, //hay que hacer desde API un "resumen" ademas de la desc completa
-      { text: "Acciones", value: "actions", sortable: false },
+      { text: "Perfil", align: "start", value: "arreglo_job" },
+      { text: "Descripción", align: "start", value: "resumen" }, //hay que hacer desde API un "resumen" ademas de la desc completa
+      { text: "Acciones", value: "actions"},
     ],
     jobs: [],
     editedIndex: -1,
@@ -241,40 +239,26 @@ export default {
       this.showWindowJustify = false;
       if (data !== ''){
         this.justificacionJobDevuelto = data;
-        this.returnJob(this.jobReturned);
-      }
-    },
+        this.proceso = this.returnJob(this.jobReturned);
 
-    returnJob(job){
-      job.nuevoEstado = 'En bandeja';
-      job.nombre_operador = null;
-      
-      //OBJECTO LOG
-      this.log = {
-        idEventoLogger: 12, //JOB DEVUELTO A BANDEJA GENÉRICA
-        procesoJob: 'GOT',
-        usuario: localStorage.usuario,
-        observaciones: this.justificacionJobDevuelto,
-        departamento: '',
-        resultadoCC: '',
-      }
-      
-      axios
-      .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, [job, this.log])
-      .then((data) => {
-        if(data.status == 201){
+        if (this.proceso === 0) {      
           this.showWindowReturnJob = false;
           for (this.index in this.jobs){
-            if (this.jobs[this.index].job == data.data.jobActualizado){
+            if (this.jobs[this.index].job == this.jobReturned.job){
               this.jobs.splice(this.index, 1)
-              this.message = `El Job ${data.data.jobActualizado} se ha devuelto a la bandeja ${job.tipo_bandeja}`
+              this.message = `El Job ${this.jobReturned.job} se ha devuelto a la bandeja ${this.jobReturned.tipo_bandeja}`
               this.messageType = 'success';
               this.showMessage = true;
               setTimeout(this.closeInfoMsg, 2000);
             }
           }
+        } else {
+            this.message = 'Error inesperado, por favor revise los datos';
+            this.messageType = 'error';
+            this.showMessage = true;
+            setTimeout(this.closeInfoMsg, 2000);
         }
-      })
+      }
     },
 
     closeInfoMsg(){
@@ -288,12 +272,19 @@ export default {
     },
 
     initialize() {
+      //REINICIO DE JOBS SI EXISTEN
+      this.jobs = [];
       axios.get(`${process.env.VUE_APP_API_ROUTE}/jobs`).then((data) => {
         this.jobsBruto = data.data.response;
         for (this.elemento in this.jobsBruto) {
           //filtramos jobs, en bandeja, operadores especializados sin operador asignado
           if (
-            this.jobsBruto[this.elemento].estado == "En bandeja_op" &&
+            this.jobsBruto[this.elemento].estado == "En bandeja_op" ||
+            this.jobsBruto[this.elemento].estado == "Versión generada" ||
+            this.jobsBruto[this.elemento].estado == "Pausa" ||
+            this.jobsBruto[this.elemento].estado == "Ejecución" ||
+            this.jobsBruto[this.elemento].estado === "Error_fin para usuario"          
+            &&
             this.jobsBruto[this.elemento].nombre_operador ==
               localStorage.usuario
           ) {
@@ -332,6 +323,7 @@ export default {
 
     dialogClose() {
       this.dialog = false;
+      this.initialize();
     },
 
     save() {

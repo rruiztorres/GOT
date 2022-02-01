@@ -3,7 +3,7 @@
     <!-- HEADER -->
     <div class="panelHeader">
       <h2 class="panelHeader-title">
-        Bandeja de Jobs (Operadores)
+        Errores al finalizar versión
       </h2>
       <v-spacer></v-spacer>
       <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1">
@@ -19,9 +19,10 @@
           <v-col cols="12" md="8">
             <v-row class="buttonGroup">
               <v-col cols="12" md="3">
-                <v-btn class="btn" dark color="success">
-                  ASIGNARME JOBS
-                </v-btn>
+                <!-- -->
+              </v-col>
+              <v-col cols="12" md="4">
+                <!-- -->
               </v-col>
               <v-spacer></v-spacer>
             </v-row>
@@ -61,7 +62,7 @@
             hide-overlay
             transition="dialog-bottom-transition"
           >
-            <VerJob :job="editedItem" @dialog="dialogClose"></VerJob>
+            <VerJob :job="editedItem" @dialog="dialogClose" @updateData="updateData"></VerJob>
           </v-dialog>
         </template>
 
@@ -70,10 +71,6 @@
           <v-btn title="Ver Job" 
             icon dark class="editButton" @click="editItem(item)">
             <v-icon> mdi-briefcase-eye </v-icon>
-          </v-btn>
-          <v-btn title="asignarme el job" 
-            icon dark class="generateBtn" @click="asignJob(item)">
-            <v-icon>mdi-thumb-up</v-icon>
           </v-btn>
         </template>
 
@@ -122,7 +119,7 @@ import NoData from "@/components/common/NoData";
 import VerJob from "@/components/common/VerJob";
 
 export default {
-  name: "BandejaOpEsp",
+  name: "BandejaErrFinalizar",
   mixins: [getColor, checkBlocking],
   components: { NoData, VerJob },
 
@@ -169,8 +166,8 @@ export default {
     },
 
     //NO DATA SLOT
-    noDataMensaje: "Vaya... parece que no existen jobs para mostrar aquí.",
-    noDataOpcion: "Si necesitas jobs para trabajar puedes generar alguna IDV",
+    noDataMensaje: "Parece que no hay jobs que requieran soporte",
+    noDataOpcion: "Quizá quieras revisar la bandeja Errores Finalizar Versión",
 
     //MENSAJES INFORMACIÓN
     showMessage: false,
@@ -203,33 +200,10 @@ export default {
       console.log();
     },
 
-    asignJob(job){
-      job.nuevoEstado = 'En bandeja_op';
-      job.nombre_operador = localStorage.usuario;
-      
-      //OBJECTO LOG
-      this.log = {
-          idEventoLogger: 11, //JOB SELECCIONADO PARA TRABAJAR
-          procesoJob: 'GOT',
-          usuario: localStorage.usuario,
-          observaciones: '',
-          departamento: '',
-          resultadoCC: '',
-      }
-
-      axios
-      .post(`${process.env.VUE_APP_API_ROUTE}/cambioEstadosJob`, [job, this.log])
-      .then((data) => {
-        for (this.index in this.jobs){
-          if (this.jobs[this.index].job == data.data.jobActualizado){
-            this.jobs.splice(this.index, 1)
-            this.message = `Te has asignado correctamente el job ${data.data.jobActualizado}`
-            this.messageType = 'success';
-            this.showMessage = true;
-            setTimeout(this.closeInfoMsg, 2000);
-          }
+    updateData(data){
+        if(data === true){
+            this.initialize();
         }
-      })
     },
 
     closeInfoMsg(){
@@ -243,21 +217,15 @@ export default {
     },
 
     initialize() {
-      //Reinicio de jobs si es que existen
-      this.jobs = [];
-      
+      //Reinicio de jobs si existen
+      this.jobs=[];
       axios
       .get(`${process.env.VUE_APP_API_ROUTE}/jobs`)
       .then((data) => {
         this.jobsBruto = data.data.response;
         for (this.elemento in this.jobsBruto) {
           //filtramos jobs, en bandeja, operadores sin operador asignado
-          if (
-            this.jobsBruto[this.elemento].estado == "En bandeja" &&
-            this.jobsBruto[this.elemento].tipo_bandeja ==
-              "Operadores" &&
-            this.jobsBruto[this.elemento].nombre_operador == null
-          ) {
+          if (this.jobsBruto[this.elemento].estado == "Error_fin para soporte") {
             this.jobs.push(this.jobsBruto[this.elemento]);
           }
         }
@@ -293,7 +261,6 @@ export default {
 
     dialogClose() {
       this.dialog = false;
-      this.initialize();
     },
 
     save() {

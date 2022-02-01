@@ -243,6 +243,9 @@ export default {
     },
 
     initialize() {
+      //Reinicio de jobs si es que existen
+      this.jobs = [];
+
       axios
       .get(`${process.env.VUE_APP_API_ROUTE}/jobs`)
       .then((data) => {
@@ -290,6 +293,7 @@ export default {
 
     dialogClose() {
       this.dialog = false;
+      this.initialize();
     },
 
     save() {

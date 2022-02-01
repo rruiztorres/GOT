@@ -1,18 +1,18 @@
 import axios from 'axios';
 
-export const asignarmeJob = {
+export const consultaResuelta = {
     
     methods: {
-        asignarmeJob(job){
-            job.nuevoEstado = 'En bandeja_op';
+        consultaResuelta(job, observaciones){
+            job.nuevoEstado = 'En triaje';
             job.nombre_operador = localStorage.usuario;
       
             //OBJECTO LOG
             this.log = {
-                idEventoLogger: 11, //JOB SELECCIONADO PARA TRABAJAR
+                idEventoLogger: 16, //JOB CONSULTA RESUELTA
                 procesoJob: 'GOT',
                 usuario: localStorage.usuario,
-                observaciones: '',
+                observaciones: observaciones,
                 departamento: '',
                 resultadoCC: '',
             }

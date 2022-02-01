@@ -1,265 +1,294 @@
 <template>
   <div class="panelContainer">
-      <div class="panelHeader">
-        <h2 class="panelHeader-title">Jobs en Triaje</h2>
-        <v-spacer></v-spacer>
-        <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1">
-          <v-icon x-large>mdi-help-box</v-icon>
-        </v-btn>
-      </div>
+    <div class="panelHeader">
+      <h2 class="panelHeader-title">Jobs en Triaje</h2>
+      <v-spacer></v-spacer>
+      <v-btn title="Obtener Ayuda" tile icon color="primary" elevation="1">
+        <v-icon x-large>mdi-help-box</v-icon>
+      </v-btn>
+    </div>
 
-      <div>    
-        <!--PANEL ACCIONES SUPERIOR -->
-        <v-card elevation="0">
-            <v-row class="panelFuncionesCard">
-              <v-col cols="12" md="8">
-                <v-row class="buttonGroup">
-                  <v-col cols="12" md="3" >
-                    <v-btn 
-                      class="btn"
-                      :disabled="groupActions()" 
-                      dark color="success" 
-                      @click="groupGenerate()">
-                      GENERAR JOBS
-                    </v-btn>
-                  </v-col>
-                  <v-col cols="12" md="3">
-                    <v-btn
-                      class="btn"
-                      :disabled="groupActions()" 
-                      dark color="#71717A" 
-                      @click="groupAsignExp()">
-                      ASIGNAR EXP.
-                    </v-btn>
-                  </v-col>
-                  <v-col cols="12" md="3">
-                    <v-btn
-                      class="btn"
-                      :disabled="groupActions()" 
-                      dark color="warning"
-                      @click="groupDesestimar()"
-                      >
-                      DESESTIMAR
-                    </v-btn>
-                  </v-col>
-                  <v-col cols="12" md="3">       
-                    <v-btn
-                      class="btn"
-                      :disabled="groupActions()" 
-                      dark color="error" 
-                      @click="deleteJobs()">
-                    ELIMINAR
-                    </v-btn>
-                  </v-col>
-                </v-row>
+    <div>
+      <!--PANEL ACCIONES SUPERIOR -->
+      <v-card elevation="0">
+        <v-row class="panelFuncionesCard">
+          <v-col cols="12" md="8">
+            <v-row class="buttonGroup">
+              <v-col cols="12" md="3">
+                <v-btn
+                  class="btn"
+                  :disabled="groupActions()"
+                  dark
+                  color="success"
+                  @click="groupGenerate()"
+                >
+                  GENERAR JOBS
+                </v-btn>
               </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field
-                  class="textField"
-                  v-model="search"
-                  append-icon="mdi-magnify"
-                  label="Buscar"
-                  single-line
-                  hide-details
-                ></v-text-field>
+              <v-col cols="12" md="3">
+                <v-btn
+                  class="btn"
+                  :disabled="groupActions()"
+                  dark
+                  color="#71717A"
+                  @click="groupAsignExp()"
+                >
+                  ASIGNAR EXP.
+                </v-btn>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-btn
+                  class="btn"
+                  :disabled="groupActions()"
+                  dark
+                  color="warning"
+                  @click="groupDesestimar()"
+                >
+                  DESESTIMAR
+                </v-btn>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-btn
+                  class="btn"
+                  :disabled="groupActions()"
+                  dark
+                  color="error"
+                  @click="deleteJobs()"
+                >
+                  ELIMINAR
+                </v-btn>
               </v-col>
             </v-row>
-        </v-card>
-        <v-data-table
-          class="dataTable"
-          v-model="selected"
-          :headers="headers"
-          :items="jobs"
-          :search="search"
-          group-by="expediente"
-          item-key="job"
-          show-select>
-          <template v-slot:top>
-            <!-- VENTANA EDICION JOB -->
-            <v-dialog
-              style="heigth:100vh;"
-              v-model="dialog"
-              persistent
-              fullscreen
-              hide-overlay
-              transition="dialog-bottom-transition"
-            >
-              <EditarJob
-                @datosActualizados="updateData"
-                @dialog="dialogClose"
-                :job="editedItem"
-              ></EditarJob>
-            </v-dialog>
-
-            <!-- ALERTA BORRADO JOBS -->
-            <v-overlay :value="dialogDelete">
-              <v-card class="alertCard">
-                <h1 class="alertCardTitle">ATENCIÓN</h1>
-                <h4>Esta acción borrará el Job y todos los errores asociados.</h4>
-                <h4>El borrado es permanente y <b>no puede deshacerse</b></h4>
-                <br/>
-                <h3><b>¿Desea continuar?</b></h3>
-                <v-card-actions>
-                  <div class="alertButtonGroup">
-                    <v-btn
-                      class="alertButton errorBtn"
-                      dark
-                      text
-                      @click="dialogDelete = !dialogDelete"
-                      >CANCELAR</v-btn
-                    >
-                    <v-btn
-                      class="alertButton generateBtn"
-                      dark
-                      text
-                      @click="confirmDeleteJobs()"
-                      >OK</v-btn
-                    >
-                  </div>
-                </v-card-actions>
-              </v-card>
-            </v-overlay>
-
-            <!-- ALERTA DESESTIMAR JOBS -->
-            <v-overlay :value="dialogDesestimar">
-              <v-card class="alertCard">
-                <h1 class="alertCardTitle">ATENCIÓN</h1>
-                <h4>Esta acción desestimará el job y los errores asociados</h4>
-                <h4>La desestimación es permanente y <b>no puede deshacerse</b></h4>
-                <br/>
-                <h3><b>¿Desea continuar?</b></h3>
-                <v-card-actions>
-                  <div class="alertButtonGroup">
-                    <v-btn
-                      class="alertButton errorBtn"
-                      dark
-                      text
-                      @click="dialogDesestimar = !dialogDesestimar"
-                      >CANCELAR</v-btn
-                    >
-                    <v-btn
-                      class="alertButton generateBtn"
-                      dark
-                      text
-                      @click="showWindowJustify = true"
-                      >OK</v-btn
-                    >
-                  </div>
-                </v-card-actions>
-              </v-card>
-            </v-overlay>
-
-            <!-- VENTANA JUSTIFICACIÓN DEVOLVER JOB-->
-            <v-overlay 
-              :value="showWindowJustify">
-              <JustificarAccion
-                title="Desestimar Job/s"
-                text="Indique el motivo por el cual desea desestimar"
-                @close="getJustification"
-              ></JustificarAccion>
-            </v-overlay>
-
-          </template>
-
-          <template v-slot:[`item.actions`]="{ item }">
-            <v-btn
-              class="editButton"
-              elevation="2"
-              @click="editItem(item)"
-              icon dark           
-            >
-              <v-icon > mdi-lead-pencil </v-icon>
-            </v-btn>
-          </template>
-
-          <template v-slot:no-data>
-            <NoData :mensaje="noDataMensaje" :opcion="noDataOpcion"></NoData>
-          </template>
-
-          <template v-slot:[`item.estado`]="{ item }">
-            <v-chip :color="getColor(item.estado)" dark>
-              {{ item.estado }}
-            </v-chip>
-          </template>
-        </v-data-table>
-
-        <!--MENSAJES DE INFORMACION-->
-        <v-overlay :value="showMessage">
-          <v-alert
-            :color="messageType"
-            dark
-            border="top"
-            icon="mdi-alert-circle-outline"
-            transition="scale-transition"
+          </v-col>
+          <v-col cols="12" md="4">
+            <v-text-field
+              class="textField"
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Buscar"
+              single-line
+              hide-details
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-card>
+      <v-data-table
+        class="dataTable"
+        v-model="selected"
+        :headers="headers"
+        :items="jobs"
+        :search="search"
+        group-by="expediente"
+        item-key="job"
+        show-select
+      >
+        <template v-slot:top>
+          <!-- VENTANA EDICION JOB -->
+          <v-dialog
+            style="heigth:100vh;"
+            v-model="dialog"
+            persistent
+            fullscreen
+            hide-overlay
+            transition="dialog-bottom-transition"
           >
-            {{ message }}
-          </v-alert>
-        </v-overlay>
+            <EditarJob
+              @datosActualizados="updateData"
+              @dialog="dialogClose"
+              :job="editedItem"
+            ></EditarJob>
+          </v-dialog>
 
-        <!--SELECCION DE EXPEDIENTES (asignacion masiva) TODO: sacar a componente-->
-        <v-overlay :value="showExpSelect">
-          <v-card light class="asignExpContainer">
-            <v-card-title class="asignExpTitle">Asignación de Expediente
-              <v-spacer></v-spacer>
+          <!-- ALERTA BORRADO JOBS -->
+          <v-overlay :value="dialogDelete">
+            <v-card class="alertCard">
+              <h1 class="alertCardTitle">ATENCIÓN</h1>
+              <h4>Esta acción borrará el Job y todos los errores asociados.</h4>
+              <h4>El borrado es permanente y <b>no puede deshacerse</b></h4>
+              <br />
+              <h3><b>¿Desea continuar?</b></h3>
               <v-card-actions>
-                <div>
-                  <v-btn text dark class="errorBtn expBtn" elevation="2" @click="showExpSelect = !showExpSelect">CANCELAR</v-btn>
-                  <v-btn text dark class="generateBtn expBtn" elevation="2" :disabled="expediente == null" @click="asignExpToSelect()">ASIGNAR A SELECCIÓN</v-btn>
+                <div class="alertButtonGroup">
+                  <v-btn
+                    class="alertButton errorBtn"
+                    dark
+                    text
+                    @click="dialogDelete = !dialogDelete"
+                    >CANCELAR</v-btn
+                  >
+                  <v-btn
+                    class="alertButton generateBtn"
+                    dark
+                    text
+                    @click="confirmDeleteJobs()"
+                    >OK</v-btn
+                  >
                 </div>
-              </v-card-actions>  
-            </v-card-title>
-            <v-row class="asignExpInfoContainer">
-              <v-col>
+              </v-card-actions>
+            </v-card>
+          </v-overlay>
+
+          <!-- ALERTA DESESTIMAR JOBS -->
+          <v-overlay :value="dialogDesestimar">
+            <v-card class="alertCard">
+              <h1 class="alertCardTitle">ATENCIÓN</h1>
+              <h4>Esta acción desestimará el job y los errores asociados</h4>
+              <h4>
+                La desestimación es permanente y <b>no puede deshacerse</b>
+              </h4>
+              <br />
+              <h3><b>¿Desea continuar?</b></h3>
+              <v-card-actions>
+                <div class="alertButtonGroup">
+                  <v-btn
+                    class="alertButton errorBtn"
+                    dark
+                    text
+                    @click="dialogDesestimar = !dialogDesestimar"
+                    >CANCELAR</v-btn
+                  >
+                  <v-btn
+                    class="alertButton generateBtn"
+                    dark
+                    text
+                    @click="showWindowJustify = true"
+                    >OK</v-btn
+                  >
+                </div>
+              </v-card-actions>
+            </v-card>
+          </v-overlay>
+
+          <!-- VENTANA JUSTIFICACIÓN DEVOLVER JOB-->
+          <v-overlay :value="showWindowJustify">
+            <JustificarAccion
+              title="Desestimar Job/s"
+              text="Indique el motivo por el cual desea desestimar"
+              @close="getJustification"
+            ></JustificarAccion>
+          </v-overlay>
+        </template>
+
+        <template v-slot:[`item.actions`]="{ item }">
+          <v-btn
+            class="editButton"
+            elevation="2"
+            @click="editItem(item)"
+            icon
+            dark
+          >
+            <v-icon> mdi-lead-pencil </v-icon>
+          </v-btn>
+        </template>
+
+        <template v-slot:no-data>
+          <NoData :mensaje="noDataMensaje" :opcion="noDataOpcion"></NoData>
+        </template>
+
+        <template v-slot:[`item.estado`]="{ item }">
+          <v-chip :color="getColor(item.estado)" dark>
+            {{ item.estado }}
+          </v-chip>
+        </template>
+      </v-data-table>
+
+      <!--MENSAJES DE INFORMACION-->
+      <v-overlay :value="showMessage">
+        <v-alert
+          :color="messageType"
+          dark
+          border="top"
+          icon="mdi-alert-circle-outline"
+          transition="scale-transition"
+        >
+          {{ message }}
+        </v-alert>
+      </v-overlay>
+
+      <!--SELECCION DE EXPEDIENTES (asignacion masiva) TODO: sacar a componente-->
+      <v-overlay :value="showExpSelect">
+        <v-card light class="asignExpContainer">
+          <v-card-title class="asignExpTitle"
+            >Asignación de Expediente
+            <v-spacer></v-spacer>
+            <v-card-actions>
+              <div>
+                <v-btn
+                  text
+                  dark
+                  class="errorBtn expBtn"
+                  elevation="2"
+                  @click="showExpSelect = !showExpSelect"
+                  >CANCELAR</v-btn
+                >
+                <v-btn
+                  text
+                  dark
+                  class="generateBtn expBtn"
+                  elevation="2"
+                  :disabled="expediente == null"
+                  @click="asignExpToSelect()"
+                  >ASIGNAR A SELECCIÓN</v-btn
+                >
+              </div>
+            </v-card-actions>
+          </v-card-title>
+          <v-row class="asignExpInfoContainer">
+            <v-col>
+              <div>
                 <div>
-                  <div>
-                    <v-card-text>Seleccione un expediente </v-card-text>
-                    <v-select
+                  <v-card-text>Seleccione un expediente </v-card-text>
+                  <v-select
                     :items="expedientes"
                     v-model="expediente"
                     label="Expediente"
                     solo
                     light
-                    ></v-select>
-                  </div>
-                    
-                    <v-card-title>Información</v-card-title>
-                    <div
-                      class="asignExpTable"
-                      v-if="expedienteInfo[0].observaciones != null && expedienteInfo[0].fecha"
-                    >
-                      <v-simple-table>
-                        <template v-slot:default>
-                          <tbody>
-                            <tr>
-                              <td class="text-left">Observaciones</td>
-                              <td><span class="asignExpObser" v-html="expedienteInfo[0].observaciones"></span></td>
-                            </tr>
-                            <tr>
-                              <td class="text-left">Fecha Alta</td>
-                              <td v-html="expedienteInfo[0].fecha"></td>
-                            </tr>
-                            <tr>
-                              <td class="text-left">Estado</td>
-                              <td v-html="expedienteInfo[0].finalizado"></td>
-                            </tr>
-                          </tbody>
-                        </template>
-                      </v-simple-table>
-                    </div>
-
-                    <div 
-                      class="asignExpTable"
-                      v-else
-                    >
-                      <div>Seleccione un expediente para ver información</div>
-                    </div>
+                  ></v-select>
                 </div>
-              </v-col>
-            </v-row>      
-          </v-card>
-        </v-overlay>
 
-      </div>
+                <v-card-title>Información</v-card-title>
+                <div
+                  class="asignExpTable"
+                  v-if="
+                    expedienteInfo[0].observaciones != null &&
+                      expedienteInfo[0].fecha
+                  "
+                >
+                  <v-simple-table>
+                    <template v-slot:default>
+                      <tbody>
+                        <tr>
+                          <td class="text-left">Observaciones</td>
+                          <td>
+                            <span
+                              class="asignExpObser"
+                              v-html="expedienteInfo[0].observaciones"
+                            ></span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td class="text-left">Fecha Alta</td>
+                          <td v-html="expedienteInfo[0].fecha"></td>
+                        </tr>
+                        <tr>
+                          <td class="text-left">Estado</td>
+                          <td v-html="expedienteInfo[0].finalizado"></td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </div>
+
+                <div class="asignExpTable" v-else>
+                  <div>Seleccione un expediente para ver información</div>
+                </div>
+              </div>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-overlay>
+    </div>
   </div>
 </template>
 
@@ -267,14 +296,13 @@
 import axios from "axios";
 
 import { getColor } from "@/assets/mixins/getColor.js";
-import { generarJobError } from '@/assets/mixins/generarJobError';
-import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry';
-import { desestimarJobs } from "@/assets/mixins/desestimarJobs";
+import { generarJobError } from "@/assets/mixins/generarJobError";
+import { stringifyJobGeometry } from "@/assets/mixins/stringifyJobGeometry";
+import { desestimarJobs } from "@/assets/mixins/proceso/desestimarJobs";
 
 import NoData from "@/components/common/NoData";
-import EditarJob from '@/components/generadorJobs/EditarJob';
-import JustificarAccion from '@/components/common/JustificarAccion';
-
+import EditarJob from "@/components/generadorJobs/EditarJob";
+import JustificarAccion from "@/components/common/JustificarAccion";
 
 export default {
   name: "JobsTriajeGJ",
@@ -289,17 +317,32 @@ export default {
     dialog: false,
     dialogDelete: false,
     dialogDesestimar: false,
-    justificacionJobDesestimado: '',
+    justificacionJobDesestimado: "",
     selected: [],
     search: "",
     headers: [
-      { text: "Estado", align: "start", sortable: true, value: "estado"},
-      { text: "Job", align: "start", sortable: true, value: "job"},
-      { text: "Expediente", align: "start", sortable: true, value: "expediente"},
-      { text: "Gravedad", align: "start", sortable: true, value: "gravedad_job"},
-      { text: "Detectado en", align: "start", sortable: true, value: "deteccion_job"},
-      { text: "Perfil", align: "start", sortable: true, value: "arreglo_job"},
-      { text: "Descripción", align: "start", sortable: true, value: "resumen"}, //hay que hacer desde API un "resumen" ademas de la desc completa
+      { text: "Estado", align: "start", sortable: true, value: "estado" },
+      { text: "Job", align: "start", sortable: true, value: "job" },
+      {
+        text: "Expediente",
+        align: "start",
+        sortable: true,
+        value: "expediente",
+      },
+      {
+        text: "Gravedad",
+        align: "start",
+        sortable: true,
+        value: "gravedad_job",
+      },
+      {
+        text: "Detectado en",
+        align: "start",
+        sortable: true,
+        value: "deteccion_job",
+      },
+      { text: "Perfil", align: "start", sortable: true, value: "arreglo_job" },
+      { text: "Descripción", align: "start", sortable: true, value: "resumen" }, //hay que hacer desde API un "resumen" ademas de la desc completa
       { text: "Acciones", value: "actions", sortable: false },
     ],
     jobs: [],
@@ -311,7 +354,7 @@ export default {
       gravedad_job: "",
       deteccion_job: "",
       arreglo_job: "",
-      resumen:"",
+      resumen: "",
     },
     defaultItem: {
       estado: "",
@@ -320,32 +363,35 @@ export default {
       gravedad_job: "",
       deteccion_job: "",
       arreglo_job: "",
-      resumen:"",
+      resumen: "",
     },
 
     showMessage: false,
-    message: '',
-    messageType: '',
+    message: "",
+    messageType: "",
 
     showWindowJustify: false,
     rules: {
-      required: value => !!value || 'Este campo es obligatorio.',
-      counter: value => value.length <= 120 || 'Máximo 120 caracteres'
+      required: (value) => !!value || "Este campo es obligatorio.",
+      counter: (value) => value.length <= 120 || "Máximo 120 caracteres",
     },
 
     //MANEJO EXPEDIENTES
     showExpSelect: false,
     expedientes: [],
     expediente: null,
-    expedienteInfo: [{
-      fecha: null,
-      observaciones: null,
-      finalizado: null,
-    }],
+    expedienteInfo: [
+      {
+        fecha: null,
+        observaciones: null,
+        finalizado: null,
+      },
+    ],
 
-     //NO DATA SLOT
-    noDataMensaje: 'En estos momentos no existen Jobs que requieran triaje.',
-    noDataOpcion: 'Echa un vistazo a los errores sin asignar por si puedes generar nuevos Jobs.',
+    //NO DATA SLOT
+    noDataMensaje: "En estos momentos no existen Jobs que requieran triaje.",
+    noDataOpcion:
+      "Echa un vistazo a los errores sin asignar por si puedes generar nuevos Jobs.",
   }),
 
   watch: {
@@ -357,19 +403,23 @@ export default {
       val || this.closeDelete();
     },
 
-    expediente(){
-      if(this.expediente != null){
+    expediente() {
+      if (this.expediente != null) {
         axios
-        .get(`${process.env.VUE_APP_API_ROUTE}/expediente/`+ this.expediente)
-        .then((data) => {
-          this.expedienteInfo[0].fecha = (data.data.respuesta[0].fecha).slice(0,10);
-          this.expedienteInfo[0].observaciones = data.data.respuesta[0].observaciones;
-          if (data.data.respuesta[0].finalizado == true){
-            this.expedienteInfo[0].finalizado = "Finalizado"
-          } else {
-            this.expedienteInfo[0].finalizado = "Abierto"
-          }
-        })
+          .get(`${process.env.VUE_APP_API_ROUTE}/expediente/` + this.expediente)
+          .then((data) => {
+            this.expedienteInfo[0].fecha = data.data.respuesta[0].fecha.slice(
+              0,
+              10
+            );
+            this.expedienteInfo[0].observaciones =
+              data.data.respuesta[0].observaciones;
+            if (data.data.respuesta[0].finalizado == true) {
+              this.expedienteInfo[0].finalizado = "Finalizado";
+            } else {
+              this.expedienteInfo[0].finalizado = "Abierto";
+            }
+          });
       }
     },
   },
@@ -379,14 +429,14 @@ export default {
   },
 
   methods: {
-    groupDesestimar(){
+    groupDesestimar() {
       this.dialogDesestimar = true;
     },
 
-    getJustification(data){
-      if(data != ''){
+    getJustification(data) {
+      if (data != "") {
         this.observaciones = data;
-        this.desestimateJobs(this.observaciones)
+        this.desestimateJobs(this.observaciones);
       } else {
         this.dialogDesestimar = false;
         this.showWindowJustify = false;
@@ -394,91 +444,105 @@ export default {
       }
     },
 
-    desestimateJobs(observaciones){
-        this.dialogDesestimar = false;
-        this.showWindowJustify = false;
-        this.ejecucion = this.desestimarJobs(this.selected, observaciones)
-        if (this.ejecucion == 0){
-          for (this.index in this.jobs){
-            for (this.indexSelection in this.selected){
-              if (this.selected[this.indexSelection].id_job == this.jobs[this.index].id_job){
-                this.jobs.splice(this.index, 1);
-              }
+    desestimateJobs(observaciones) {
+      this.dialogDesestimar = false;
+      this.showWindowJustify = false;
+      this.ejecucion = this.desestimarJobs(this.selected, observaciones);
+      if (this.ejecucion == 0) {
+        for (this.index in this.jobs) {
+          for (this.indexSelection in this.selected) {
+            if (
+              this.selected[this.indexSelection].id_job ==
+              this.jobs[this.index].id_job
+            ) {
+              this.jobs.splice(this.index, 1);
             }
           }
-          this.showInfo("Los jobs seleccionados se han desestimado correctamente", "green");
-          setTimeout(this.closeInfo, 1500);
         }
+        this.showInfo(
+          "Los jobs seleccionados se han desestimado correctamente",
+          "green"
+        );
+        setTimeout(this.closeInfo, 1500);
+      }
     },
 
-    asignExpToSelect(){
-      //Asigna el expediente a la seleccion de jobs actual   
-      for (this.index in this.selected){
-        this.selected[this.index].geometria = this.stringifyJobGeometry(this.selected[this.index].geometria_json);
+    asignExpToSelect() {
+      //Asigna el expediente a la seleccion de jobs actual
+      for (this.index in this.selected) {
+        this.selected[this.index].geometria = this.stringifyJobGeometry(
+          this.selected[this.index].geometria_json
+        );
         this.selected[this.index].expediente = this.expediente;
 
         axios
-        .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, [this.selected[this.index]])
-        .then((data)=>{
-          this.showExpSelect = false;
-          this.selected = [];
-          if (data.status == 201){
-            this.showInfo("El expediente ha sido asignado a los jobs seleccionados", "green");
-            setTimeout(this.closeInfo, 1500);
-          } else {
-            this.showInfo(data.data.mensaje, "red");
-            setTimeout(this.closeInfo, 1500);
-          }
-        })
-        
+          .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, [
+            this.selected[this.index],
+          ])
+          .then((data) => {
+            this.showExpSelect = false;
+            this.selected = [];
+            if (data.status == 201) {
+              this.showInfo(
+                "El expediente ha sido asignado a los jobs seleccionados",
+                "green"
+              );
+              setTimeout(this.closeInfo, 1500);
+            } else {
+              this.showInfo(data.data.mensaje, "red");
+              setTimeout(this.closeInfo, 1500);
+            }
+          });
       }
-      
     },
 
-    groupAsignExp(){
+    groupAsignExp() {
       this.showExpSelect = true;
       this.getExpedientes();
     },
 
-    getExpedientes(){
-      axios
-      .get(`${process.env.VUE_APP_API_ROUTE}/expedientes`)
-      .then((data)=>{
-        for (this.index in data.data.respuesta){
-          this.expedientes.push(data.data.respuesta[this.index].expediente)
+    getExpedientes() {
+      axios.get(`${process.env.VUE_APP_API_ROUTE}/expedientes`).then((data) => {
+        for (this.index in data.data.respuesta) {
+          this.expedientes.push(data.data.respuesta[this.index].expediente);
         }
-      })
+      });
     },
-    
-    deleteJobs(){
+
+    deleteJobs() {
       this.dialogDelete = true;
     },
 
-    confirmDeleteJobs(){
-      const deleteJobs = this.selected
+    confirmDeleteJobs() {
+      const deleteJobs = this.selected;
       axios
-      .delete(`${process.env.VUE_APP_API_ROUTE}/deleteJobs`, {data: deleteJobs}) 
-      .then((data) => {
-        if (data.status == 201){
-          this.showInfo(data.data.mensaje, "green");
-          setTimeout(this.closeInfo, 1500);
+        .delete(`${process.env.VUE_APP_API_ROUTE}/deleteJobs`, {
+          data: deleteJobs,
+        })
+        .then((data) => {
+          if (data.status == 201) {
+            this.showInfo(data.data.mensaje, "green");
+            setTimeout(this.closeInfo, 1500);
 
-          //Actualizar array jobs
-          for (this.index in this.jobs){
-            for (this.indexSelection in this.selected){
-              if (this.selected[this.indexSelection].id_job == this.jobs[this.index].id_job){
-                this.jobs.splice(this.index, 1)
+            //Actualizar array jobs
+            for (this.index in this.jobs) {
+              for (this.indexSelection in this.selected) {
+                if (
+                  this.selected[this.indexSelection].id_job ==
+                  this.jobs[this.index].id_job
+                ) {
+                  this.jobs.splice(this.index, 1);
+                }
               }
             }
+            //Deseleccionar jobs eliminados
+            this.selected = [];
+          } else {
+            this.showInfo(data.data.mensaje, "red");
+            setTimeout(this.closeInfo, 1500);
           }
-          //Deseleccionar jobs eliminados
-          this.selected = []
-        } else {
-          this.showInfo(data.data.mensaje, "red");
-          setTimeout(this.closeInfo, 1500);        
-        }
-        this.dialogDelete = false;
-      })
+          this.dialogDelete = false;
+        });
     },
 
     showInfo(message, type) {
@@ -491,53 +555,51 @@ export default {
       this.showMessage = false;
     },
 
-
-    groupGenerate(){
+    groupGenerate() {
       //Recuperar errores por cada job
-      for (this.index in this.selected){
+      for (this.index in this.selected) {
         const jobAGenerar = [this.selected[this.index]];
         axios
-        .get(`${process.env.VUE_APP_API_ROUTE}/error/` + jobAGenerar[0].job)
-        .then ((data) => { 
-          if (data.data.errores != undefined){
-            //El job tiene errores asociados
-            this.erroresGenerar = data.data.errores;
-          }             
-          else {
-            //El job no tiene errores asociados.
-            this.erroresGenerar = [];
-          }
-          this.generarJobError(jobAGenerar, this.erroresGenerar);
-        })
+          .get(`${process.env.VUE_APP_API_ROUTE}/error/` + jobAGenerar[0].job)
+          .then((data) => {
+            if (data.data.errores != undefined) {
+              //El job tiene errores asociados
+              this.erroresGenerar = data.data.errores;
+            } else {
+              //El job no tiene errores asociados.
+              this.erroresGenerar = [];
+            }
+            this.generarJobError(jobAGenerar, this.erroresGenerar);
+          });
       }
 
-      //actualizar array jobs 
-      for (this.index in this.jobs){
-        for(this.selIndex in this.selected){
-          if (this.jobs[this.index].job == this.selected[this.selIndex].job){
-            this.jobs.splice(this.index, 1)
+      //actualizar array jobs
+      for (this.index in this.jobs) {
+        for (this.selIndex in this.selected) {
+          if (this.jobs[this.index].job == this.selected[this.selIndex].job) {
+            this.jobs.splice(this.index, 1);
           }
         }
       }
 
-      //info 
+      //info
       this.showInfo("jobs generados correctamente", "green");
-      setTimeout(this.closeInfo, 1500);  
-      
+      setTimeout(this.closeInfo, 1500);
+
       //Deseleccionar
       this.selected = [];
-      this.search = '';
+      this.search = "";
     },
 
-    groupActions(){
-      if (this.selected == 0){
-        return true
+    groupActions() {
+      if (this.selected == 0) {
+        return true;
       } else {
-        return false
+        return false;
       }
     },
 
-    updateData(data){
+    updateData(data) {
       if (data == true) {
         this.initialize();
       }
@@ -553,14 +615,17 @@ export default {
           this.jobsBruto = data.data.response;
           for (this.elemento in this.jobsBruto) {
             //filtramos jobs segun estado
-            if (this.jobsBruto[this.elemento].estado == "En triaje") {
+            if (
+              this.jobsBruto[this.elemento].estado == "En triaje" ||
+              this.jobsBruto[this.elemento].estado == "En consulta"
+            ) {
               this.jobs.push(this.jobsBruto[this.elemento]);
             }
           }
         })
         .catch((data) => {
-          console.log(data)
-        })
+          console.log(data);
+        });
     },
 
     editItem(item) {
@@ -614,7 +679,7 @@ export default {
 }
 
 .panelContainer {
-  background-color:white;
+  background-color: white;
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 2px 2px 6px 2px rgba(0, 0, 0, 0.2);
@@ -624,7 +689,7 @@ export default {
   display: flex;
 }
 
-.panelHeader-title{
+.panelHeader-title {
   font-weight: 500;
   margin-bottom: 2rem;
 }
@@ -642,8 +707,8 @@ export default {
 }
 
 .btn {
-    width: 100%;
-    font-weight: 400;
+  width: 100%;
+  font-weight: 400;
 }
 
 .textField {
@@ -652,7 +717,7 @@ export default {
 }
 
 .editButton {
-  background-color:#4287f5;
+  background-color: #4287f5;
 }
 
 /* ALERTA BORRADO */
@@ -688,8 +753,8 @@ export default {
 
 /* SELECCION DE EXPEDIENTES */
 .asignExpContainer {
-  width:40vw; 
-  min-width:430px;
+  width: 40vw;
+  min-width: 430px;
 }
 
 .asignExpTitle {
@@ -709,11 +774,10 @@ export default {
 
 .asignExpTable {
   padding: 0.5rem;
-  background-color:#CFD8DC;
+  background-color: #cfd8dc;
   border-radius: 4px;
 }
 .asignExpObser > p {
   margin-bottom: 0rem;
 }
-
 </style>

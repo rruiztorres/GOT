@@ -90,6 +90,11 @@
             </v-list-item-group>
           </v-list>
 
+          <!-- LOGOUT -->
+          <div class="logoutBtn">
+            <v-btn block class="info"><v-icon class="logoutIcon">mdi-power-standby</v-icon>LOG OUT</v-btn>
+          </div>
+
         </v-card>
       </v-menu>
     </div>
@@ -108,6 +113,9 @@
       <div v-if="userRole == 'Control de Calidad'">
         <Ccalidad @cambiomenu="changeMenu"></Ccalidad>
       </div>
+      <div v-if="userRole == 'Soporte BDIG'">
+        <NavSopBDIG @cambiomenu="changeMenu"></NavSopBDIG>
+      </div>
     </div>
 
     <!-- FIN MENU OPCIONES SEGUN ROL -->
@@ -122,6 +130,7 @@
 import NavGJ from "@/components/generadorJobs/NavGJ";
 import NavOpEsp from "@/components/operadorEsp/NavOpEsp";
 import Ccalidad from "@/components/controlCalidad/navCC";
+import NavSopBDIG from "@/components/soporteBDIG/NavSopBDIG"
 
 //mixins
 import { roles } from "@/assets/mixins/roles.js";
@@ -131,7 +140,7 @@ export default {
 
   mixins: [roles],
 
-  components: { NavGJ, NavOpEsp, Ccalidad },
+  components: { NavGJ, NavOpEsp, Ccalidad, NavSopBDIG },
 
   jobsBdjaOpEsp: { default: 0 },
 
@@ -205,5 +214,15 @@ export default {
   .userRole {
     font-weight: 500 !important;
     font-family: 'Montserrat';
+  }
+
+  .logoutBtn {
+    font-weight: 400 !important;
+    margin: 0rem 0.5rem 0rem 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .logoutIcon {
+    margin-right: 0.5rem;
   }
 </style>

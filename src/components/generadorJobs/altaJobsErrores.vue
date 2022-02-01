@@ -29,14 +29,6 @@
           @click="saveData"
           >GUARDAR DATOS</v-btn
         >
-        <v-btn
-          class="toolbarBtn generateBtn"
-          elevation="2"
-          dark
-          text
-          @click="generateJobsErrors()"
-          >GENERAR</v-btn
-        >
       </v-toolbar>
 
       <template>
@@ -143,7 +135,7 @@
                     >CANCELAR</v-btn
                   >
                   <v-btn
-                    class="alertButton generateBtn"
+                    class="alertButton saveBtn"
                     dark
                     text
                     @click="closeDialog"
@@ -218,19 +210,6 @@ export default {
   },
 
   methods: {
-    generateJobsErrors() {
-      this.resultado = this.generarJobError(this.jobs, this.errores);
-      if (this.resultado.procesadoOK == false) {
-        this.showInfo(this.resultado.mensaje, "red");
-        setTimeout(this.closeInfo, 2000);
-      } else if (this.resultado.procesadoOK == true) {
-        this.showInfo(this.resultado.mensaje, "green");
-        setTimeout(this.closeInfo, 2000);
-        //Cierre automático tras generar jobs y errores
-        setTimeout(this.closeDialog, 2200);
-      }
-    },
-
     checkData() {
       if (
         (this.jobs.length != 0 && this.datosGuardados == false) ||
@@ -262,6 +241,7 @@ export default {
       this.message = message;
       this.messageType = type;
     },
+
     closeInfo() {
       this.showMessage = false;
     },
@@ -272,22 +252,6 @@ export default {
 
     storeErrors(errores) {
       this.errores = errores;
-    },
-
-    updateDataError() {
-      axios
-        .put(`${process.env.VUE_APP_API_ROUTE}/updateErrores` + this.errores)
-        .then((data) => {
-          console.log("Errores actualizados correctamente ", data);
-        });
-    },
-
-    updateDataJobs() {
-      axios
-        .put(`${process.env.VUE_APP_API_ROUTE}/updateJobs` + this.jobs)
-        .then((data) => {
-          console.log("Jobs actualizados correctamente ", data);
-        });
     },
 
     // GUARDAR DATOS MAESTRO
@@ -335,10 +299,12 @@ export default {
             this.showLoading = false;
             this.showInfo("Datos guardados correctamente", "green");
             setTimeout(this.closeInfo, 2000);
+            setTimeout(this.checkData, 3500);
           } else {
             console.log(data.data.mensaje);
           }
-        });
+      });
+      
     },
   },
 
@@ -415,10 +381,6 @@ export default {
 }
 
 .saveBtn {
-  background-color: #6b7280;
-}
-
-.generateBtn {
   background-color: #10b981;
 }
 
