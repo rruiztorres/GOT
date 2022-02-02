@@ -4,5 +4,5 @@ module.exports = {
   ],
 
   //Pagina en blanco en produccion
-  publicPath: './',
+  publicPath: process.env.NODE_ENV === 'production'?'/GOT/':'/'
 }

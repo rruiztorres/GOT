@@ -19,7 +19,6 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  //base: '/GOT/', // comentar en desarrollo hasta encontrar otra solucion mejor
   base: '/',
   mode: 'history',
   routes
