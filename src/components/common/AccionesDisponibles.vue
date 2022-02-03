@@ -2,8 +2,13 @@
     <div class="actionsWrapper" v-if="loadAction != true">
         <!-- JOB SELECCIONADO PARA TRABAJAR || JOB GENERADO DIRECTO A OPERADOR -->
         <div v-if="accion =='JST' || accion =='JAO' || accion =='JGE' && job.nombre_operador != null">
-            <v-btn class="actionBtn" block color="success" @click="createVersion">Solicitar Versión</v-btn>
-            <v-btn class="actionBtn" block color="error" @click="showDevolverWindow = true">Devolver a Bandeja</v-btn>
+            <div v-if="activeRole === 'Operador' || activeRole === 'Operador Especializado'">
+                <v-btn class="actionBtn" block color="success" @click="createVersion">Solicitar Versión</v-btn>
+                <v-btn class="actionBtn" block color="error" @click="showDevolverWindow = true">Devolver a Bandeja</v-btn>
+            </div>
+            <div v-else>
+                <v-alert dense type="success">Job generado correctamente</v-alert>
+            </div>
         </div>
 
         <!-- JOB GENERADO A BANDEJA GENÉRICA -->

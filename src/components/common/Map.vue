@@ -123,7 +123,7 @@
                     >
                         <vl-overlay
                         class="showIdErrorContainer"
-                        :position="atribute.geometria_json.coordinates"
+                        :position="atribute.geometria.coordinates"
                         :offset="[-48, -45]">
                             <p>
                                 {{atribute.error}}
@@ -701,8 +701,7 @@ import {v4 as uuidv4} from 'uuid';
 import { makeArrayFromApi } from '@/assets/mixins/makeArrayFromApi';
 import { asignarValoresDefault } from '@/assets/mixins/asignarValoresDefault';
 import { getMapExtent } from '@/assets/mixins/getMapExtent';
-import { stringifyJobGeometry } from '@/assets/mixins/stringifyJobGeometry';
-import { stringifyErrorGeometry } from '@/assets/mixins/stringifyErrorGeometry';
+
 
 import FormularioDatosJob from '@/components/common/FormularioDatosJob';
 import FormularioDatosError from '@/components/common/FormularioDatosError';
@@ -732,8 +731,6 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             makeArrayFromApi, 
             asignarValoresDefault,
             getMapExtent,
-            stringifyJobGeometry,
-            stringifyErrorGeometry,
         ],
 
         created(){
@@ -742,7 +739,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             this.getJobParameters();
             this.getErrorParameters();
             this.retrieveJobFromBD();
-            this.retrieveErrorsFromBD();         
+            this.retrieveErrorsFromBD();
         },
 
 
@@ -782,7 +779,10 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     if(this.jobsAttrb.length > 0){
                         for (this.index in this.jobs){
                             if (this.jobs[this.index].id == this.jobsAttrb[this.index].id){
-                                this.jobsAttrb[this.index].geometria_json = this.jobs[this.index].geometry;
+                                if (this.jobs[this.index].geometry.coordinates != this.jobsAttrb[this.index].geometria.coordinates){
+                                    this.jobsAttrb[this.index].editado = true;
+                                    this.jobsAttrb[this.index].geometria = this.jobs[this.index].geometry;
+                                }
                             }
                         }
                     }
@@ -802,8 +802,8 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                 if(this.errores.length == this.erroresAttrb.length){
                     for (this.index in this.errores){
                         for (this.indexAttrb in this.erroresAttrb){
-                            if (this.errores[this.index].id == this.erroresAttrb[this.indexAttrb].id) {
-                                this.erroresAttrb[this.index].geometria_json = this.errores[this.index].geometry;
+                            if (this.errores[this.index].id === this.erroresAttrb[this.indexAttrb].id) {
+                                this.erroresAttrb[this.index].geometria = this.errores[this.index].geometry;
                             }
                         }
                     }
@@ -825,7 +825,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                 for (this.index in this.erroresAttrb){
                     if (this.erroresAttrb[this.index].id==this.errorMostrarInfo.id){
                         this.erroresAttrb[this.index] = this.errorMostrarInfo
-                        this.erroresAttrb[this.index].geometria = this.stringifyErrorGeometry(this.errorMostrarInfo.geometria_json)
+                        this.erroresAttrb[this.index].geometria = this.errorMostrarInfo.geometria
                     }
                 }
                 this.$emit("errores", this.erroresAttrb)
@@ -863,8 +863,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                                         via_ent: this.errorSeleccionado.via_ent,
                                         estado: this.errorSeleccionado.estado,
                                         job: this.errorSeleccionado.job,
-                                        geometria: null,
-                                        geometria_json: this.errorSeleccionado.geometria_json,
+                                        geometria: this.errorSeleccionado.geometria,
                                     }
                                 }
                             }
@@ -887,7 +886,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                                 if (this.jobsAttrb[this.indexattrb].id == this.selectedJobs[this.index].id){
                                     this.jobMostrarInfo = this.jobsAttrb[this.indexattrb];
                                     //Reiniciamos la geometría por si fuera necesario hacer ediciones
-                                    this.jobMostrarInfo.geometria = this.stringifyJobGeometry(this.jobsAttrb[this.indexattrb].geometria_json)
+                                    this.jobMostrarInfo.geometria = this.selectedJobs[this.index].geometry;
                                 }
                             }
                         }
@@ -906,7 +905,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                         //Geometrias
                         this.newJob = {
                             id: uuidv4(),
-                            geometry: this.jobsRecibidos.geometria_json,
+                            geometry: {coordinates: this.jobsRecibidos.geometria.coordinates, type: this.jobsRecibidos.geometria.type},
                             type: "Feature"
                         }
                         this.jobs.push(this.newJob);
@@ -925,7 +924,6 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                             asignacion_job: this.jobsRecibidos.asignacion_job,
                             nombre_operador: this.jobsRecibidos.nombre_operador,
                             geometria: this.jobsRecibidos.geometria,
-                            geometria_json: this.jobsRecibidos.geometria_json,
                             job_grande: this.jobsRecibidos.job_grande,
                         };
                         this.jobsAttrb.push(this.newAttrbJobBd);
@@ -953,7 +951,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                         for (this.index in this.erroresRecibidos){
                             this.newError = {
                                 id: uuidv4(),
-                                geometry: this.erroresRecibidos[this.index].geometria_json,
+                                geometry: {coordinates: this.erroresRecibidos[this.index].geometria.coordinates, type: this.erroresRecibidos[this.index].geometria.type},
                                 type: "Feature"
                             }
                             this.errores.push(this.newError);
@@ -969,8 +967,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                                 tipo_error: this.erroresRecibidos[this.index].tipo_error,
                                 via_ent: this.erroresRecibidos[this.index].via_ent,
                                 estado: this.erroresRecibidos[this.index].estado,
-                                geometria: null,
-                                geometria_json: this.erroresRecibidos[this.index].geometria_json,
+                                geometria: this.erroresRecibidos[this.index].geometria,
                             };
                             this.erroresAttrb.push(this.newAttrbErrorBd);
                         }
@@ -1072,26 +1069,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     })
             },
 
-            storeAttrbErrors(){
-                //Almacenamos los atributos de cada job en un array distinto
-                //TODO: parece imposible unificar todo en un mismo array... 
-                let newAttrbError = {
-                    id: this.errores[this.errores.length-1].id,
-                    id_error: null,
-                    error: null,
-                    descripcion: this.descError,
-                    job: null,
-                    tema_error: this.selectTema,
-                    tipo_error: this.selectTipoError,    
-                    via_ent: 'IDV',
-                    estado: 'Marcado',
-                    geometria: this.stringifyErrorGeometry(this.errores[this.errores.length-1].geometry),
-                    geometria_json: this.errores[this.errores.length-1].geometry,            
-                }
-                this.erroresAttrb.push(newAttrbError);
-                this.editError = false;
-                this.$emit('errores', this.erroresAttrb)
-            },
+            
 
             getJobParameters(){
                 axios.get(`${process.env.VUE_APP_API_ROUTE}/jobParameters`).then((data) => {
@@ -1191,13 +1169,34 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     tipo_bandeja: this.tipoBandejaJob,
                     asignacion_job: this.asignacionJob,
                     nombre_operador: this.nombreOperadorJob,
-                    geometria: this.stringifyJobGeometry(this.jobs[this.jobs.length-1].geometry),
-                    geometria_json: this.jobs[this.jobs.length-1].geometry,
+                    geometria: this.jobs[this.jobs.length-1].geometry,
                     job_grande: this.jobGrande,
+                    editado: true,
                 }
                 this.jobsAttrb.push(this.newAttrbJob);
                 this.editJob = false;
                 this.$emit('jobs', this.jobsAttrb)
+            },
+
+            storeAttrbErrors(){
+                //Almacenamos los atributos de cada job en un array distinto
+                //TODO: parece imposible unificar todo en un mismo array... 
+                let newAttrbError = {
+                    id: this.errores[this.errores.length-1].id,
+                    id_error: null,
+                    error: null,
+                    descripcion: this.descError,
+                    job: null,
+                    tema_error: this.selectTema,
+                    tipo_error: this.selectTipoError,    
+                    via_ent: 'IDV',
+                    estado: 'Marcado',
+                    geometria: this.errores[this.errores.length-1].geometry,
+                    editado: true,            
+                }
+                this.erroresAttrb.push(newAttrbError);
+                this.editError = false;
+                this.$emit('errores', this.erroresAttrb)
             },
 
             activeDrawJobs(){

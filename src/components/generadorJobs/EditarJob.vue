@@ -9,7 +9,8 @@
       >
       <v-spacer></v-spacer>
         <v-btn 
-          class="editJobBtn errorBtn" 
+          class="editJobBtn errorBtn"
+          :disabled="mapIsActive === true || loggerIsActive === true"
           dark 
           text 
           @click="closeDialog"
@@ -17,20 +18,13 @@
           >CANCELAR
         </v-btn>
         <v-btn 
-        class="editJobBtn saveBtn" 
+        class="editJobBtn saveBtn"
+        :disabled="mapIsActive === true || loggerIsActive === true"
         dark 
         text 
         @click="updateDataBD"
         elevation="2"
         >GUARDAR DATOS
-        </v-btn>
-        <v-btn 
-        class="editJobBtn generateBtn" 
-        dark 
-        text 
-        elevation="2"
-        @click="generateJobsErrors()"
-        >GENERAR
         </v-btn>
     </v-toolbar>
 
@@ -64,55 +58,11 @@
           
           <!--DATOS DEL JOB-->
           <v-tab-item>  
-            <v-card class="card" flat>
-              <div class="dataTable">
-                <h2>Jobs</h2>
-                <v-data-table
-                  :headers="jobHeaders"
-                  :items="datosJob"
-                  hide-default-footer
-                >
-                  <template v-slot:[`item.estado`]="{ item }">
-                    <v-chip :color="getColor(item.estado)" dark>
-                      {{ item.estado }}
-                    </v-chip>
-                  </template>
-                </v-data-table>
-              </div>
-
-              <div class="dataTable">
-                <h2>Errores Asociados</h2>
-                  <v-data-table
-                    calculate-widths
-                    :headers="errorHeaders"
-                    :items="errores"
-                    item-key="error"
-                    hide-default-footer
-                    >
-                    <template v-slot:[`item.estado`]="{ item }">
-                      <v-chip :color="getColor(item.estado)" dark>
-                        {{ item.estado }}
-                      </v-chip>
-                    </template>
-
-                    <template v-slot:no-data>
-                      <h2 class="errorNoData">No existen errores asociados al job</h2>
-                    </template>
-
-                    <template v-slot:[`item.actions`]="{ item }">
-                      <v-btn 
-                      class="errorBtn"
-                      title="Eliminar Error" 
-                      icon 
-                      dark>
-                        <v-icon @click="confirmDelete(item)">
-                          mdi-trash-can
-                        </v-icon>
-                      </v-btn>
-                    </template>
-                  </v-data-table>
-              </div>
-            </v-card>
+            <DatosJobErrores
+              :job="[editandoJob]"
+              :errores="errores"
+            >
+            </DatosJobErrores>
           </v-tab-item>
 
           <!--LOCALIZACIÓN EN EL MAPA-->
@@ -129,7 +79,6 @@
               </Map>
             </v-card>
           </v-tab-item>
-          <!-- FIN LOCALIZACION EN EL MAPA -->
 
           <!--PROCESO-->
           <v-tab-item>
@@ -173,37 +122,6 @@
             </v-card>
           </v-overlay>
 
-        <!-- AVISO ELIMINAR ERRORES -->
-        <v-overlay :value="showAlertError">
-          <v-card class="alertCard">
-            <h1 class="alertCardTitle">ATENCIÓN</h1>
-            <h4>Esto borrara el error.</h4>
-            <h4>El borrado es permanente y <b>no puede deshacerse</b>.</h4>
-            <br/>
-            <h3><b>¿Desea continuar?</b></h3>
-            <v-card-actions>
-              <div class="alertButtonGroup">
-                <v-btn
-                class="alertButton errorBtn"
-                dark
-                text
-                @click="showAlertError = false"
-                >
-                CANCELAR
-                </v-btn>
-                <v-btn
-                class="alertButton generateBtn"
-                dark
-                text
-                @click="deleteError(errorBorrar)"
-                >
-                OK
-                </v-btn>
-              </div>
-            </v-card-actions>
-          </v-card>
-        </v-overlay>
-
         <!--MENSAJES DE INFORMACION-->
         <v-overlay :value="showMessage">
           <v-alert
@@ -224,12 +142,12 @@
 <script>
 import { getColor } from "@/assets/mixins/getColor";
 import { generarJobError } from "@/assets/mixins/generarJobError";
-import { stringifyJobGeometry } from "@/assets/mixins/stringifyJobGeometry";
-import { stringifyErrorGeometry } from "@/assets/mixins/stringifyErrorGeometry";
+
 
 import pointInPolygon from "point-in-polygon";
 
 import axios from "axios";
+import DatosJobErrores from "@/components/common/DatosJobErrores";
 import Map from "@/components/common/Map";
 import Logger from "@/components/common/Logger";
 
@@ -237,8 +155,6 @@ export default {
   mixins: [
     getColor,
     generarJobError,
-    stringifyJobGeometry,
-    stringifyErrorGeometry,
   ],
 
   props: ["job"],
@@ -252,6 +168,7 @@ export default {
   name: "EditarJob",
 
   components: {
+    DatosJobErrores,
     Map,
     Logger,
   },
@@ -272,49 +189,19 @@ export default {
   },
 
   methods: {
+    initialize() {
+      //Enviamos señal sin cambio a map
+      this.activeTab = 0;
+      //Evita crear claves duplicadas en el array de errores
+      this.errores = [];
+      if (this.errores.length == 0) {
+        this.getErroresFromJobBD();
+      }
+    },
+
     updateDataFromLogger(data){
       data.job.estado = data.job.nuevoEstado;
-      this.storeJobs(data.job)
-    },
-
-    confirmDelete(errorBorrar) {
-      this.showAlertError = true;
-      this.errorBorrar = errorBorrar;
-    },
-
-    deleteError(error) {
-      if (error.error != null) {
-        axios
-          .delete(`${process.env.VUE_APP_API_ROUTE}/deleteError`, {
-            data: { error },
-          })
-          .then((data) => {
-            if (data.status == 201) {
-              this.showInfo(data.data.mensaje, "green");
-              setTimeout(this.closeInfo, 1000);
-
-              //Actualizar array errores
-              for (this.index in this.errores) {
-                if (this.errores[this.index].error == error.error) {
-                  this.errores.splice(this.index, 1);
-                }
-              }
-            } else {
-              this.showInfo(data.data.mensaje, "red");
-              setTimeout(this.closeInfo, 2000);
-            }
-          });
-      } else {
-        this.showInfo("Error eliminado correctamente", "green");
-        setTimeout(this.closeInfo, 2000);
-        //Actualizar array errores
-        for (this.index in this.errores) {
-          if (this.errores[this.index].error == error.error) {
-            this.errores.splice(this.index, 1);
-          }
-        }
-      }
-      this.showAlertError = false;
+      this.storeJobs([data.job])
     },
 
     closeWithoutSave() {
@@ -341,36 +228,6 @@ export default {
       }
     },
 
-    updateEditedJob(job) {
-      this.updateJob = job;
-      this.editandoJob.expediente = this.updateJob.expediente;
-      this.editandoJob.arreglo_job = this.updateJob.arreglo_job;
-      this.editandoJob.deteccion_job = this.updateJob.deteccion_job;
-      this.editandoJob.gravedad_job = this.updateJob.gravedad_job;
-      this.editandoJob.asignacion_job = this.updateJob.asignacion_job;
-      this.editandoJob.nombre_operador = this.updateJob.nombre_operador;
-      this.editandoJob.descripcion = this.updateJob.descripcion;
-      this.editandoJob.geometria_json = this.updateJob.geometria_json;
-    },
-
-    generateJobsErrors() {
-      //TODO: Comprobar que las ediciones se han guardado.
-      if (this.edicionSinGuardar == false) {
-        this.resultado = this.generarJobError([this.editandoJob], []);
-        if (this.resultado.procesadoOK == false) {
-          this.showInfo(this.resultado.mensaje, "red");
-          setTimeout(this.closeInfo, 2000);
-        } else if (this.resultado.procesadoOK == true) {
-          this.showInfo(this.resultado.mensaje, "green");
-          setTimeout(this.closeInfo, 2000);
-          setTimeout(this.closeDialog, 2200);
-        }
-      } else {
-        this.showInfo("Guarde los datos antes de generar el job", "red");
-        setTimeout(this.closeInfo, 2000);
-      }
-    },
-
     showInfo(message, type) {
       this.showMessage = true;
       this.message = message;
@@ -381,34 +238,26 @@ export default {
       this.showMessage = false;
     },
 
-    datosJobToDataTable() {
-      //caso edicion devuelve arrays hay que convertir a objeto
-      if (this.editandoJob.length > 0) {
-        this.editandoJob = this.editandoJob[0];
-        //añadimos atributos
-        this.editandoJob.geometria = this.stringifyJobGeometry(
-          this.editandoJob.geometria_json
-        );
-      }
-      this.datosJob = [this.editandoJob];
-    },
-
     storeJobs(job) {
-      this.editandoJob = job;
-      this.updateEditedJob(this.editandoJob);
-      this.datosJobToDataTable();
-      this.edicionSinGuardar = true;
+      this.editandoJob = job[0];
+      //TODO: IMPLEMENTAR DETECCION DE CAMBIOS
+      /*
+      if (this.editandoJob.editado != undefined && this.editandoJob === true){
+        this.edicionSinGuardar = true;
+      }
+      */
     },
 
     storeErrors(errores) {
       this.errores = errores;
-      this.edicionSinGuardar = true;
-
+      //TODO: IMPLEMENTAR DETECCION DE CAMBIOS
+      /*
       for (this.index in errores) {
-        this.errores[this.index].geometria = this.stringifyErrorGeometry(
-          errores[this.index].geometria_json
-        );
+        if (this.errores[this.index].editado != undefined && this.errores[this.index].editado === true){
+          this.edicionSinGuardar = true;
+        }
       }
+      */
     },
 
     activateMap(active) {
@@ -417,20 +266,6 @@ export default {
 
     activateLogger(active) {
       this.loggerIsActive = active;
-    },
-
-    initialize() {
-      //Enviamos señal sin cambio a map
-      this.activeTab = 0;
-
-      //Evita crear claves duplicadas en el array de errores
-      this.errores = [];
-      if (this.errores.length == 0) {
-        this.getErroresFromJobBD();
-      }
-
-      //Formateo datos job a tabla
-      this.datosJobToDataTable();
     },
 
     getErroresFromJobBD() {
@@ -460,7 +295,6 @@ export default {
     },
 
     errorInJob(polygon, point) {
-      //Evalua si un punto de error está dentro de un job
       this.polygon = [polygon];
       this.point = [point.coordinates[0], point.coordinates[1]];
       this.inside = pointInPolygon(this.point, this.polygon[0]);
@@ -485,28 +319,26 @@ export default {
         resultadoCC: "",
       };
 
-      //Actualizamos datos de job
-      if (this.edicionSinGuardar == true) {
-        axios
-          .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, [
-            this.datosJob,
-            this.log,
-          ])
-          .then((data) => {
-            if (data.status !== 201) {
-              this.ejecucionPutJob = false;
-            }
-          })
-          .catch((data) => {
-            console.log(data);
-          });
-      }
+      //ACTUALIZAMOS DATOS DEL JOB
+      axios
+      .put(`${process.env.VUE_APP_API_ROUTE}/updateJob`, [
+        this.editandoJob,
+        this.log,
+      ])
+      .then((data) => {
+        if (data.status !== 201) {
+          this.ejecucionPutJob = false;
+        }
+      })
+      .catch((data) => {
+        console.log(data);
+      });
 
-      //Comprobar si existe algún error fuera del job
+      //EXISTEN ERRORES FUERA DEL JOB?
       for (this.index in this.errores) {
         this.errorDentro = this.errorInJob(
-          this.editandoJob.geometria_json.coordinates[0],
-          this.errores[this.index].geometria_json
+          this.editandoJob.geometria.coordinates[0],
+          this.errores[this.index].geometria
         );
         if (this.errorDentro == false) {
           this.continue = false;
@@ -514,7 +346,7 @@ export default {
         }
       }
 
-      //Identificamos si son errores para actualizar o insertar
+      //UPDATE O INSERT DE ERRORES?
       if (this.continue == true) {
         for (this.index in this.errores) {
           if (this.errores[this.index].error == null) {
@@ -526,7 +358,7 @@ export default {
         }
       }
 
-      //Hacemos insercion de errores
+      //INSERT ERRORES
       if (this.continue == true) {
         axios
           .post(`${process.env.VUE_APP_API_ROUTE}/postError`, this.arrayPost)
@@ -549,7 +381,7 @@ export default {
             }
           });
 
-        //Hacemos update de errores
+        //UPDATE ERRORES
         axios
           .put(`${process.env.VUE_APP_API_ROUTE}/updateError`, this.arrayPut)
           .then((data) => {
@@ -559,7 +391,7 @@ export default {
           });
       }
 
-      //Respuesta a usuario
+      //RESULTADO DE EJECUCIONES
       if (
         this.ejecucionPostError == true &&
         this.ejecucionPutError == true &&
@@ -570,6 +402,7 @@ export default {
           this.edicionSinGuardar = false;
           this.showInfo("Datos actualizados correctamente", "green");
           setTimeout(this.closeInfo, 1500);
+          setTimeout(this.closeDialog, 2000);
         } else {
           this.showInfo(
             "No pueden existir errores fuera del job, por favor revise los datos",
@@ -591,33 +424,14 @@ export default {
     return {
       errores: [],
       erroresBruto: [],
-      errorHeaders: [
-        { text: "Estado", value: "estado" },
-        { text: "Error", value: "error" },
-        { text: "Tema", value: "tema_error" },
-        { text: "Tipo", value: "tipo_error" },
-        { text: "Descripcion", value: "descripcion" },
-        { text: "Procedencia", value: "via_ent" },
-        { text: "Acciones", value: "actions" },
-      ],
-
-      jobHeaders: [
-        { text: "Estado", value: "estado" },
-        { text: "Expediente", value: "expediente" },
-        { text: "Perfil", value: "arreglo_job" },
-        { text: "Detectado en", value: "deteccion_job" },
-        { text: "Gravedad", value: "gravedad_job" },
-        { text: "Asignado a", value: "asignacion_job" },
-        { text: "Operador", value: "nombre_operador" },
-        { text: "Descripción", value: "descripcion" },
-      ],
+      
 
       mapReset: false,
       mapIsActive: false,
       activeTab: 0,
 
       showMessage: false,
-      messageType: "", //green para success, red para error, blue para info.
+      messageType: "",      //green para success, red para error, blue para info.
       message: "",
 
       showEditJob: false,
@@ -630,9 +444,6 @@ export default {
       //ALERTA DATOS SIN GUARDAD
       showAlert: false,
 
-      //ALERTA BORRADO ERRORES
-      showAlertError: false,
-
       //LOGGER
       loggerIsActive: false,
     };
@@ -642,10 +453,10 @@ export default {
 
 <style scoped>
 .card {
-  height: 87vh;
-  padding: 0.5rem;
-  overflow-y: auto;
-  overflow-x: hidden;
+    height: 87vh;
+    padding: 0.5rem;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .editJobTitle, .editJobBtn, .tab, h2 {
@@ -661,10 +472,6 @@ export default {
 }
 
 .saveBtn {
-  background-color: #6b7280;
-}
-
-.generateBtn {
   background-color: #10b981;
 }
 

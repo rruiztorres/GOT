@@ -516,9 +516,7 @@ export default {
     confirmDeleteJobs() {
       const deleteJobs = this.selected;
       axios
-        .delete(`${process.env.VUE_APP_API_ROUTE}/deleteJobs`, {
-          data: deleteJobs,
-        })
+        .delete(`${process.env.VUE_APP_API_ROUTE}/deleteJobs`, {data: deleteJobs,})
         .then((data) => {
           if (data.status == 201) {
             this.showInfo(data.data.mensaje, "green");
@@ -527,10 +525,7 @@ export default {
             //Actualizar array jobs
             for (this.index in this.jobs) {
               for (this.indexSelection in this.selected) {
-                if (
-                  this.selected[this.indexSelection].id_job ==
-                  this.jobs[this.index].id_job
-                ) {
+                if (this.selected[this.indexSelection].id_job === this.jobs[this.index].id_job) {
                   this.jobs.splice(this.index, 1);
                 }
               }
