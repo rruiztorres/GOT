@@ -107,7 +107,6 @@
 
 <script>
 import Map from "@/components/common/Map";
-import {stringifyErrorGeometry} from "@/assets/mixins/stringifyErrorGeometry";
 import {getColor} from "@/assets/mixins/getColor";
 import axios from 'axios';
 
@@ -115,7 +114,7 @@ export default {
   name: "AsignarErrores",
   components: { Map },
   props: ["errores"],
-  mixins: [stringifyErrorGeometry, getColor],
+  mixins: [getColor],
 
   data() {
     return {
@@ -181,10 +180,6 @@ export default {
         departamento: "",
         resultadoCC: "",
       };
-
-      for (this.index in this.erroresAsign){
-        this.erroresAsign[this.index].geometria = this.stringifyErrorGeometry(this.erroresAsign[this.index].geometria_json)
-      }
 
       this.jobsErrores = {
         jobs: this.jobsAsign,

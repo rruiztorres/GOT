@@ -169,20 +169,22 @@
 </template>
 
 <script>
+
 import Map from "@/components/common/Map";
 import axios from "axios";
-import { getColor } from "@/assets/mixins/getColor.js";
-import { generarJobError } from "@/assets/mixins/generarJobError.js";
+import { getColor } from "@/assets/mixins/getColor";
+import { generarJobError } from "@/assets/mixins/generarJobError";
+
+import { stringifyJobGeometry } from "@/assets/mixins/stringifyJobGeometry";
+import { stringifyErrorGeometry } from "@/assets/mixins/stringifyErrorGeometry";
 
 export default {
   name: "altaJobsErrores",
 
-  components: {
-    Map,
-  },
+  components: { Map },
 
-  mixins: [getColor, generarJobError],
-
+  mixins: [getColor, generarJobError, stringifyJobGeometry, stringifyErrorGeometry],
+  
   watch: {
     selectViaEntrada() {
       this.viaEntrada = this.selectViaEntrada;
@@ -220,40 +222,32 @@ export default {
         this.closeDialog();
       }
     },
-
     openAlert() {
       this.showAlert = true;
     },
-
     closeAlert() {
       this.showAlert = false;
     },
-
     closeDialog() {
       this.dialog = false;
       //Al cerrar el dialogo devuelve el valor por defecto para GJ a loader
       //TODO: habría que definir el valor por defecto en una función global
       this.$emit("closed", "JobsTriajeGJ");
     },
-
     showInfo(message, type) {
       this.showMessage = true;
       this.message = message;
       this.messageType = type;
     },
-
     closeInfo() {
       this.showMessage = false;
     },
-
     storeJobs(jobs) {
       this.jobs = jobs;
     },
-
     storeErrors(errores) {
       this.errores = errores;
     },
-
     // GUARDAR DATOS MAESTRO
     saveData() {
       this.showLoading = true;
@@ -264,12 +258,13 @@ export default {
         departamento: "",
         resultadoCC: "",
       };
+
       this.jobsErrores = {
         jobs: this.jobs,
         errores: this.errores,
         log: this.log,
       };
-
+      
       axios
         .post(
           `${process.env.VUE_APP_API_ROUTE}/postJobsErrores`,
@@ -289,12 +284,13 @@ export default {
                   data.data.errores[this.asignIndex].idInterno ==
                     this.errores[this.index].id
                 ) {
-                  this.errores[this.index].asocJob = data.data.errores[this.asignIndex].job;
-                  this.errores[this.index].idError = data.data.errores[this.asignIndex].codigoError;
+                  this.errores[this.index].asocJob =
+                    data.data.errores[this.asignIndex].job;
+                  this.errores[this.index].idError =
+                    data.data.errores[this.asignIndex].codigoError;
                 }
               }
             }
-
             this.datosGuardados = true;
             this.showLoading = false;
             this.showInfo("Datos guardados correctamente", "green");
@@ -303,11 +299,9 @@ export default {
           } else {
             console.log(data.data.mensaje);
           }
-      });
-      
+        });
     },
   },
-
   data() {
     return {
       dialog: true,
@@ -318,7 +312,6 @@ export default {
       showMessage: false, //Muestra mensajes de información en la parte inferior de la pantalla
       message: "", //Determina el texto mostrado en el mensaje de información
       messageType: "", //green para success, red para error, blue para info.
-
       jobHeaders: [
         { text: "Estado", value: "estado" },
         { text: "ID Job", value: "job" },
@@ -330,7 +323,6 @@ export default {
         { text: "Operador", value: "nombre_operador" },
         { text: "Descripción", value: "descripcion" },
       ],
-
       errorHeaders: [
         { text: "Estado", value: "estado" },
         { text: "Id Error", value: "idError" },
@@ -339,10 +331,8 @@ export default {
         { text: "Tema Error", value: "tema_error" },
         { text: "Descripcion", value: "descripcion" },
       ],
-
       showAlert: false, //Muestra ventana de alerta
       datosGuardados: false, //Indica si los datos han sido guardados en base de datos.
-
       showLoading: false, //Muestra la pantalla de carga mientras los datos son almacenados
     };
   },
@@ -353,37 +343,29 @@ export default {
 .dialogContainer {
   height: 93vh;
 }
-
 .toolbarBtn {
   margin: auto 0.5rem;
   font-weight: 400 !important;
 }
-
 .tab {
   font-weight: 400 !important;
 }
-
 .cardMap {
-  height: 88vh;
+  height: 87vh;
 }
-
 .cardJob {
   height: 86vh;
   overflow-y: auto;
 }
-
 .cardJob > * > h2 {
   font-weight: 400 !important;
 }
-
 .errorBtn {
   background-color: #ef4444;
 }
-
 .saveBtn {
   background-color: #10b981;
 }
-
 /* RESUMEN JOBS ERRORES */
 .dataTable {
   margin: 1rem 1rem 2rem 1rem;
@@ -391,25 +373,20 @@ export default {
   background-color: #eceff1;
   border-radius: 3px;
 }
-
 /*ALERTA DATOS NO GUARDADOS */
 .alertCard {
   text-align: center;
   padding: 1rem;
 }
-
 .alertCardTitle {
   margin-bottom: 0.5rem;
 }
-
 .alertCard > * {
   font-weight: 400 !important;
 }
-
 .alertButtonGroup {
   margin: 0 auto;
 }
-
 .alertButton {
   width: 10rem;
   margin: 1rem;

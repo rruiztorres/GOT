@@ -329,7 +329,7 @@ export default {
         })
         .catch((data) => {
           console.log(data)
-        })
+      })
     },
 
     editItem(item) {

@@ -284,12 +284,11 @@ export default {
             this.jobsBruto[this.elemento].estado == "Pausa" ||
             this.jobsBruto[this.elemento].estado == "Ejecución" ||
             this.jobsBruto[this.elemento].estado === "Error_fin para usuario"          
-            &&
-            this.jobsBruto[this.elemento].nombre_operador ==
-              localStorage.usuario
-          ) {
-            this.jobs.push(this.jobsBruto[this.elemento]);
-          }
+            ) {
+              if (this.jobsBruto[this.elemento].nombre_operador == localStorage.usuario){
+                this.jobs.push(this.jobsBruto[this.elemento]);
+              }
+            }
         }
       });
     },
