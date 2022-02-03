@@ -92,7 +92,7 @@
 
           <!-- LOGOUT -->
           <div class="logoutBtn">
-            <v-btn block class="info"><v-icon class="logoutIcon">mdi-power-standby</v-icon>LOG OUT</v-btn>
+            <v-btn block class="info" @click="doLogout()"><v-icon class="logoutIcon">mdi-power-standby</v-icon>LOGOUT</v-btn>
           </div>
 
         </v-card>
@@ -145,15 +145,25 @@ export default {
   jobsBdjaOpEsp: { default: 0 },
 
   methods: {
+
     changeMenu(data) {
       this.newMenu = data;
       this.$emit("cambiomenu", data);
     },
+
     changeRol(rol) {
       this.userRole = rol.name;
       localStorage.rol = rol.name;
       this.changeMenu(rol.default);
     },
+
+    doLogout() {
+      localStorage.usuario = null;
+      localStorage.usrRoles = null;
+      localStorage.token = null;
+      localStorage.rol = null;
+      this.$router.push("/");
+    }
   },
 
   data() {
