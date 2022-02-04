@@ -81,7 +81,7 @@
         group-by="expediente"
         item-key="job"
         show-select
-      >
+        >
         <template v-slot:top>
           <!-- VENTANA EDICION JOB -->
           <v-dialog

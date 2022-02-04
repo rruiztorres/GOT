@@ -25,6 +25,10 @@ export const getColor = {
             //EXPEDIENTES
             else if (estado == 'Cerrado') return '#f54b42';                  //rojo
             else if (estado == 'Abierto') return '#009933';                  //verde
+
+            //MISC
+            else if(estado == true) return '#009933'                        //verde
+            else if(estado == false) return '#f54b42'
         }
     },
 }

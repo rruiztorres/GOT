@@ -18,6 +18,9 @@
             <!--Soporte BDIG -->
             <div v-if="activarMenu == 'BandejaErrCrear'"><BandejaErrCrear></BandejaErrCrear></div>
             <div v-if="activarMenu == 'BandejaErrFin'"><BandejaErrFin></BandejaErrFin></div>
+
+            <!-- GOT Admin -->
+            <div v-if="activarMenu == 'GestionUsuarios'"><GestionUsuarios></GestionUsuarios></div>
         </div>
     </div>
 </template>
@@ -33,6 +36,7 @@
     import ErroresNoAsign from '@/components/generadorJobs/ErroresNoAsign';
     import BandejaErrCrear from "@/components/soporteBDIG/BandejaErrCrear";
     import BandejaErrFin from "@/components/soporteBDIG/BandejaErrFin";
+    import GestionUsuarios from "@/components/GOTAdmin/GestionUsuarios";
     
     export default {
         name:'Loader',
@@ -47,6 +51,7 @@
             ErroresNoAsign,
             BandejaErrCrear,
             BandejaErrFin,
+            GestionUsuarios,
         },
 
         props: ['activarMenu'],
