@@ -470,9 +470,6 @@ export default {
     asignExpToSelect() {
       //Asigna el expediente a la seleccion de jobs actual
       for (this.index in this.selected) {
-        this.selected[this.index].geometria = this.stringifyJobGeometry(
-          this.selected[this.index].geometria_json
-        );
         this.selected[this.index].expediente = this.expediente;
 
         axios
@@ -488,6 +485,7 @@ export default {
                 "green"
               );
               setTimeout(this.closeInfo, 1500);
+              console.log(this.jobs)
             } else {
               this.showInfo(data.data.mensaje, "red");
               setTimeout(this.closeInfo, 1500);

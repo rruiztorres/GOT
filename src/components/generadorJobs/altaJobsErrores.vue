@@ -41,7 +41,6 @@
           >
             <v-tab class="tab">Localización en el Mapa</v-tab>
             <v-tab class="tab">Resumen Jobs / Errores creados</v-tab>
-            <v-tab class="tab">Datos Adjuntos</v-tab>
 
             <v-tabs-slider color="#76aff5"></v-tabs-slider>
 
@@ -96,13 +95,6 @@
               </v-card>
             </v-tab-item>
 
-            <!--DATOS ADJUNTOS-->
-            <v-tab-item>
-              <v-card flat>
-                EMPTY
-              </v-card>
-            </v-tab-item>
-            <!-- FIN DATOS ADJUNTOS -->
           </v-tabs>
 
           <!--MENSAJES DE INFORMACION-->
