@@ -54,7 +54,6 @@
                 ></Map>
               </v-card>
             </v-tab-item>
-            <!-- FIN LOCALIZACION EN EL MAPA -->
 
             <!--RESUMEN DE JOBS Y ERRORES-->
             <v-tab-item>
