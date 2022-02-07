@@ -13,6 +13,36 @@
                 :center.sync="center">
             </vl-view>
 
+            <!-- BASE -->
+            <!--Mapa base-->
+            <vl-layer-tile>
+                <vl-source-xyz :url="urlTileBase"></vl-source-xyz>
+            </vl-layer-tile>
+
+            <!-- CAPAS WMTS -->    
+            <vl-layer-tile
+            v-if="activeTab === 'raster'"
+            id="wmts" 
+            :z-index="0">
+                <vl-source-wmts 
+                :attributions="activeMap.attribution" 
+                :url="activeMap.url" 
+                :layer-name="activeMap.layerName" 
+                :matrixSet="activeMap.matrixSet" 
+                :format="activeMap.format" 
+                :style-name="activeMap.styleName">
+                </vl-source-wmts>
+            </vl-layer-tile>
+
+            <div v-if="activeTab === 'vector'">
+                <vl-layer-vector-tile
+                    v-for="vlTile in vectorTileServices"
+                    :key="vlTile.url"  
+                >
+                 <vl-source-vector-tile :url="vlTile.url"></vl-source-vector-tile>
+                </vl-layer-vector-tile>
+            </div>
+
             <!--GEOMETRIAS MAPA -->
 
             <!--Geometrias de job--> 
@@ -97,19 +127,6 @@
             </vl-interaction-modify>
             <!-- fin errores -->
 
-            <!-- CAPAS WMTS -->    
-            <vl-layer-tile 
-            id="wmts" 
-            :z-index="0">
-                <vl-source-wmts 
-                :attributions="activeMap.attribution" 
-                :url="activeMap.url" 
-                :layer-name="activeMap.layerName" 
-                :matrixSet="activeMap.matrixSet" 
-                :format="activeMap.format" 
-                :style-name="activeMap.styleName">
-                </vl-source-wmts>
-            </vl-layer-tile>
 
             <!-- INFORMACIÓN NUMEROS DE ERROR EN MAPA -->
             <!--Meter en el div el control de capa --> 
@@ -212,14 +229,30 @@
                         <div class="sectionToolTitle">
                         CAPAS
                         </div>
-                        <v-btn
-                            v-for="service in wmtsServices"
-                            :key="service.nombre"
-                            text dark
-                            class="btnLayer"
-                            @click="activeMap = service"
-                            >{{service.nombre}}
-                        </v-btn>
+                            <v-tabs fixed-tabs dark background-color="blue darken-2">
+                                <v-tab class="tab" @click="activateTab('raster')">Ráster</v-tab>
+                                <v-tab class="tab" @click="activateTab('vector')">Vector</v-tab>
+
+                                <!--RASTER-->
+                                <v-tab-item class="bgTab">
+                                    <v-btn
+                                        v-for="service in wmtsServices"
+                                        :key="service.nombre"
+                                        text dark
+                                        class="btnLayer"
+                                        @click="activeMap = service"
+                                        >{{service.nombre}}
+                                    </v-btn>
+                                </v-tab-item>
+
+                                <!--VECTOR-->
+                                <v-tab-item class="bgTab">
+                                    <v-btn text dark class="btnLayer">BDIG VECTOR TILES</v-btn>
+                                </v-tab-item>
+
+
+                            </v-tabs>
+                        
 
                         <v-divider class="endSection"></v-divider>
 
@@ -872,6 +905,10 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                 //Auxiliar funciones vacías
             },
 
+            activateTab(tab){
+                this.activeTab = tab;
+            },
+
             resetMap(){
                 //Devuelve valores por defecto
                 this.zoom = 5.5;
@@ -1335,6 +1372,17 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             minZoom: 5.5,
             center: [ -386025.74417069746, 4683331.210786856 ],
 
+            //CONTROL CAPAS
+            activeTab: 'raster',    //Valor por defecto
+
+            //SOURCE VECTOR TILE (En pruebas)
+            urlTileBase: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}',
+            vectorTileServices:[
+                {
+                    url: 'https://basemaps-api.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/tile/11/791/1016.pbf?token=AAPK9bd1fbc69f0b41c1acbefc67a6ec3738_dA6L31Mo_jYLwhQ5awh_9wMAP_c_ov-WxHn1ePvss9fM09ZH2WFioY8ZDmWJc8F',
+                }
+            ],
+
             //SOURCE WMTS -> añadimos servicio añadiendo objeto al array
             wmtsServices: [
                 {
@@ -1387,6 +1435,17 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     activeMap: 'ignMTN25Old', 
                     format: 'image/jpeg'
                 },
+                {
+                    attribution: 'BDIG - Tiles',
+                    url: " https://bdig.ign.es/server/rest/services/BDIG/BDIG_WebMercator/MapServer/WMTS",
+                    layerName: "BDIG_BDIG_WebMercator", 
+                    nombre: "BDIG Tiles", 
+                    matrixSet: "GoogleMapsCompatible", 
+                    styleName: "default",
+                    activeMap: 'bdigTiles', 
+                    format: 'image/jpeg'
+                },
+               
             ],
 
             //GEOMETRIAS MAPA
@@ -1736,4 +1795,8 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
         box-shadow: 0px 1px 5px 2px gray;
     }
 
+    .bgTab{
+        padding: 0.1rem 0rem 0.1rem 0rem;
+        background-color: rgba(0, 60, 136, 0.5);
+    }
 </style>
