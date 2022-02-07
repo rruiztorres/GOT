@@ -132,30 +132,37 @@
                     </template>
                 </vl-feature>
             </div>
+
+            <!-- ICONOS LOCALIZACION TOPONIMOS -->
+            <div>
+                <vl-feature v-if="toponimoLocalizado != undefined">
+                    <template>
+                        <vl-overlay :position="toponimoLocalizado">                   
+                            <v-icon elevation="2" x-large color="red" @click="toponimoLocalizado = undefined">mdi-map-marker</v-icon>
+                        </vl-overlay>
+                    </template>
+                </vl-feature>
+            </div>
         </vl-map>     
 
         <!--PANEL DE CONTROL -->
         <div style="float: right; height: 0rem">
-            <div
-            class="toolPanelContainer"
-            >
-                <v-card-actions
-                    class="topBarToolPanel"
-                >
+            <div class="toolPanelContainer">
+                <v-card-actions class="topBarToolPanel">
                     <div
                         v-for="generalTool in generalTools" 
-                        :key="generalTool.title">
-                        <v-btn dark small color="#003c8866" elevation="0" >
+                        :key="generalTool.title"
+                        :title="generalTool.title"
+                        >
+                        <v-btn dark small color="#003c8866" elevation="0" @click="generalTool.click">
                             <v-icon>{{generalTool.icon}}</v-icon>
                         </v-btn>
                         <v-spacer></v-spacer>
                     </div>
 
                     <v-btn dark text @click="showMapTools = !showMapTools">
-                    TOOLS
-                        <v-icon>{{
-                        showMapTools ? "mdi-chevron-up" : "mdi-chevron-down"
-                        }}</v-icon>
+                        TOOLS
+                        <v-icon>{{showMapTools ? "mdi-chevron-up" : "mdi-chevron-down"}}</v-icon>
                     </v-btn>
                 </v-card-actions>
 
@@ -226,6 +233,31 @@
                 </v-expand-transition>
             </div>
         </div>
+
+        <!--VENTANA BUSCADOR-->
+        <v-text-field
+            v-if="showNameSearch == true" 
+            class="searchWindow"
+            label="Buscar"
+            solo
+            v-model="busquedaToponimo"
+            prepend-inner-icon="mdi-map-search"
+        >        
+        </v-text-field>
+            <v-list-item-group 
+            v-if="resultados != undefined && showNameSearch == true" class="resultWindow">
+                <v-list-item
+                    v-for="(resultado, i) in resultados.results"
+                    :key="i"
+                    @click="toponimoSeleccionado(resultado.id)"
+                    >
+                    <div class="containerResultados">
+                        <v-icon color="red">mdi-map-marker</v-icon>
+                        <span class="resultadoTitle">{{resultado.title}}</span>
+                        <span>({{resultado.type}})</span>
+                    </div>
+                </v-list-item>
+            </v-list-item-group>
 
         <!-- VENTANA INFORMACION MAPA (Centro, zoom, etc) -->
         <v-card class="windowInfoMap">
@@ -701,6 +733,8 @@ import {v4 as uuidv4} from 'uuid';
 import { makeArrayFromApi } from '@/assets/mixins/makeArrayFromApi';
 import { asignarValoresDefault } from '@/assets/mixins/asignarValoresDefault';
 import { getMapExtent } from '@/assets/mixins/getMapExtent';
+import { searchToponimo } from '@/assets/mixins/searchToponimo';
+import { situarToponimoMapa } from "@/assets/mixins/situarToponimoMapa";
 
 
 import FormularioDatosJob from '@/components/common/FormularioDatosJob';
@@ -731,6 +765,8 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             makeArrayFromApi, 
             asignarValoresDefault,
             getMapExtent,
+            searchToponimo,
+            situarToponimoMapa,
         ],
 
         created(){
@@ -749,6 +785,26 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
         },
 
         watch:{
+            //CALLBACK DESDE SITUARTOPONIMO
+            localizacion(){
+                if(this.localizacion != undefined){                   
+                     if(this.localizacion.length > 0){
+                        this.lat = parseFloat(this.localizacion[0])
+                        this.lon = parseFloat(this.localizacion[1])
+                        this.toponimoLocalizado = this.convertirCoordenadas(this.lon, this.lat);
+                        this.center = this.toponimoLocalizado;
+                        this.zoom = 15;
+                    }
+                }
+            },
+
+            busquedaToponimo(){
+                if (this.busquedaToponimo != undefined || this.busquedaToponimo != ''){
+                    this.resultados = this.searchToponimo(this.busquedaToponimo);
+                }
+            },
+
+
             descError(){
                 if(this.descError.length >= 255 || this.descError.length == 0){
                     this.disableAceptarError = true;
@@ -813,7 +869,27 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
         methods:{
             dummy(){
-                //
+                //Auxiliar funciones vacías
+            },
+
+            resetMap(){
+                //Devuelve valores por defecto
+                this.zoom = 5.5;
+                this.center = [ -386025.74417069746, 4683331.210786856 ];
+            },
+
+            convertirCoordenadas(lon, lat){
+                var x = lon * 20037508.34 / 180;
+                var y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+                y = y * 20037508.34 / 180;
+                return [x, y]
+            },
+
+            toponimoSeleccionado(idNGBE){
+                this.resultados = undefined;
+                this.busquedaToponimo = undefined;
+                this.showNameSearch = false;
+                this.localizacion = this.situarToponimoMapa(idNGBE);                
             },
 
             updateEditedJob(){
@@ -1238,6 +1314,10 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                 this.drawType = null;
             },
 
+            activeWindowSearch(){
+                this.showNameSearch = !this.showNameSearch;
+            }
+
         },
 
         data(){
@@ -1275,7 +1355,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     matrixSet: "EPSG:3857", 
                     styleName: "default",
                     activeMap: 'ignPNOA', 
-                    format: 'image/jpeg'
+                    format: 'image/jpeg',
                 },
                 {
                     attribution: 'IGN Mapa Ráster - Instituto Geográfico Nacional',
@@ -1319,6 +1399,13 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             jobsAttrb:[],
             erroresAttrb:[],
 
+            //BUSCADOR TOPONIMOS
+            showNameSearch: false,
+            busquedaToponimo: undefined,
+            resultados: undefined,
+            localizacion: '',
+            toponimoLocalizado: undefined,
+
             //HERRAMIENTAS
             showMapTools: true,
             toggleBtnError: 9,                //Muestra el boton seleccionado en panel control errores
@@ -1328,15 +1415,18 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             generalTools: [
                 {
                     title: "Buscar",
-                    icon: "mdi-map-search"
+                    icon: "mdi-map-search",
+                    click: this.activeWindowSearch
                 },
                 {
                     title: "Mover",
-                    icon: "mdi-cursor-pointer"
+                    icon: "mdi-cursor-pointer",
+                    click: this.dummy,
                 },
                 {
                     title: "Centrar Mapa",
-                    icon: "mdi-arrow-expand-all"
+                    icon: "mdi-arrow-expand-all",
+                    click: this.resetMap,
                 },
             ],
             jobsPanel: [              
@@ -1487,6 +1577,32 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
         box-shadow: 0px 0px 5px 3px white;
         background-color: #003c8866;
         border-radius: 3px;
+    }
+
+    .searchWindow{
+        position: absolute;
+        top:2.5rem;
+        right: 19rem;
+        width: 18rem;
+    }
+
+    .resultWindow{
+        position: absolute;
+        border: 1px solid white;
+        right: 19rem;
+        top: 7rem;
+        width: auto;
+        min-width: 18rem;
+        background-color: white;
+    }
+
+    .containerResultados{
+        font-size: 70%;
+    }
+    
+    .resultadoTitle{
+        margin: 0rem 0.5rem 0rem 0.5rem;
+        font-weight: 600 !important;
     }
 
     .topBarToolPanel {
