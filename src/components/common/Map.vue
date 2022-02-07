@@ -1629,8 +1629,8 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
     /* PANEL HERRAMIENTAS */
     .toolPanelContainer {
         position:absolute;
-        top:2.5rem;
-        right:1.7rem;
+        top:0.7rem;
+        right:-0.1rem;
         margin-right: 1rem;
         width: 16rem;
         box-shadow: 0px 0px 5px 3px white;
