@@ -268,29 +268,32 @@
         </div>
 
         <!--VENTANA BUSCADOR-->
-        <v-text-field
-            v-if="showNameSearch == true" 
-            class="searchWindow"
-            label="Buscar"
-            solo
-            v-model="busquedaToponimo"
-            prepend-inner-icon="mdi-map-search"
-        >        
-        </v-text-field>
-            <v-list-item-group 
-            v-if="resultados != undefined && showNameSearch == true" class="resultWindow">
-                <v-list-item
-                    v-for="(resultado, i) in resultados.results"
-                    :key="i"
-                    @click="toponimoSeleccionado(resultado.id)"
-                    >
-                    <div class="containerResultados">
-                        <v-icon color="red">mdi-map-marker</v-icon>
-                        <span class="resultadoTitle">{{resultado.title}}</span>
-                        <span>({{resultado.type}})</span>
-                    </div>
-                </v-list-item>
-            </v-list-item-group>
+        <v-expand-x-transition>
+            <div class="searchWindow" v-if="showNameSearch == true">
+                <v-text-field
+                    class="searchWindowField" 
+                    label="Buscar"
+                    solo dense
+                    v-model="busquedaToponimo"
+                    prepend-inner-icon="mdi-map-search"
+                >        
+                </v-text-field>
+                <v-list-item-group 
+                v-if="resultados != undefined && showNameSearch == true" class="resultWindow">
+                    <v-list-item
+                        v-for="(resultado, i) in resultados.results"
+                        :key="i"
+                        @click="toponimoSeleccionado(resultado.id)"
+                        >
+                        <div class="containerResultados">
+                            <v-icon color="red">mdi-map-marker</v-icon>
+                            <span class="resultadoTitle">{{resultado.title}}</span>
+                            <span>({{resultado.type}})</span>
+                        </div>
+                    </v-list-item>
+                </v-list-item-group>
+            </div>
+        </v-expand-x-transition>
 
         <!-- VENTANA INFORMACION MAPA (Centro, zoom, etc) -->
         <v-card class="windowInfoMap">
@@ -1639,17 +1642,25 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
     }
 
     .searchWindow{
+        background-color:#1e40af;
+        border-radius: 3px 0px 0px 3px;
         position: absolute;
-        top:2.5rem;
-        right: 19rem;
+        top:0.7rem;
+        right: 16.85rem;
         width: 18rem;
+        height: 3.5rem;
+    }
+
+    .searchWindowField{
+        margin-top: 0.5rem;
+        padding: 0rem 0.5rem 0rem 0.5rem;
     }
 
     .resultWindow{
         position: absolute;
         border: 1px solid white;
-        right: 19rem;
-        top: 7rem;
+        right: 0rem;
+        top: 3.5rem;
         width: auto;
         min-width: 18rem;
         background-color: white;
@@ -1665,7 +1676,8 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
     }
 
     .topBarToolPanel {
-        border-radius: 3px 3px 0px 0px;
+        border-radius: 0px 3px 0px 0px;
+        height: 3.5rem;
         background-color: #1e40af;
     }
     
