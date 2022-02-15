@@ -119,6 +119,9 @@
       <div v-if="userRole == 'GOT Admin'">
         <NavGOTAdmin @cambiomenu="changeMenu"></NavGOTAdmin>
       </div>
+      <div v-if="userRole == 'Gestor'">
+        <NavGestor @cambiomenu="changeMenu"></NavGestor>
+      </div>
     </div>
 
     <!-- FIN MENU OPCIONES SEGUN ROL -->
@@ -135,6 +138,7 @@ import NavOpEsp from "@/components/operadorEsp/NavOpEsp";
 import Ccalidad from "@/components/controlCalidad/navCC";
 import NavSopBDIG from "@/components/soporteBDIG/NavSopBDIG"
 import NavGOTAdmin from "@/components/GOTAdmin/NavGOTAdmin";
+import NavGestor from "@/components/gestor/NavGestor";
 
 
 //mixins
@@ -145,7 +149,7 @@ export default {
 
   mixins: [roles],
 
-  components: { NavGJ, NavOpEsp, Ccalidad, NavSopBDIG, NavGOTAdmin },
+  components: { NavGJ, NavOpEsp, Ccalidad, NavSopBDIG, NavGOTAdmin, NavGestor, },
 
   jobsBdjaOpEsp: { default: 0 },
 

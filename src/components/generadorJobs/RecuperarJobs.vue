@@ -15,16 +15,17 @@
           <v-row class="panelFuncionesCard">
               <v-col cols="12" md="6">
                 <v-row class="buttonGroup">
-                  <v-col cols="12" md="5">
+                  <v-col cols="12" md="4">
                     <v-btn
                       class="button"
                       :disabled="groupActions()" 
-                      dark color="success" 
+                      dark color="warning" 
                       @click="recuperarTriaje()">
                       RECUPERAR A TRIAJE
                     </v-btn>
                   </v-col>
-                  <v-col cols="12" md="5">
+
+                  <v-col cols="12" md="4">
                     <v-btn
                       class="button"
                       :disabled="groupActions()" 
@@ -56,47 +57,6 @@
           item-key="job"
           show-select
         >
-          <template v-slot:top>
-            <!-- VENTANA EDICION INCIDENCIA -->
-            <v-dialog
-              v-model="dialog"
-              fullscreen
-              hide-overlay
-              transition="dialog-bottom-transition"
-            >
-              <VerIncidencia
-                @dialog="dialogClose"
-                :incidencia="editedItem"
-                :error="editedItem.geometria_error"
-                :center="editedItem.geometria_error"
-              ></VerIncidencia>
-            </v-dialog>
-            <!-- FIN VENTANA EDICION INCIDENCIA -->
-
-            <v-dialog v-model="dialogDelete" max-width="500px">
-              <v-card>
-                <h1>ATENCIÓN</h1>
-                <h3>
-                  Esta acción borrará la incidencia ¿Desea continuar?
-                </h3>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn 
-                  dark text @click="closeDelete"
-                    >Cancel</v-btn
-                  >
-                  <v-btn
-                    dark
-                    text
-                    @click="deleteItemConfirm"
-                    >OK</v-btn
-                  >
-                  <v-spacer></v-spacer>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </template>
-
           <template v-slot:no-data>
             <NoData :mensaje="noDataMensaje" :opcion="noDataOpcion"></NoData>
           </template>
@@ -106,7 +66,45 @@
               {{ item.estado }}
             </v-chip>
           </template>
+
+          <template v-slot:[`item.actions`]="{ item }">
+            <v-btn
+              class="editButton"
+              elevation="2"
+              @click="editItem(item)"
+              icon
+              dark
+            >
+              <v-icon> mdi-map </v-icon>
+            </v-btn>
+          </template>
+
         </v-data-table>
+
+        
+        <!-- VER EN MAPA -->
+        <v-dialog
+            v-if="showMap == true"
+            style="heigth:100vh;"
+            v-model="showMap"
+            persistent
+            fullscreen
+            hide-overlay
+            transition="dialog-bottom-transition"
+          >
+          <v-toolbar dark color="primary">
+            <v-btn icon dark @click="showMap = false"><v-icon>mdi-close</v-icon></v-btn>
+            <v-toolbar-title class="editJobTitle"
+              >VER JOB</v-toolbar-title
+            >            
+          </v-toolbar>
+          <v-card class="mapCard">
+            <Map
+              :modoMapa="'visualizar'"
+              :jobsRecibidos="jobEditar"
+            ></Map>
+          </v-card>
+        </v-dialog>
       </div>
 
       <!--MENSAJES DE INFORMACION-->
@@ -127,21 +125,19 @@
 <script>
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
-import VerIncidencia from "@/components/common/VerIncidencia";
 import NoData from "@/components/common/NoData";
+import Map from "@/components/common/Map";
 
 
 export default {
   name: "RecuperarJobs",
   mixins: [getColor],
   components: {
-    VerIncidencia,
     NoData,
+    Map,
   },
 
   data: () => ({
-    dialog: false,
-    dialogDelete: false,
     selected: [],
     search: "",
     headers: [
@@ -152,6 +148,7 @@ export default {
       { text: "Detectado en", align: "start", sortable: true, value: "deteccion_job"},
       { text: "Perfil", align: "start", sortable: true, value: "arreglo_job"},
       { text: "Descripción", align: "start", sortable: true, value: "resumen"}, //hay que hacer desde API un "resumen" ademas de la desc completa
+      { text: "Ver en mapa", align: "center", sortable: false, value: "actions"},
     ],
     jobs: [],
     editedIndex: -1,
@@ -176,6 +173,9 @@ export default {
     //NO DATA SLOT
     noDataMensaje: 'Vaya... parece que no hay Jobs que puedan recuperarse',
     noDataOpcion: 'Si existe algún problemá técnico puedes contactar con un administrador',
+
+    //VER EN MAPA
+    showMap: false,
   }),
 
   computed: {
@@ -184,19 +184,6 @@ export default {
     },
   },
 
-  watch: {
-    dialog(val) {
-      val || this.close();
-    },
-
-    dialogDelete(val) {
-      val || this.closeDelete();
-    },
-
-    editItem(){
-      console.log("edit", this.editedItem)
-    }
-  },
   created() {
     this.initialize();
   },
@@ -273,45 +260,16 @@ export default {
               this.jobs.push(this.jobsBruto[this.elemento]);
             }
           }
-          
         });
-    },
-
-    editItem(item) {
-      this.editedIndex = this.jobs.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true;
-    },
-
-    deleteItem(item) {
-      this.editedIndex = this.jobs.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
-    },
-
-    deleteItemConfirm() {
-      this.jobs.splice(this.editedIndex, 1);
-      this.closeDelete();
-    },
-
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
     },
 
     dialogClose() {
       this.dialog = false;
+    },
+
+    editItem(item) {
+      this.showMap = true;
+      this.jobEditar = item;
     },
 
     save() {
@@ -359,7 +317,7 @@ export default {
   padding: 0.5rem;
 }
 
-.btn {
+.button {
     width: 100%;
     font-weight: 400;
 }
@@ -367,6 +325,10 @@ export default {
 .textField {
   background-color: white;
   padding: 0.5rem;
+}
+
+.mapCard {
+  height: 100vh;
 }
 
 </style>

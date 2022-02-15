@@ -95,12 +95,12 @@
             hide-overlay
             transition="dialog-bottom-transition"
           >
-          <AsignarErrores
+          <MapaAsignarErrores
           :job="undefined"
           :errores="selected"
           @closeDialog="closeAsignar"
           @deleteErrores="updateTableErrors"
-          ></AsignarErrores>
+          ></MapaAsignarErrores>
         </v-dialog>
 
         <!--MENSAJES DE INFORMACION-->
@@ -123,7 +123,6 @@
               text="Indique el motivo por el cual desea desestimar el error:"
               @close="getJustification"
             >
-
             </JustificarAccion>
         </v-overlay>
 
@@ -135,16 +134,14 @@
             <br/>
             <h3><b>¿Desea continuar?</b></h3>
             <v-card-actions>
-              <div class="alertButtonGroup">
+              <div>
                 <v-btn
-                  class="alertButton errorBtn"
                   dark
                   text
                   @click="dialogJustify = false"
                   >CANCELAR</v-btn
                 >
                 <v-btn
-                  class="alertButton generateBtn"
                   dark
                   text
                   @click="justifyDesestimate"
@@ -165,14 +162,14 @@ import { generarJobError } from '@/assets/mixins/generarJobError';
 import { desestimarErrores } from '@/assets/mixins/desestimarErrores';
 
 import NoData from "@/components/common/NoData";
-import AsignarErrores from "@/components/common/AsignarErrores";
+import MapaAsignarErrores from "@/components/generadorJobs/mapaAsignarErrores";
 import JustificarAccion from "@/components/common/JustificarAccion";
 
 
 export default {
   name: "ErroresNoAsign",
   mixins: [getColor, generarJobError, desestimarErrores],
-  components: { NoData, AsignarErrores, JustificarAccion },
+  components: { NoData, MapaAsignarErrores, JustificarAccion },
 
   data: () => ({
     dialog: false,
@@ -402,11 +399,6 @@ export default {
 
   .buttonGroup {
     padding: 0.5rem;
-  }
-
-  .btn {
-      width: 100%;
-      font-weight: 400;
   }
 
   .textField {

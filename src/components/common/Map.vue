@@ -15,7 +15,7 @@
 
             <!-- BASE -->
             <!--Mapa base-->
-            <vl-layer-tile>
+            <vl-layer-tile v-if="activeTab === 'vector' || activeMap.nombre === 'BDIG Tiles'">
                 <vl-source-xyz :url="urlTileBase"></vl-source-xyz>
             </vl-layer-tile>
 
@@ -644,7 +644,7 @@
                 >
                 <v-spacer></v-spacer>
                     <v-btn
-                    class="button"
+                    class="propsButton"
                     color="error" 
                     elevation="3" 
                     @click="closeWindowInfoJob()"
@@ -652,7 +652,7 @@
                     CANCELAR
                     </v-btn>
                     <v-btn
-                    class="button" 
+                    class="propsButton" 
                     :disabled="modoMapa == 'visualizar'" 
                     color="primary" 
                     elevation="3" 
@@ -661,7 +661,7 @@
                     EDITAR
                     </v-btn>
                     <v-btn
-                    class="button" 
+                    class="propsButton" 
                     color="success" 
                     elevation="3" 
                     @click="updateEditedJob()"
@@ -723,7 +723,7 @@
                 >
                 <v-spacer></v-spacer>
                     <v-btn
-                    class="button" 
+                    class="propsButton" 
                     color="error" 
                     elevation="3" 
                     @click="ventanaInfoError = false"
@@ -731,7 +731,7 @@
                     CANCELAR
                     </v-btn>
                     <v-btn
-                    class="button" 
+                    class="propsButton" 
                     :disabled="modoMapa == 'visualizar'" 
                     color="primary" 
                     elevation="3" 
@@ -740,7 +740,7 @@
                     EDITAR
                     </v-btn>
                     <v-btn
-                    class="button"
+                    class="propsButton"
                     color="success" 
                     elevation="3" 
                     @click="updateEditedError()"
@@ -821,6 +821,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
         },
 
         watch:{
+
             //CALLBACK DESDE SITUARTOPONIMO
             localizacion(){
                 if(this.localizacion != undefined){                   
@@ -1016,6 +1017,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             
             retrieveJobFromBD(){
                 if (this.modoMapa == 'visualizar' || this.modoMapa == 'editar') {
+                    console.log(this.jobsRecibidos)
                     //Solo ejecutamos si recibimos errores desde el componente padre
                     if (this.jobsRecibidos) {
                         //Geometrias
@@ -1774,7 +1776,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
         margin-top: 0.46rem;
     }
 
-    .button {
+    .propsButton {
         font-weight: 400 !important;
     }
 

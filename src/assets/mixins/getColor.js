@@ -18,7 +18,8 @@ export const getColor = {
             else if (estado == 'Error versión') return '#f54b42';           //rojo
             else if (estado == 'Versión generada') return '#009933';        //verde
             else if (estado == 'Ejecución') return '#ffcc00';               //amarillo
-            else if (estado == 'Conciliado') return '#009933';        //verde
+            else if (estado == 'Conciliado') return '#009933';              //verde
+            else if (estado == 'Pausa') return '#6b7280';                   //gris
             
 
 
