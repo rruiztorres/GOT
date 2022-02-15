@@ -9,7 +9,7 @@ export const searchToponimo = {
             axios
             .get(url + 'name_equals='+ toponimo +'&maxresults=' + maxResults)
             .then(response => this.resultado = response.data)
-            return this.resultado;     
+            return this.resultado;   
         },
     },
 }

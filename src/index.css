@@ -2,9 +2,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600&display=swap');
 
 html {
-    background-color: #EFF6FF;;
+    background-color: #EFF6FF;
+    overflow-y: hidden;
   }
 
 #gotApp{
     font-family: 'Montserrat', sans-serif !important;
+}
+
+.v-row-group__header{
+  background-color: #4287f51c !important;
 }

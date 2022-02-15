@@ -8,17 +8,17 @@
       >
       <v-spacer></v-spacer>
       <v-btn
-        class="button editJobBtn errorBtn"
+        class="fontControl editJobBtn errorBtn"
         dark
         text
         elevation="2"
         @click="closeDialog()"
         >CANCELAR
       </v-btn>
-      <v-btn class="button editJobBtn saveBtn" dark text elevation="2" @click="saveData()"
+      <v-btn class="fontControl editJobBtn saveBtn" dark text elevation="2" @click="saveData()"
         >GUARDAR DATOS
       </v-btn>
-      <v-btn class="button editJobBtn generateBtn" dark text elevation="2"
+      <v-btn class="fontControl editJobBtn generateBtn" dark text elevation="2"
         >GENERAR
       </v-btn>
     </v-toolbar>
@@ -26,8 +26,8 @@
     <!--MAIN-->
     <v-card>
       <v-tabs fixed-tabs background-color="#0341a6" dark>
-        <v-tab class="tab" :key="1">Localización en el Mapa </v-tab>
-        <v-tab class="tab" :key="2">Resumen Jobs / Errores creados </v-tab>
+        <v-tab class="fontControl" :key="1">Localización en el Mapa </v-tab>
+        <v-tab class="fontControl" :key="2">Resumen Jobs / Errores creados </v-tab>
         <v-tabs-slider color="#76aff5"></v-tabs-slider>
 
         <!--LOCALIZACIÓN EN EL MAPA-->
@@ -111,7 +111,7 @@ import {getColor} from "@/assets/mixins/getColor";
 import axios from 'axios';
 
 export default {
-  name: "AsignarErrores",
+  name: "mapaAsignarErrores",
   components: { Map },
   props: ["errores"],
   mixins: [getColor],
@@ -223,6 +223,11 @@ export default {
 .tab {
   font-weight: 400 !important;
 }
+
+.fontControl {
+  font-weight: 400 !important;
+}
+
 
 .asignTabContent {
   height: 86vh;

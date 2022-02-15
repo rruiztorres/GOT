@@ -21,6 +21,12 @@
 
             <!-- GOT Admin -->
             <div v-if="activarMenu == 'GestionUsuarios'"><GestionUsuarios></GestionUsuarios></div>
+
+            <!--GESTOR -->
+            <div v-if="activarMenu == 'EstadisticasGestor'"><EstadisticasGestor></EstadisticasGestor></div>
+            <div v-if="activarMenu === 'VerMapa'"><VerMapa></VerMapa></div>
+            <div v-if="activarMenu ==='JobsGestor'"><JobsGestor></JobsGestor></div>
+            <div v-if="activarMenu === 'ErroresGestor'"><ErroresGestor></ErroresGestor></div>
         </div>
     </div>
 </template>
@@ -37,6 +43,11 @@
     import BandejaErrCrear from "@/components/soporteBDIG/BandejaErrCrear";
     import BandejaErrFin from "@/components/soporteBDIG/BandejaErrFin";
     import GestionUsuarios from "@/components/GOTAdmin/GestionUsuarios";
+    import EstadisticasGestor from "@/components/gestor/EstadisticasGestor";
+    import VerMapa from "@/components/gestor/VerMapa";
+    import JobsGestor from "@/components/gestor/JobsGestor";
+    import ErroresGestor from "@/components/gestor/ErroresGestor";
+
     
     export default {
         name:'Loader',
@@ -52,6 +63,10 @@
             BandejaErrCrear,
             BandejaErrFin,
             GestionUsuarios,
+            EstadisticasGestor,
+            VerMapa,
+            JobsGestor,
+            ErroresGestor,
         },
 
         props: ['activarMenu'],
