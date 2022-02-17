@@ -129,10 +129,7 @@
       </v-row>
     </div>
 
-    <br/>
-    <hr/>
-    <br/>
-    
+    <br/>   
     <!-- ERRORES -->
     <!-- CARDS -->
     <div class="cardsRow bgLightRed shadow">

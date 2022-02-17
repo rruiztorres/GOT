@@ -447,13 +447,13 @@
                         >
                             <v-spacer></v-spacer>
                             <v-btn
-                            class="button" 
+                            class="propsButton"
                             color="error" 
                             dark 
                             @click="abortInsertion('jobs')"
                             >CANCELAR</v-btn>
                             <v-btn 
-                            class="button"
+                            class="propsButton"
                             :disabled="disableAceptarJob || descJob == null"
                             color="success" 
                             :dark="!disableAceptarJob"
@@ -528,14 +528,14 @@
                         class="actionForm"
                     >
                         <v-spacer></v-spacer>
-                        <v-btn 
-                        class="button"
+                        <v-btn
+                        class="propsButton"
                         color="error" 
                         dark
                         @click="abortInsertion('errores')"
                         >CANCELAR</v-btn>
                         <v-btn
-                        class="button"
+                        class="propsButton"
                         :disabled="disableAceptarError || descError == null"
                         color="success" 
                         :dark="!disableAceptarError"
@@ -1017,7 +1017,6 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             
             retrieveJobFromBD(){
                 if (this.modoMapa == 'visualizar' || this.modoMapa == 'editar') {
-                    console.log(this.jobsRecibidos)
                     //Solo ejecutamos si recibimos errores desde el componente padre
                     if (this.jobsRecibidos) {
                         //Geometrias
@@ -1192,6 +1191,15 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             getJobParameters(){
                 axios.get(`${process.env.VUE_APP_API_ROUTE}/jobParameters`).then((data) => {
                     this.objeto = data.data;
+
+                    //Añadimos opcion null para la eleccion expediente
+                    this.expedienteNull = {id_expediente: null, expediente: '', fecha: null, observaciones: null, finalizado: null}
+                    this.objeto.expediente.unshift(this.expedienteNull)
+
+                    //Añadimos opcion null para la eleccion operadores
+                    this.operadorNull = {id_operador: null, nombre_operador: '', usr_operador: null, rol_operador: null}
+                    this.objeto.operador.unshift(this.operadorNull)
+
                     //makeArrayFromApi (objetoAPI, arrayCrear, columnaBD)
                     this.makeArrayFromApi(this.objeto.expediente,this.expediente, 'expediente')
                     this.makeArrayFromApi(this.objeto.asignacion,this.asignacion, 'asignacion')
@@ -1209,7 +1217,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     this.perfilJob = this.perfil[this.asignarValoresDefault(this.objeto.perfilJob, 'id_arreglo')];
                     this.tipoBandejaJob = this.tipoBandeja[this.asignarValoresDefault(this.objeto.tipoBandeja, 'id_tipo_bandeja')];
                     this.nombreOperadorJob = null;
-                    })
+                })
             },
 
             throwMessage(color, tipo, mensaje, aceptar){

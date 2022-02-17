@@ -60,7 +60,7 @@
             >
                 <v-spacer></v-spacer>
                 <v-btn
-                class="button"
+                class="fontControl"
                 color="error" 
                 dark 
                 @click="closeEditError()"
@@ -69,7 +69,7 @@
                 :disabled="disableAceptarError || descripcion.length == 0"
                 color="success" 
                 :dark="!disableAceptarError"
-                class="button" 
+                class="fontControl" 
                 @click="storeErrorData()"
                 >ACEPTAR</v-btn>
             </v-card-actions>
@@ -191,7 +191,7 @@ import { makeArrayFromApi } from '@/assets/mixins/makeArrayFromApi.js';
         margin-top: 0.46rem;
     }
 
-    .button {
-        font-weight: 400 !important;
+    .fontControl {
+        font-weight: 400;
     }
 </style>

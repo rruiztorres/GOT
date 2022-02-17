@@ -22,14 +22,14 @@
         </div>
 
         <!-- JOB EN TRIAJE || INSERCIÓN JOB MANUAL DESDE GOT -->
-        <div v-else-if="accion =='JET' || accion == 'IMA' || accion == 'IEM' || accion == 'JCR'">
+        <div v-else-if="accion =='JET' || accion == 'IMA' || accion == 'IEM' || accion == 'JCR' || accion == 'JMD'">
             <v-btn class="actionBtn" block color="success" @click="generateJobErrors">Generar el Job</v-btn>
             <v-btn class="actionBtn" block color="warning" @click="sendConsulta">Enviar a consulta</v-btn>
             <v-btn class="actionBtn" block color="error" @click="showDesestimarWindow = true">Desestimar el Job</v-btn>
         </div>
 
         <!-- JOB ENVIADO A CONSULTA -->
-        <div v-else-if="accion =='JEC'">
+        <div v-else-if="accion =='JCO'">
             <v-btn class="actionBtn" block color="success" @click="showConsultaWindow = true">Consulta Resuelta</v-btn>
         </div>
 
@@ -68,14 +68,24 @@
 
         <!-- EL OPERADOR TRABAJA EN EL JOB -->
         <div v-else-if="accion =='JEJ' || accion == 'ESO' || accion == 'EDE'">
-            <v-btn class="actionBtn" block color="success" @click="checkFinalizar">Finalizar Job</v-btn>
-            <v-btn class="actionBtn" block color="warning" @click="showPauseWindow = true">Pausar Job</v-btn>
-            <v-btn class="actionBtn" block color="info">Solicitar soporte</v-btn>
-            <v-btn class="actionBtn" block color="error" @click="showDevolverAtriajeWindow = true">Devolver el Job a triaje</v-btn>
+            <div v-if="activeRole === 'Operador' || activeRole === 'Operador Especializado'">
+                <v-btn class="actionBtn" block color="success" @click="checkFinalizar">Finalizar Job</v-btn>
+                <v-btn class="actionBtn" block color="warning" @click="showPauseWindow = true">Pausar Job</v-btn>
+                <v-btn class="actionBtn" block color="info">Solicitar soporte</v-btn>
+                <v-btn class="actionBtn" block color="error" @click="showDevolverAtriajeWindow = true">Devolver el Job a triaje</v-btn>
+            </div>
+            <div v-else>
+                <v-alert dense type="info">No existen acciones disponibles</v-alert>
+            </div>
         </div>
 
         <!-- ERROR FIN PARA USUARIO -->
         <div v-else-if="accion =='EFT'">
+            <v-alert dense type="error">
+                Se han detectado errores en las validaciones sin justificar o solucionar. 
+                Revise el job en el entorno de edición. Cuando haya terminado vuelva a esta
+                ventana y ejecute de nuevo "Finalizar Job"
+            </v-alert>
             <v-btn class="actionBtn" block color="success" @click="checkFinalizar">Finalizar Job</v-btn>
         </div>
 
@@ -297,8 +307,7 @@ import JustificarAccion from "@/components/common/JustificarAccion";
             createVersion(){
                 this.loadAction = true;      
                 //CREARÁ VERSION Y ESCRIBE ESTADO EN BD
-                this.startJob(this.job);
-
+                this.startJob(this.job)
                 //LEEREMOS DATOS EN BD CON UN DELAY 500ms SUPERIOR A LO QUE TARDA LA VERSION
                 setTimeout(this.updateAction, 5500)
             },

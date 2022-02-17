@@ -72,6 +72,7 @@
           </v-col>
         </v-row>
       </v-card>
+
       <v-data-table
         class="dataTable"
         v-model="selected"
@@ -208,30 +209,39 @@
       <!--SELECCION DE EXPEDIENTES (asignacion masiva) TODO: sacar a componente-->
       <v-overlay :value="showExpSelect">
         <v-card light class="asignExpContainer">
-          <v-card-title class="asignExpTitle"
-            >Asignación de Expediente
-            <v-spacer></v-spacer>
-            <v-card-actions>
-              <div>
-                <v-btn
-                  text
-                  dark
-                  class="errorBtn expBtn"
-                  elevation="2"
-                  @click="showExpSelect = !showExpSelect"
-                  >CANCELAR</v-btn
-                >
-                <v-btn
-                  text
-                  dark
-                  class="generateBtn expBtn"
-                  elevation="2"
-                  :disabled="expediente == null"
-                  @click="asignExpToSelect()"
-                  >ASIGNAR A SELECCIÓN</v-btn
-                >
-              </div>
-            </v-card-actions>
+          <v-card-title class="asignExpTitle">
+            <v-row>
+              <v-col cols="12" xl="5">
+                Asignación de Expediente
+              </v-col>
+              <v-col cols="12" xl="7">
+                  <v-row>
+                    <v-col cols="12" md="6">
+                      <v-btn
+                        text
+                        dark
+                        class="errorBtn expBtn buttonWidth"
+                        elevation="2"
+                        @click="showExpSelect = !showExpSelect"
+                        >
+                        CANCELAR
+                      </v-btn>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                      <v-btn
+                        text
+                        dark
+                        class="generateBtn expBtn buttonWidth"
+                        elevation="2"
+                        :disabled="expediente === null"
+                        @click="asignExpToSelect()"
+                        >
+                        ASIGNAR A SELECCIÓN
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+              </v-col>
+            </v-row>
           </v-card-title>
           <v-row class="asignExpInfoContainer">
             <v-col>
@@ -250,10 +260,7 @@
                 <v-card-title>Información</v-card-title>
                 <div
                   class="asignExpTable"
-                  v-if="
-                    expedienteInfo[0].observaciones != null &&
-                      expedienteInfo[0].fecha
-                  "
+                  v-if="expedienteInfo[0].observaciones != null && expedienteInfo[0].fecha"
                 >
                   <v-simple-table>
                     <template v-slot:default>
@@ -280,8 +287,8 @@
                   </v-simple-table>
                 </div>
 
-                <div class="asignExpTable" v-else>
-                  <div>Seleccione un expediente para ver información</div>
+                <div v-else>
+                  <v-alert type="info">No se ha seleccionado ningún expediente.</v-alert>
                 </div>
               </div>
             </v-col>
@@ -318,8 +325,11 @@ export default {
     dialogDelete: false,
     dialogDesestimar: false,
     justificacionJobDesestimado: "",
+
+    //CONTROL DATA TABLE
     selected: [],
     search: "",
+
     headers: [
       { text: "Estado", align: "start", sortable: true, value: "estado" },
       { text: "Job", align: "start", sortable: true, value: "job" },
@@ -390,8 +400,7 @@ export default {
 
     //NO DATA SLOT
     noDataMensaje: "En estos momentos no existen Jobs que requieran triaje.",
-    noDataOpcion:
-      "Echa un vistazo a los errores sin asignar por si puedes generar nuevos Jobs.",
+    noDataOpcion: "Echa un vistazo a los errores sin asignar por si puedes generar nuevos Jobs.",
   }),
 
   watch: {
@@ -404,22 +413,26 @@ export default {
     },
 
     expediente() {
-      if (this.expediente != null) {
-        axios
-          .get(`${process.env.VUE_APP_API_ROUTE}/expediente/` + this.expediente)
-          .then((data) => {
-            this.expedienteInfo[0].fecha = data.data.respuesta[0].fecha.slice(
-              0,
-              10
-            );
-            this.expedienteInfo[0].observaciones =
-              data.data.respuesta[0].observaciones;
-            if (data.data.respuesta[0].finalizado == true) {
-              this.expedienteInfo[0].finalizado = "Finalizado";
-            } else {
-              this.expedienteInfo[0].finalizado = "Abierto";
-            }
-          });
+      if (this.expediente !== null) {
+        if (this.expediente === ''){
+          this.expedienteInfo[0].fecha = null;
+          this.expedienteInfo[0].observaciones = null;
+          this.expedienteInfo[0].finalizado = null;
+        } else {
+            axios
+              .get(`${process.env.VUE_APP_API_ROUTE}/expediente/` + this.expediente)
+              .then((data) => {
+                this.expedienteInfo[0].fecha = data.data.respuesta[0].fecha.slice(0,10);
+                this.expedienteInfo[0].observaciones = data.data.respuesta[0].observaciones;
+
+                //FORMATEO RESPUESTA
+                if (data.data.respuesta[0].finalizado == true) {
+                  this.expedienteInfo[0].finalizado = "Finalizado";
+                } else {
+                  this.expedienteInfo[0].finalizado = "Abierto";
+                }
+            });
+        }
       }
     },
   },
@@ -485,7 +498,6 @@ export default {
                 "green"
               );
               setTimeout(this.closeInfo, 1500);
-              console.log(this.jobs)
             } else {
               this.showInfo(data.data.mensaje, "red");
               setTimeout(this.closeInfo, 1500);
@@ -504,6 +516,8 @@ export default {
         for (this.index in data.data.respuesta) {
           this.expedientes.push(data.data.respuesta[this.index].expediente);
         }
+      //Añadir la opción de seleccionar un expediente null
+      this.expedientes.unshift('');
       });
     },
 
@@ -746,6 +760,10 @@ export default {
   background-color: #10b981;
 }
 
+.buttonWidth {
+  width: 100%;
+}
+
 /* SELECCION DE EXPEDIENTES */
 .asignExpContainer {
   width: 40vw;
@@ -763,7 +781,6 @@ export default {
 }
 
 .expBtn {
-  margin: 0.25rem 0.25rem;
   font-weight: 400 !important;
 }
 

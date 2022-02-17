@@ -122,7 +122,7 @@
       <v-card-actions class="actionForm">
         <v-spacer></v-spacer>
         <v-btn 
-          class="button"
+          class="fontControl"
           color="error" 
           dark 
           @click="closeEditJob()"
@@ -130,7 +130,7 @@
         CANCELAR
         </v-btn>
         <v-btn
-          class="button"
+          class="fontControl"
           color="success"
           :dark="!disableAceptarJob"
           @click="storeJobData()"
@@ -202,38 +202,23 @@ export default {
         .get(`${process.env.VUE_APP_API_ROUTE}/jobParameters`)
         .then((data) => {
           this.objeto = data.data;
+
+          //Añadimos opcion null para la eleccion expediente
+          this.expedienteNull = {id_expediente: null, expediente: '', fecha: null, observaciones: null, finalizado: null}
+          this.objeto.expediente.unshift(this.expedienteNull)
+
+          //Añadimos opcion null para la eleccion operadores
+          this.operadorNull = {id_operador: null, nombre_operador: '', usr_operador: null, rol_operador: null}
+          this.objeto.operador.unshift(this.operadorNull)
+
           //makeArrayFromApi (objetoAPI, arrayCrear, columnaBD)
-          this.makeArrayFromApi(
-            this.objeto.expediente,
-            this.expediente,
-            "expediente"
-          );
-          this.makeArrayFromApi(
-            this.objeto.asignacion,
-            this.asignacion,
-            "asignacion"
-          );
-          this.makeArrayFromApi(
-            this.objeto.deteccion,
-            this.deteccion,
-            "deteccion"
-          );
-          this.makeArrayFromApi(
-            this.objeto.gravedad,
-            this.gravedad,
-            "gravedad"
-          );
-          this.makeArrayFromApi(
-            this.objeto.operador,
-            this.nombreOperador,
-            "nombre_operador"
-          );
+          this.makeArrayFromApi(this.objeto.expediente, this.expediente, "expediente");
+          this.makeArrayFromApi(this.objeto.asignacion, this.asignacion, "asignacion");
+          this.makeArrayFromApi(this.objeto.deteccion, this.deteccion, "deteccion");
+          this.makeArrayFromApi(this.objeto.gravedad, this.gravedad, "gravedad");
+          this.makeArrayFromApi(this.objeto.operador, this.nombreOperador, "nombre_operador");
           this.makeArrayFromApi(this.objeto.perfilJob, this.perfil, "arreglo");
-          this.makeArrayFromApi(
-            this.objeto.tipoBandeja,
-            this.tipoBandeja,
-            "tipo_bandeja"
-          );
+          this.makeArrayFromApi(this.objeto.tipoBandeja, this.tipoBandeja, "tipo_bandeja");
 
           //Valores preasignados del job a editar
           this.descJob = this.job.descripcion;
@@ -322,7 +307,7 @@ export default {
   margin-top: 0.46rem;
 }
 
-.button{
+.fontControl{
   font-weight: 400 !important;
 }
 

@@ -15,7 +15,7 @@ export const startJob = {
               }
 
             axios
-            .post(`${process.env.VUE_APP_API_ROUTE}/createVersion`, [job, this.log])            
+            .post(`${process.env.VUE_APP_API_ROUTE}/createVersion`, [job, this.log])
         }
     }
     

@@ -17,11 +17,13 @@
     </div>
     <v-card-actions class="returnJobWindowActions">
       <v-spacer></v-spacer>
-      <v-btn class="button" color="error" @click="closeWithoutSave()">
+      <v-btn
+      class="fontControl"
+      color="error" @click="closeWithoutSave()">
         CANCELAR
       </v-btn>
       <v-btn
-        class="button"
+        class="fontControl"
         :disabled="justificacion == '' || justificacion.length >= 100"
         color="success"
         @click="closeAndSave()"
@@ -59,6 +61,11 @@ export default {
 </script>
 
 <style scoped>
+
+.fontControl {
+  font-weight: 400;
+}
+
 .returnJobWindow {
   margin: auto 1rem;
   width: 90vw;
