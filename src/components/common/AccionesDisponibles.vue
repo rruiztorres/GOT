@@ -177,7 +177,7 @@
 <script>
 import axios from "axios";
 
-//mixins
+//MIXINS
 import {desestimarJobs} from "@/assets/mixins/proceso/desestimarJobs";
 import {asignarmeJob} from "@/assets/mixins/proceso/asignarmeJob";
 import {returnJob} from "@/assets/mixins/proceso/returnJob";
@@ -192,10 +192,8 @@ import {generarJobError} from "@/assets/mixins/generarJobError";
 import {devolverJobTriaje} from "@/assets/mixins/proceso/devolverJobTriaje";
 import {finalizarJob} from "@/assets/mixins/proceso/finalizarJob";
 
-//components
+//COMPONENTS
 import JustificarAccion from "@/components/common/JustificarAccion";
-
-
 
     export default {
         name: "AccionesDisponibles",
@@ -234,15 +232,11 @@ import JustificarAccion from "@/components/common/JustificarAccion";
             }
         },
 
-        computed: {
-        },
-
         created(){
             this.getLastAction();
         },
         
         methods:{
-
             generateJobErrors(){
                 this.loadAction = true;
                 this.generarJobError([this.job], this.errores)

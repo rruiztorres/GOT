@@ -32,21 +32,21 @@
               <v-col cols="12" md="4">
                 <v-btn
                   class="btn"
-                  :disabled="selected.length == 0"
+                  :disabled="checkAction('Cerrar')"
                   dark
-                  color="success"
-                  @click="closeExpediente()"
+                  color="error"
+                  @click="stateFinalizarExp(true)"
                 >
-                  FINALIZAR
+                  CERRAR
                 </v-btn>
               </v-col>
               <v-col cols="12" md="4">
                 <v-btn
                   class="btn"
-                  :disabled="selected.length == 0"
+                  :disabled="checkAction('Abrir')"
                   dark
-                  color="warning"
-                  @click="deleteExpediente()"
+                  color="success"
+                  @click="stateFinalizarExp(false)"
                 >
                   VOLVER A ABRIR
                 </v-btn>
@@ -89,8 +89,8 @@
         </template>
 
         <template v-slot:[`item.finalizado`]="{ item }">
-          <v-chip :color="getColor(item.finalizado)" dark>
-            {{ item.finalizado }}
+          <v-chip :color="getColor(formatFinalizado(item.finalizado))" dark>
+            {{formatFinalizado(item.finalizado)}}
           </v-chip>
         </template>
       </v-data-table>
@@ -108,6 +108,7 @@
     <template>
       <v-dialog v-model="mensajeFlotante.visibilidad" max-width="49rem">
         <v-alert
+          class="floatMsg" 
           :color="mensajeFlotante.color"
           :type="mensajeFlotante.type"
           prominent
@@ -127,6 +128,8 @@
         </v-alert>
       </v-dialog>
     </template>
+
+    
   </div>
 </template>
 
@@ -211,6 +214,37 @@ export default {
   },
 
   methods: {
+
+    checkAction(isopen){
+      //COMPROBAR ACCION (abrir / cerrar)
+      if (isopen === 'Abrir'){
+        this.accion = false
+      } else {
+        this.accion = true
+      }
+      
+      if(this.selected.length > 0){
+        this.check = false;
+        for (this.index in this.selected){
+          if (this.selected[this.index].finalizado == this.accion){
+            this.check = true
+          }
+        }
+        return this.check;
+      } else {
+        return true
+      }
+    },
+
+
+    formatFinalizado(estado){
+      if(estado === false){
+        return 'Abierto'
+      } else {
+        return 'Cerrado'
+      }
+    },
+
     closeInfoMessage() {
       this.mensajeFlotante.visibilidad = false;
     },
@@ -223,35 +257,25 @@ export default {
       this.mensajeFlotante.aceptar = aceptar; //Muestra el boton de "entendido"
     },
 
-    closeExpediente() {
+    stateFinalizarExp(isopen) {
       let proceso = 0;
-
+      let estado = isopen;
       for (this.index in this.selected) {
-        //TODO: Formateo de datos no necesario cuando actualicemos tabla
-        this.selected[this.index].finalizado = true;
-        this.selected[this.index].fechaInicio = this.selected[this.index].fecha;
-
+        this.selected[this.index].finalizado = estado;
         axios
-          .put(
-            `${process.env.VUE_APP_API_ROUTE}/updateExpediente`,
-            this.selected[this.index]
-          )
+          .put(`${process.env.VUE_APP_API_ROUTE}/updateExpediente`, this.selected[this.index])
           .then((data) => {
             if (data.status != 201) {
               proceso = 1;
             }
           });
       }
-      //Comprobar ejecución
       if (proceso == 0) {
-        this.selected[this.index].finalizado = "Cerrado";
-        this.throwMessage(
-          "green",
-          "success",
-          "Expedientes actualizados con éxito",
-          false
-        );
+        this.selected = [];
+        this.throwMessage("green", "success", "Expedientes actualizados con éxito", false);
         setTimeout(this.closeInfoMessage, 1500);
+      } else {
+        this.throwMessage("red", "error", "Error inesperado. Revise los datos", true);
       }
     },
 
@@ -283,13 +307,6 @@ export default {
             this.fecha = this.expedientes[this.index].fecha;
             this.fechaCortada = this.fecha.slice(0, 10);
             this.expedientes[this.index].fecha = this.fechaCortada;
-
-            //Devuelve estado en formato Abierto / Cerrado para la tabla
-            if (this.expedientes[this.index].finalizado == true) {
-              this.expedientes[this.index].finalizado = "Cerrado";
-            } else {
-              this.expedientes[this.index].finalizado = "Abierto";
-            }
           }
         });
     },
@@ -343,4 +360,9 @@ export default {
 .infoButton {
   background-color: #EF6C00;
 }
+
+.floatMsg{
+  margin-bottom: 0rem;
+}
+
 </style>
