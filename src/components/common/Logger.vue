@@ -15,7 +15,7 @@
 
               <v-list-item-content>
                 <v-list-item-subtitle
-                  v-html="`${item.fecha} - ${item.hora}`"
+                  v-html="`${item.fecha}`"
                 ></v-list-item-subtitle>
                 <v-list-item-title v-html="item.title"></v-list-item-title>
                 <v-list-item-subtitle
@@ -207,15 +207,19 @@ export default {
 
     returnFormatLog(log) {
       for (this.index in log) {
-        this.arrayFecha = log[this.index].fecha.split("T");
+        this.formatDate = log[this.index].fecha.split(" ");
+        this.date = this.formatDate[2] + 
+        " / " + this.formatDate[1] + 
+        " / " + this.formatDate[3] + 
+        " - " + this.formatDate[4];
+
         this.logNewEntry = {
           id: log[this.index].id_log,
           claseProceso: this.getLogIconColors(log[this.index].codigo),
           class: "",
           icon: this.getLogIcons(log[this.index].codigo),
           procDesc: log[this.index].codigo,
-          fecha: this.arrayFecha[0],
-          hora: this.arrayFecha[1].slice(0, -5),
+          fecha: this.date,
           title: log[this.index].evento,
           subtitle: log[this.index].descripcion,
         };

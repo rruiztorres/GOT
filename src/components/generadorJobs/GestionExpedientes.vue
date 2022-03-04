@@ -76,11 +76,11 @@
         show-select
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <v-btn title="editar" icon dark class="editButton"
+          <v-btn title="editar" icon dark class="editButton" :disabled="item.finalizado === true"
             ><v-icon @click="dummy(item)"> mdi-lead-pencil </v-icon></v-btn
           >
-          <v-btn title="ver estado" icon dark class="infoButton"
-            ><v-icon @click="dummy(item)"> mdi-chart-areaspline </v-icon></v-btn
+          <v-btn title="ver estado" icon dark class="infoButton" :disabled="item.finalizado === true"
+            ><v-icon @click="showStateExp(item)"> mdi-chart-areaspline </v-icon></v-btn
           >
         </template>
 
@@ -103,6 +103,16 @@
         @updateExp="updateStoredExp"
       ></NuevoExpediente>
     </v-overlay>
+
+    <!--VENTANA ESTADO EXPEDIENTE-->
+    <v-dialog fullscreen :value="showStateExpWindow">
+      <EstadoExpediente
+      v-if="showStateExpWindow === true"
+      :expediente="mostrarEstadoExp"
+      @close="closeEstadoExp"
+      >
+      </EstadoExpediente>
+    </v-dialog>
 
     <!-- MENSAJES DE ALERTA FLOTANTES -->
     <template>
@@ -137,12 +147,13 @@
 import axios from "axios";
 import { getColor } from "@/assets/mixins/getColor.js";
 import NuevoExpediente from "@/components/generadorJobs/NuevoExpediente";
+import EstadoExpediente from "@/components/generadorJobs/EstadoExpediente";
 import NoData from "@/components/common/NoData";
 
 export default {
   name: "GestionExpedientes",
   mixins: [getColor],
-  components: { NuevoExpediente, NoData, },
+  components: { NuevoExpediente, NoData, EstadoExpediente },
 
   data: () => ({
     dialog: false,
@@ -195,6 +206,10 @@ export default {
     //NUEVO EXPEDIENTE
     showWindowNewExp: false,
 
+    //ESTADO EXPEDIENTE
+    showStateExpWindow: false,
+    mostrarEstadoExp: undefined,
+
     //MENSAJES FLOTANTES
     mensajeFlotante: {
       visibilidad: false,
@@ -214,6 +229,15 @@ export default {
   },
 
   methods: {
+
+    closeEstadoExp(data){
+      this.showStateExpWindow = data
+    },
+
+    showStateExp(expediente){
+      this.mostrarEstadoExp = expediente;
+      this.showStateExpWindow = true;
+    },
 
     checkAction(isopen){
       //COMPROBAR ACCION (abrir / cerrar)

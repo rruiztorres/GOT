@@ -32,6 +32,7 @@ export const createDataSeries = {
           }
         }
       }
+      
       return { tipos: this.tiposFiltrados, series: this.serieTiposJob };
     },
   },

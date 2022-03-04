@@ -29,7 +29,7 @@
         </div>
 
         <!-- JOB ENVIADO A CONSULTA -->
-        <div v-else-if="accion =='JCO'">
+        <div v-else-if="accion =='JEC'">
             <v-btn class="actionBtn" block color="success" @click="showConsultaWindow = true">Consulta Resuelta</v-btn>
         </div>
 

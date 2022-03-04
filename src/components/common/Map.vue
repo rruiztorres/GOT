@@ -15,20 +15,32 @@
 
             <!-- BASE -->
             <!--Mapa base-->
+            <vl-layer-tile 
+            v-if="activeTab === 'vector' || activeMap.nombre === 'BDIG Tiles'"
+            :z-index="0"
+            >
+                <vl-source-wmts 
+                    url="https://www.ign.es/wmts/mapa-raster" 
+                    layer-name="MTN_Fondo" 
+                    matrixSet="EPSG:3857" 
+                    style-name="default">
+                </vl-source-wmts>
+            </vl-layer-tile>
+            <!--
             <vl-layer-tile v-if="activeTab === 'vector' || activeMap.nombre === 'BDIG Tiles'">
                 <vl-source-xyz :url="urlTileBase"></vl-source-xyz>
             </vl-layer-tile>
+            -->
 
             <!-- CAPAS WMTS -->    
             <vl-layer-tile
             v-if="activeTab === 'raster'"
             id="wmts" 
-            :z-index="0">
+            :z-index="1">
                 <vl-source-wmts 
-                :attributions="activeMap.attribution" 
                 :url="activeMap.url" 
                 :layer-name="activeMap.layerName" 
-                :matrixSet="activeMap.matrixSet" 
+                :matrixSet="activeMap.matrixSet"
                 :format="activeMap.format" 
                 :style-name="activeMap.styleName">
                 </vl-source-wmts>
@@ -46,7 +58,7 @@
             <!--GEOMETRIAS MAPA -->
 
             <!--Geometrias de job--> 
-            <vl-layer-vector :z-index="1">
+            <vl-layer-vector :z-index="2">
                 <vl-source-vector :features.sync="jobs" ident="jobs"></vl-source-vector>
                 <vl-style-box>
                     <vl-style-stroke color="blue" :width="4"></vl-style-stroke>
@@ -163,7 +175,7 @@
         </vl-map>     
 
         <!--PANEL DE CONTROL -->
-        <div style="float: right; height: 0rem">
+        <div class="toolPanelWrapper">
             <div class="toolPanelContainer">
                 <v-card-actions class="topBarToolPanel">
                     <div
@@ -582,7 +594,7 @@
             transition="fade-transition"
             type="info"
             color="#9fbce3"
-            style="top: -15rem; margin: auto; max-width: 30rem"
+            class="toolHelpContainer"
             >
                 <v-col cols="12">
                     {{ayudaHerramienta.mensaje}}
@@ -1125,7 +1137,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                 this.deactivateSelectTool('Jobs');
                 this.toolActive = this.errorPanel[1].active;
                 this.drawType = null;
-                this.showToolHelp('Haga clic sobre un error para seleccionarlo. El color azul indica que el error ha sido seleccionado')
+                this.showToolHelp('Haga clic sobre un error para seleccionarlo. El color rojo indica que el error ha sido seleccionado')
                 setTimeout(this.closeToolHelp, 3000);
             },
 
@@ -1337,7 +1349,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                 this.deactivateSelectTool('Errores');
                 this.toolActive = this.jobsPanel[1].active;
                 this.drawType = null;
-                this.showToolHelp('Haga clic sobre un job para seleccionarlo. El color azul indica que el job ha sido seleccionado')
+                this.showToolHelp('Haga clic sobre un job para seleccionarlo. El color rojo indica que el job ha sido seleccionado')
                 setTimeout(this.closeToolHelp, 3000);
             },
 
@@ -1381,15 +1393,18 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
             activeMap: null,
 
             //VIEW
-            zoom: 5.5,
-            minZoom: 5.5,
+            zoom: 5,
+            minZoom: 5,
             center: [ -386025.74417069746, 4683331.210786856 ],
 
             //CONTROL CAPAS
             activeTab: 'raster',    //Valor por defecto
 
             //SOURCE VECTOR TILE (En pruebas)
-            urlTileBase: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}',
+            urlTileBase: "https://www.ign.es/wmts/ign-base",
+            layerBaseName: "MTN_Fondo",
+            baseEPSG: "EPSG:3857",
+            baseStyle: "default",
             vectorTileServices:[
                 {
                     url: 'https://basemaps-api.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/tile/11/791/1016.pbf?token=AAPK9bd1fbc69f0b41c1acbefc67a6ec3738_dA6L31Mo_jYLwhQ5awh_9wMAP_c_ov-WxHn1ePvss9fM09ZH2WFioY8ZDmWJc8F',
@@ -1711,6 +1726,17 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
 
     .toolContainer {
         margin: 0rem 0.5rem;
+    }
+
+    .toolPanelWrapper {
+        float: right; 
+        height: 0rem;
+    }
+
+    .toolHelpContainer {
+        top: -15rem;
+        margin: auto;
+        max-width: 30rem;
     }
 
     .switches {
