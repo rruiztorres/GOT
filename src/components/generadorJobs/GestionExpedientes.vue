@@ -12,9 +12,9 @@
       <!--PANEL ACCIONES SUPERIOR -->
       <v-card elevation="0">
         <v-row class="panelFuncionesCard">
-          <v-col cols="12" md="6">
+          <v-col cols="12" md="8">
             <v-row class="buttonGroup">
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-btn
                   class="btn"
                   :disabled="selected.length != 0"
@@ -29,7 +29,7 @@
                   NUEVO EXP.
                 </v-btn>
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-btn
                   class="btn"
                   :disabled="checkAction('Cerrar')"
@@ -40,7 +40,7 @@
                   CERRAR
                 </v-btn>
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-btn
                   class="btn"
                   :disabled="checkAction('Abrir')"
@@ -51,9 +51,19 @@
                   VOLVER A ABRIR
                 </v-btn>
               </v-col>
+              <v-col cols="12" md="3">
+                <v-btn
+                  class="btn"
+                  dark
+                  color="error"
+                  :disabled="checkAction('Abrir')"
+                >
+                  ELIMINAR
+                </v-btn>
+              </v-col>
             </v-row>
           </v-col>
-          <v-col cols="12" md="6">
+          <v-col cols="12" md="4">
             <v-text-field
               class="textField"
               v-model="search"
@@ -76,12 +86,25 @@
         show-select
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <v-btn title="editar" icon dark class="editButton" :disabled="item.finalizado === true"
-            ><v-icon @click="dummy(item)"> mdi-lead-pencil </v-icon></v-btn
+          <v-btn 
+          title="editar" 
+          icon dark 
+          class="editButton" 
+          :disabled="item.finalizado === true"
+          @click="showEditExp(item)"
           >
-          <v-btn title="ver estado" icon dark class="infoButton" :disabled="item.finalizado === true"
-            ><v-icon @click="showStateExp(item)"> mdi-chart-areaspline </v-icon></v-btn
+            <v-icon> mdi-lead-pencil </v-icon>
+          </v-btn>
+
+          <v-btn 
+          title="ver estado" 
+          icon dark 
+          class="infoButton" 
+          :disabled="item.finalizado === true"
+          @click="showStateExp(item)"
           >
+            <v-icon >mdi-chart-areaspline</v-icon>
+          </v-btn>
         </template>
 
         <template v-slot:no-data>
@@ -99,6 +122,19 @@
     <!--VENTANA NUEVO EXPEDIENTE-->
     <v-overlay :value="showWindowNewExp">
       <NuevoExpediente
+        :edit="false"
+        tituloVentana="NUEVO EXPEDIENTE"
+        @closed="closeWindowExp"
+        @updateExp="updateStoredExp"
+      ></NuevoExpediente>
+    </v-overlay>
+
+    <!--VENTANA EDITAR EXPEDIENTE-->
+    <v-overlay :value="showWindowEditExp">
+      <NuevoExpediente
+        :edit="true"
+        :editarExpediente="editarExpediente"
+        tituloVentana="EDITAR EXPEDIENTE"
         @closed="closeWindowExp"
         @updateExp="updateStoredExp"
       ></NuevoExpediente>
@@ -206,6 +242,10 @@ export default {
     //NUEVO EXPEDIENTE
     showWindowNewExp: false,
 
+    //EDITAR EXPEDIENTE
+    showWindowEditExp: false,
+    editarExpediente: undefined,
+
     //ESTADO EXPEDIENTE
     showStateExpWindow: false,
     mostrarEstadoExp: undefined,
@@ -237,6 +277,11 @@ export default {
     showStateExp(expediente){
       this.mostrarEstadoExp = expediente;
       this.showStateExpWindow = true;
+    },
+
+    showEditExp(expediente){
+      this.editarExpediente = expediente;
+      this.showWindowEditExp = true;
     },
 
     checkAction(isopen){
@@ -312,10 +357,13 @@ export default {
     closeWindowExp(closed) {
       if (closed == true) {
         this.showWindowNewExp = false;
+        this.showWindowEditExp = false;
       }
     },
 
     initialize() {
+      //REINICIO EXPEDIENTES
+      this.expedientes = [];
       axios
         .get(`${process.env.VUE_APP_API_ROUTE}/expedientes`)
         //se realiza el filtro para los jobs en triaje y la asignación del job_id

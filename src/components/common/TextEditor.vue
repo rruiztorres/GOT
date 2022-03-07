@@ -94,12 +94,21 @@ export default {
   components: {
     EditorContent,
   },
-
+  
   props: {
     value: {
       type: String,
       default: 'Introduzca el texto aquí',
     },
+
+    edit: {
+      type: Boolean,
+      default: false,
+    },
+
+    getObservaciones: {
+      type: String,
+    }
   },
 
   data() {
@@ -111,7 +120,6 @@ export default {
   methods:{
     addImage() {
       const url = window.prompt('URL')
-
       if (url) {
         this.editor.chain().focus().setImage({ src: url }).run()
       }
@@ -120,33 +128,30 @@ export default {
 
   watch: {
     value(value) {
-      // HTML
-      const isSame = this.editor.getHTML() === value
-
-      // JSON
-      // const isSame = this.editor.getJSON().toString() === value.toString()
-
-      if (isSame) {
-        return
+      //MODO CREACIÓN
+      if(this.edit === false){
+        const isSame = this.editor.getHTML() === value
+        if (isSame) {return}
+        this.editor.commands.setContent(this.value, false)
       }
-
-      this.editor.commands.setContent(this.value, false)
     },
+
+    getObservaciones(){
+      //MODO EDICION
+      if(this.edit === true){
+        const isSame = this.editor.getHTML() === this.getObservaciones
+        if (isSame) {return}
+        this.editor.commands.setContent(this.getObservaciones, false)
+      }
+    }
   },
 
   mounted() {
     this.editor = new Editor({
-      extensions: [
-        StarterKit,
-        Image,
-      ],
+      extensions: [StarterKit, Image,],
       content: this.value,
       onUpdate: () => {
-        // HTML
         this.$emit('editor', this.editor.getHTML())
-
-        // JSON
-        // this.$emit('input', this.editor.getJSON())
       },
     })
   },

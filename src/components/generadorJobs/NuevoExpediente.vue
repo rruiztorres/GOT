@@ -2,7 +2,7 @@
   <div>
     <v-card light class="newExpContainer">
       <v-card-title class="newExpTitle">
-        NUEVO EXPEDIENTE
+        {{tituloVentana}}
         <v-spacer></v-spacer>
         <v-card-actions>
           <v-btn class="newExpBtn" color="error" dark @click="closeExpediente"
@@ -24,6 +24,7 @@
           <v-col cols="12">
             <h3 title="obligatorio">Número de Expediente <b>*</b></h3>
             <v-text-field
+            :disabled="bloqNexp"
               v-model="nExp"
               filled
               :rules="[rules.required, rules.formNumExp]"
@@ -36,7 +37,12 @@
           <v-col cols="12">
             <h3 title="obligatorio">Observaciones <b>*</b></h3>
             <div>
-              <TextEditor @editor="storeObservationsExp"></TextEditor>
+              <TextEditor 
+                :getObservaciones="observaciones"
+                :edit="edit"
+                @editor="storeObservationsExp"
+              >
+              </TextEditor>
             </div>
             <div class="obsLengthContainer">
               <h5 v-if="returnObservacionesLength()<=255" class="obsLengthOK">{{returnObservacionesLength()}}</h5>
@@ -104,6 +110,7 @@
     <template>
       <v-dialog v-model="mensajeFlotante.visibilidad" max-width="49rem">
         <v-alert
+          class="floatMsg"
           :color="mensajeFlotante.color"
           :type="mensajeFlotante.type"
           prominent
@@ -133,15 +140,26 @@ import TextEditor from "@/components/common/TextEditor";
 export default {
   name: "NuevoExpediente",
   components: { TextEditor },
+  props: ['edit', 'editarExpediente', 'tituloVentana'],
 
   mounted() {
     this.initializeParameters();
     this.retrieveExpFromBD();
+    
   },
 
   methods: {
     initializeParameters() {
-      this.storeObservationsExp("");
+      if(this.edit !== true){
+        this.storeObservationsExp("");
+      } else {
+        //MODO EDICION
+        this.nExp = this.editarExpediente.expediente;
+        this.bloqNexp = true;
+        this.fechaInicio = this.editarExpediente.fecha;
+        this.observaciones = this.editarExpediente.textoPlano;
+        this.finalizado = false;
+      }
     },
 
     returnObservacionesLength(){
@@ -177,48 +195,78 @@ export default {
           true
         );
       } else {
-        // comprobamos que expediente no existe ya en BD
-        this.compruebaExp = "ok";
-        for (this.index in this.expedientesBD) {
-          if (this.expedientesBD[this.index].expediente == datos.numExp) {
-            this.throwMessage(
-              "red",
-              "error",
-              "El número de expediente ya existe",
-              true
-            );
-            this.compruebaExp = "error";
+        if(this.edit === false){
+          // comprobamos que expediente no existe ya en BD
+          this.compruebaExp = "ok";
+          for (this.index in this.expedientesBD) {
+            if (this.expedientesBD[this.index].expediente == datos.numExp) {
+              this.throwMessage(
+                "red",
+                "error",
+                "El número de expediente ya existe",
+                true
+              );
+              this.compruebaExp = "error";
+            }
           }
+        } else {
+          this.compruebaExp = "ok";
         }
       }
       return this.compruebaExp;
     },
 
     saveExpediente() {
-      let newExp = {
-        numExp: this.nExp,
-        fechaInicio: this.fechaInicio,
-        fechaFin: this.fechaFin,
-        observaciones: this.observaciones,
-        finalizado: false,
-      };
-      const datosCorrectos = this.checkData(newExp);
-      if (datosCorrectos == "ok") {
-        axios
-          .post(`${process.env.VUE_APP_API_ROUTE}/expediente`, newExp)
-          .then((data) => {
-            if (data.status == 201) {
-              this.throwMessage(
-                "green",
-                "success",
-                `Expediente ${this.nExp} creado correctamente`,
-                true
-              );
-              this.initializeParameters();
+      //EXPEDIENTES NUEVOS
+      if(this.edit !== true){
+        let newExp = {
+          numExp: this.nExp,
+          fechaInicio: this.fechaInicio,
+          fechaFin: this.fechaFin,
+          observaciones: this.observaciones,
+          finalizado: false,
+        };
+        const datosCorrectos = this.checkData(newExp);
+        if (datosCorrectos == "ok") {
+          axios
+            .post(`${process.env.VUE_APP_API_ROUTE}/expediente`, newExp)
+            .then((data) => {
+              if (data.status == 201) {
+                this.throwMessage("green", "success", `Expediente ${this.nExp} creado correctamente`, false);
+                setTimeout(this.closeInfoMessage, 1500)
+                this.initializeParameters();
+                this.$emit("updateExp", true);
+              }
+            });
+        }
+      } //EXPEDIENTES EDITADOS
+        else {
+          let newExp = {
+            expediente: this.nExp,
+            fecha: this.fechaInicio,
+            fechaFin: this.fechaFin,
+            observaciones: this.observaciones,
+            finalizado: false,
+          };
+          const datosCorrectos = this.checkData(newExp);
+          if (datosCorrectos == "ok") {
+            this.proceso = 0;
+            axios
+            .put(`${process.env.VUE_APP_API_ROUTE}/updateExpediente`, newExp)
+            .then((data)=> {
+              if (data.status == 203){
+                this.proceso = 1;
+              }
+            })
+            if (this.proceso === 0){
+              this.throwMessage("green", "success", `Expediente ${this.nExp} editado correctamente`, false);
+              setTimeout(this.closeInfoMessage, 1500)
               this.$emit("updateExp", true);
             }
-          });
-      }
+            
+          }
+
+        }
     },
 
     throwMessage(color, tipo, mensaje, aceptar) {
@@ -245,6 +293,7 @@ export default {
 
       observaciones: "",
       nExp: "",
+      bloqNexp: false,
       expedientesBD: [],
 
       visibilidadMensajeInfo: true,
