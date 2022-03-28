@@ -57,6 +57,7 @@
                   dark
                   color="error"
                   :disabled="checkAction('Abrir')"
+                  @click="deleteExpedientes"
                 >
                   ELIMINAR
                 </v-btn>
@@ -269,6 +270,22 @@ export default {
   },
 
   methods: {
+    deleteExpedientes(){
+      const expedienteBorrar = this.selected;
+      axios
+      .delete(`${process.env.VUE_APP_API_ROUTE}/deleteExpediente`, {data: expedienteBorrar})
+      .then((data) => {
+        if(data.status === 201){
+          this.initialize();
+          this.throwMessage('green', 'success', 'Expedientes eliminados correctamente', false);
+          setTimeout(this.closeInfoMessage, 1500)
+          this.selected = [];
+        } else {
+          this.throwMessage("red", "error", "Ocurrió un error inesperado, por favor revise los datos", false);
+          setTimeout(this.closeInfoMessage, 1500)
+        }
+      })
+    },
 
     closeEstadoExp(data){
       this.showStateExpWindow = data

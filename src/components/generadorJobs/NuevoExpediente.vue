@@ -188,24 +188,14 @@ export default {
         datos.numExp == "" ||
         datos.observaciones == ""
       ) {
-        this.throwMessage(
-          "red",
-          "error",
-          "Los campos Número Expediente, Observaciones y Fecha Inicio son obligatorios",
-          true
-        );
+        this.throwMessage("red", "error", "Los campos Número Expediente, Observaciones y Fecha Inicio son obligatorios", true);
       } else {
         if(this.edit === false){
           // comprobamos que expediente no existe ya en BD
           this.compruebaExp = "ok";
           for (this.index in this.expedientesBD) {
             if (this.expedientesBD[this.index].expediente == datos.numExp) {
-              this.throwMessage(
-                "red",
-                "error",
-                "El número de expediente ya existe",
-                true
-              );
+              this.throwMessage("red", "error", "El número de expediente ya existe", true);
               this.compruebaExp = "error";
             }
           }
@@ -217,56 +207,44 @@ export default {
     },
 
     saveExpediente() {
-      //EXPEDIENTES NUEVOS
-      if(this.edit !== true){
-        let newExp = {
-          numExp: this.nExp,
-          fechaInicio: this.fechaInicio,
-          fechaFin: this.fechaFin,
-          observaciones: this.observaciones,
-          finalizado: false,
-        };
-        const datosCorrectos = this.checkData(newExp);
-        if (datosCorrectos == "ok") {
-          axios
-            .post(`${process.env.VUE_APP_API_ROUTE}/expediente`, newExp)
-            .then((data) => {
-              if (data.status == 201) {
-                this.throwMessage("green", "success", `Expediente ${this.nExp} creado correctamente`, false);
-                setTimeout(this.closeInfoMessage, 1500)
-                this.initializeParameters();
-                this.$emit("updateExp", true);
-              }
-            });
-        }
-      } //EXPEDIENTES EDITADOS
-        else {
-          let newExp = {
+      let newExp = {
             expediente: this.nExp,
             fecha: this.fechaInicio,
             fechaFin: this.fechaFin,
             observaciones: this.observaciones,
             finalizado: false,
           };
-          const datosCorrectos = this.checkData(newExp);
+      const datosCorrectos = this.checkData(newExp);
+      this.proceso = 0;
+
+      if(this.edit !== true){
+        //CREACION DE EXPEDIENTE
+        if (datosCorrectos == "ok") {
+          axios
+            .post(`${process.env.VUE_APP_API_ROUTE}/expediente`, newExp)
+            .then((data) => {
+              if (data.status === 201) {this.initializeParameters();} 
+              else { this.proceso = 1; }
+            });
+        }
+      } else {
+        //EDICIÓN EXPEDIENTE
           if (datosCorrectos == "ok") {
-            this.proceso = 0;
             axios
             .put(`${process.env.VUE_APP_API_ROUTE}/updateExpediente`, newExp)
             .then((data)=> {
-              if (data.status == 203){
-                this.proceso = 1;
-              }
-            })
-            if (this.proceso === 0){
-              this.throwMessage("green", "success", `Expediente ${this.nExp} editado correctamente`, false);
-              setTimeout(this.closeInfoMessage, 1500)
-              this.$emit("updateExp", true);
-            }
-            
+              if (data.status === 203){this.proceso = 1;}
+            })     
           }
-
         }
+      
+      if(this.proceso === 0){
+        this.throwMessage("green", "success", `Datos guardados correctamente`, false);
+        this.$emit("updateExp", true);
+      } else {
+        this.throwMessage("red", "error", `Error inesperado, por favor, revise los datos`, false);
+      }
+      setTimeout(this.closeInfoMessage, 1500)
     },
 
     throwMessage(color, tipo, mensaje, aceptar) {
