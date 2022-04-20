@@ -34,11 +34,11 @@ import Loader from "@/components/common/Loader";
 import Navigation from "@/components/common/Navigation";
 
 //mixins
-import { roles } from "@/assets/mixins/roles.js";
+import {getDefaultPanel} from "@/assets/mixins/getDefaultPanel";
 
 export default {
   name: "Dashboard",
-  mixins: [roles],
+  mixins: [getDefaultPanel],
   components: {
     Navigation,
     Loader,
@@ -54,14 +54,11 @@ export default {
   },
 
   methods: {
-    //asigna el panel que debe activarse de acuerdo al array "roles" recibido como mixin property.
+    //Asigna el panel que debe activarse por defecto. El panel por defecto se configura en la funcion getDefaultPanel
+    //TODO: Parametro configurable en panel admin
     initialize() {
-      this.rolDefault = localStorage.rol;
-      for (this.rol in roles) {
-        if (roles[this.rol].name == this.rolDefault) {
-          this.newMenu = roles[this.rol].default;
-        }
-      }
+      this.userRole = localStorage.rol;
+      this.newMenu = this.getDefaultPanel(localStorage.rol)
     },
 
     cambiarMenu(data) {
@@ -70,12 +67,10 @@ export default {
   },
 
   data() {
-    const userRole = "Generador de Jobs";
     let newMenu = this.newMenu;
 
     return {
         drawer:null,
-        userRole,
         newMenu,
     };
   },

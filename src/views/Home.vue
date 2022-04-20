@@ -111,10 +111,10 @@ export default {
         .post(`${process.env.VUE_APP_API_ROUTE}/auth/${usrlogin.usuario}/${usrlogin.password}`, usrlogin)
         .then((data) => {
           if (data.status == 201) {
+            localStorage.usrName = usrlogin.usuario
             localStorage.token = data.data.token;
             localStorage.usuario = data.data.usuario;
             localStorage.rol = data.data.defaultRole;
-            localStorage.usrRoles = data.data.usrRoles;
             this.$router.push("Dashboard");
             }
           })

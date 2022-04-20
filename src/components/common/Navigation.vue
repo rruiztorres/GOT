@@ -30,7 +30,7 @@
               <v-col cols="4">
                 <v-btn title="Avisos" dark color="#2563EB">
                   <!-- MUESTRA NOTIFICACIONES EN BOTONES
-                    <v-badge overlap content="1" color="error">
+                    <v-badge overlap content="3" color="error">
                     <v-icon title="Avisos" dark>mdi-bell-outline</v-icon>
                   </v-badge>-->
                   <v-icon title="Avisos" dark>mdi-bell-outline</v-icon>
@@ -77,12 +77,11 @@
 
           <!-- SELECCION DE ROL -->
           <v-list nav dense>
-            <v-list-item-group v-model="selectedItem" color="primary">
+            <v-list-item-group v-model="activeRole" color="primary">
               <v-list-item v-for="rol in roles" :key="rol.name"  @click="changeRol(rol)">
                 <v-list-item-icon>
                   <v-icon v-text="rol.icon"></v-icon>
                 </v-list-item-icon>
-
                 <v-list-item-content>
                   <v-list-item-title class="userRole">{{rol.name}}</v-list-item-title>
                 </v-list-item-content>
@@ -132,6 +131,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 //components
 import NavGJ from "@/components/generadorJobs/NavGJ";
 import NavOpEsp from "@/components/operadorEsp/NavOpEsp";
@@ -140,20 +141,45 @@ import NavSopBDIG from "@/components/soporteBDIG/NavSopBDIG"
 import NavGOTAdmin from "@/components/GOTAdmin/NavGOTAdmin";
 import NavGestor from "@/components/gestor/NavGestor";
 
-
 //mixins
-import { roles } from "@/assets/mixins/roles.js";
+import { getUserNavIcons } from "@/assets/mixins/getUserNavIcons";
+import { getDefaultPanel } from "@/assets/mixins/getDefaultPanel";
 
 export default {
   name: "Navigation",
-
-  mixins: [roles],
-
+  mixins: [getUserNavIcons, getDefaultPanel],
   components: { NavGJ, NavOpEsp, Ccalidad, NavSopBDIG, NavGOTAdmin, NavGestor, },
 
-  jobsBdjaOpEsp: { default: 0 },
+  created(){
+    this.initialize();
+  },
 
   methods: {
+    async initialize(){
+      await axios
+      .get(`${process.env.VUE_APP_API_ROUTE}/getUserRoles/`+ this.usr)
+      .then((data) => {
+        this.rolesBD = data.data.roles;
+        for(this.index in this.rolesBD){
+          this.newRole = {
+            name: this.rolesBD[this.index],
+            icon: this.getUserNavIcons(this.rolesBD[this.index]),
+            default: this.getDefaultPanel(this.rolesBD[this.index])
+          }
+          this.roles.push(this.newRole)          
+        }
+        //MARCAR ROL ACTIVO EN MENU
+        this.activeRole = this.activeRoleMenu(localStorage.rol)
+      })      
+    },
+
+    activeRoleMenu(rol){
+      for (this.index in this.roles){
+        if (rol === this.roles[this.index].name){
+          return parseInt(this.index)
+        }
+      }
+    },
 
     changeMenu(data) {
       this.newMenu = data;
@@ -180,10 +206,11 @@ export default {
       closeOnClick: true,
       drawer: true,
       menu: false,
+      usr: localStorage.usrName,
       userName: localStorage.usuario,
       userRole: localStorage.rol,
-      roles, //desde mixins configuramos fuera
-      selectedItem: 0,
+      roles: [],
+      activeRole: 1,
       items: [
         { }
       ]
