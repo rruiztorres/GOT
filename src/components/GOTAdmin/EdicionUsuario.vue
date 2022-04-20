@@ -17,14 +17,12 @@
             dark
           >
             <v-tab class="fontControl">Datos</v-tab>
-            <v-tab class="fontControl">Seguridad</v-tab>
-            <v-tab class="fontControl">Permisos</v-tab>
+            <v-tab class="fontControl">Roles</v-tab>
 
             <v-tabs-slider color="#76aff5"></v-tabs-slider>
 
             <v-tab-item><DatosUsuario :usuario="usuario"></DatosUsuario></v-tab-item>
-            <v-tab-item>Seguridad</v-tab-item>
-            <v-tab-item>Status</v-tab-item>
+            <v-tab-item>Roles</v-tab-item>
 
 
           </v-tabs>

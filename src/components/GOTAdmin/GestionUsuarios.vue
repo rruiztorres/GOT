@@ -16,14 +16,26 @@
             <v-col cols="12" md="7">
               <v-row class="buttonGroup">
                 <v-col cols="12" md="4">
-                  <v-btn class="btn" dark color="success">
+                  <v-btn 
+                  class="btn" dark color="success"
+                  @click="newUser"
+                  >
                     <v-icon>mdi-plus</v-icon>
                     NUEVO USUARIO
                   </v-btn>
                 </v-col>
                 <v-col cols="12" md="4">
-                  <v-btn class="btn" dark color="error">
+                  <v-btn class="btn" dark color="error"
+                  @click="disableUser(false)"
+                  >
                     DESACTIVAR USUARIO
+                  </v-btn>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-btn class="btn" dark color="success"
+                  @click="disableUser(true)"
+                  >
+                    ACTIVAR USUARIO
                   </v-btn>
                 </v-col>
               </v-row>
@@ -43,9 +55,13 @@
         <v-data-table
           :headers="userHeaders"
           :items="usuarios"
-          key="id"
+          item-key="id_usuario"
           :search="search"
+          v-model="selected"
           show-select
+          :single-expand="singleExpand"
+          :expanded.sync="expanded"
+          show-expand
         >
           <template v-slot:[`item.activo`]="{ item }">
             <v-chip :color="getColor(item.activo)" small dark>
@@ -53,9 +69,9 @@
             </v-chip>
           </template>
 
-          <template v-slot:[`item.username`]="{ item }">
+          <template v-slot:[`item.usuario`]="{ item }">
             <span style="color:blue; text-decoration:underline;">{{
-              item.username
+              item.usuario
             }}</span>
           </template>
 
@@ -71,66 +87,161 @@
             </v-btn>
           </template>
 
+          <!-- PANEL EXPANSION -->
+          <template v-slot:expanded-item="{ item }">
+              <td colspan="5"></td>
+              <td class="expansionPanel">
+                <b>Otros roles del usuario:</b>
+                <br/>
+                <ul v-for="role in item.roles" :key="role">
+                  <li>{{role}}</li>
+                </ul>
+              </td>
+          </template>
+
           <template v-slot:top>
-            <!-- VENTANA EDICION JOB -->
+            <!-- VENTANA EDICION USUARIO -->
             <v-overlay
-              :value="dialog"
+              :value="editDialog"
               transition="dialog-bottom-transition"
             >
               <EdicionUsuario :usuario="user" @closed="closeEdicion"></EdicionUsuario>
             </v-overlay>
+
+            <!-- VENTANA NUEVO USUARIO -->
+            <v-overlay
+              :value="newUserDialog"
+              transition="dialog-bottom-transition"
+            >
+              <NuevoUsuario @close="closeNewUser"></NuevoUsuario>
+            </v-overlay>
           </template>
+          
         </v-data-table>
       </div>
     </v-card>
+
+    <!--MENSAJES DE INFORMACION-->
+    <v-overlay :value="showMessage">
+        <v-alert
+        :color="messageType"
+        dark
+        border="top"
+        icon="mdi-alert-circle-outline"
+        transition="scale-transition"
+        >
+        {{ message }}
+        </v-alert>
+    </v-overlay> 
   </div>
 </template>
 
 <script>
+import axios from 'axios';
 import {getColor} from "@/assets/mixins/getColor";
+
 import EdicionUsuario from "@/components/GOTAdmin/EdicionUsuario";
+import NuevoUsuario from "@/components/GOTAdmin/NuevoUsuario";
 
 export default {
   name: "GestionUsuarios",
   mixins: [getColor],
-  components: {EdicionUsuario},
+  components: {EdicionUsuario, NuevoUsuario},
 
     data() {
         return {
         foo: null,
         search: '',
-        dialog: false,
+        editDialog: false,
+        newUserDialog: false,
         user: undefined,
+        selected: undefined,
+        expanded: [],
+        singleExpand: true,
+
+        showMessage: false,
+        messageType: 'info',
+        message: 'undefined',
+
         userHeaders: [
             { text: "Nombre", align: "start", sortable: true, value: "nombre" },
             { text: "Apellidos", align: "start", sortable: true, value: "apellidos" },
-            { text: "Grupo Trabajo", align: "start", sortable: true, value: "grupo" },
-            { text: "Nombre usuario", align: "start", sortable: true, value: "username"},
-            { text: "Fecha Alta", align: "start", sortable: true, value: "fechaAlta" },
+            { text: "Nombre usuario", align: "start", sortable: true, value: "usuario"},
+            { text: "Rol por defecto", align: "start", sortabable: true, value: "rol_defecto"},
+            { text: "Fecha Alta", align: "start", sortable: true, value: "f_creacion" },
+            { text: "Fecha Baja", align: "start", sortable: true, value: "fechaBaja" },
             { text: "Activo", align: "start", sortable: true, value: "activo" },
-            { text: "Organización", align: "start", sortable: true, value: "organizacion" },
             { text: "Editar", align: "start", sortable: true, value: "actions" },
         ],
-        usuarios: [
-            { nombre: 'Raúl', apellidos: 'Ruiz Torres', grupo:'Operadores, Generador de Jobs, Soporte BDIG', username: 'rrtorres', fechaAlta: '01-01-2022', id:1, activo: true, organizacion: 'IGN'},
-            { nombre: 'Pepe', apellidos: 'Pérez García', grupo:'Operadores', username: 'pperez', fechaAlta: '10-01-2022', id:2, activo: true, organizacion: 'IGN'},
-            { nombre: 'John', apellidos: 'Doe', grupo:'Generador de Jobs', username: 'jdoe', fechaAlta: '03-02-2022', id:3, activo: true, organizacion: 'Mapitas s.a.'},
-            { nombre: 'Jane', apellidos: 'Doe', grupo:'Soporte BDIG', username: 'jadoe', fechaAlta: '25-01-2022', id:4, activo: false, organizacion: 'Mapitas s.a.'},
-        ]
+        usuarios: undefined,
         };
     },
 
+    created(){
+      this.initialize();
+    },
+
     methods:{
+
+        closeInfoMsg(){
+          this.showMessage = false;
+        },
+
+        async initialize(){
+          this.usuarios = [];
+          
+          await axios
+          .get(`${process.env.VUE_APP_API_ROUTE}/getUsers`)
+          .then((data) => {
+            this.usuarios = data.data.usuarios;
+          })
+        },
+
+        async disableUser(disable){
+          this.proceso = 0;
+          this.mensaje = undefined;
+          for (this.index in this.selected){
+            this.selected[this.index].activo = disable; //True - false
+            axios 
+            .put(`${process.env.VUE_APP_API_ROUTE}/updateUser`, this.selected[this.index])
+            .then((data) => {
+              if(data.status === 203){
+                this.proceso = 1
+              }
+            })
+          }
+          if(this.proceso == 0){
+            this.showMessage = true;
+            this.messageType = 'success';
+            this.message = 'Cambios realizados en usuario.'
+
+            this.initialize();
+            setTimeout(this.closeInfoMsg, 2000)
+            this.selected = [];
+          }
+        },
+
+        newUser(){
+          this.newUserDialog = true;
+        },
+
         editUser(user){
-            this.dialog = true;
+            this.editDialog = true;
             this.user = user;
         },
 
         closeEdicion(data){
           if(data == false){
-            this.dialog = data;
+            this.editDialog = data;
           }
-        }
+        },
+
+        closeNewUser(data){
+          if(data === false){
+            this.newUserDialog = data
+            this.initialize();
+          }
+        },
     }
 };
 </script>
@@ -148,5 +259,9 @@ export default {
     .textField {
         background-color: white;
         padding: 0.5rem;
+    }
+
+    .expansionPanel {
+      padding: 1rem 0rem 1rem 0rem !important;
     }
 </style>

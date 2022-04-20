@@ -1,26 +1,43 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import Dashboard from '../views/Dashboard.vue'
+
+function autentication(){
+  //COMPROBACION DE TOKENS EN LUGAR DE LOCALSTORAGE??
+  if(localStorage.usrName !== undefined && localStorage.token !== undefined){
+    return true;
+  } else {
+    return false;
+  }
+}
+
 
 Vue.use(VueRouter)
-
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: () => import ('../views/Home.vue'),
   },
+
   {
     path: '/dashboard',
-    name: 'Dashboard',
-    component: Dashboard,
+    component: () => import ('../views/Dashboard.vue'),
+    beforeEnter: (to, from, next) => {        
+      if(autentication() === true){
+        next();     //permitir navegacion
+      } else {
+        next('/')   //ir a login
+      }
+    },
+    
   },
 ]
 
+
+// TODO: Correccion rutas automatico al desplegar
 const router = new VueRouter({
-  base: '/got',
-  //base: '/',
+  base: '/got',             //dev
+  //base: '/',              //prod
   mode: 'history',
   routes
 })
