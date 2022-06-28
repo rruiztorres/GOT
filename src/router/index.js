@@ -34,10 +34,8 @@ const routes = [
 ]
 
 
-// TODO: Correccion rutas automatico al desplegar
 const router = new VueRouter({
-  base: '/got',             //dev
-  //base: '/',              //prod
+  base: '/got',        
   mode: 'history',
   routes
 })

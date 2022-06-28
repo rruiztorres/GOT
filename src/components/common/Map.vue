@@ -833,7 +833,6 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
         },
 
         watch:{
-
             //CALLBACK DESDE SITUARTOPONIMO
             localizacion(){
                 if(this.localizacion != undefined){                   
@@ -1209,7 +1208,7 @@ import FormularioDatosError from '@/components/common/FormularioDatosError';
                     this.objeto.expediente.unshift(this.expedienteNull)
 
                     //Añadimos opcion null para la eleccion operadores
-                    this.operadorNull = {id_operador: null, nombre_operador: '', usr_operador: null, rol_operador: null}
+                    this.operadorNull = {id_operador: null, nombre_operador: '-Cualquiera-', usr_operador: null, rol_operador: null}
                     this.objeto.operador.unshift(this.operadorNull)
 
                     //makeArrayFromApi (objetoAPI, arrayCrear, columnaBD)
